@@ -183,22 +183,6 @@
                     <input type="text" id="commaVal" value=",">
                 </div>
             </div>
-            
-            <div class="option-group">
-                <h3>Link Replacement Options</h3>
-                <div class="option">
-                    <label for="isReplaceLinks">Enable Link Replacement:</label>
-                    <input type="checkbox" id="isReplaceLinks" checked>
-                </div>
-                <div class="option">
-                    <label for="aliasPrefix">Alias Prefix:</label>
-                    <input type="text" id="aliasPrefix" value="XX_00">
-                </div>
-                <div class="option" style="display: none;">
-                    <label for="currentHeader">Current Header:</label>
-                    <input type="text" id="currentHeader" value="DisclaimerText">
-                </div>
-            </div>
         </div>
     </div>
 
@@ -206,99 +190,16 @@
         // Define constants
         const regTag = `<sup style="vertical-align: top; font-size: 80%; line-height: 120%; mso-ansi-font-size:90%;">&#174;</sup>`;
         const tmTag = `&#8482;`;
-        const tag2 = `?utm_medium=email&utm_source=%%__AdditionalEmailAttribute1%%&utm_campaign=%%__AdditionalEmailAttribute2%%&utm_content=%%=format(xtshortdate,"yyyyMMdd")=%%_j%%jobid%%_%%=iif(empty(@dst_segmentKey),concat("u",subscriberid),concat("e",@dst_segmentKey))=%%_d8l&utm_term=%%LoyaltyAccountType%%&dst=%%=v(@dst_degSendID)=%%&utm_launch=%%=Format(xtshortdate,"yyyy-MM-dd")=%%&member-id=%%SubscriberProfileGUID%%" target="_blank" style="text-decoration: underline; color: #00aef1; font-weight:normal;">`;
-
-        const escapeRegExp = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
         const cleanUp = (text) => {
             // Get options from the UI
             const isReplaceChars = document.getElementById('isReplaceChars').checked;
-            const hyphenVal = document.getElementById('hyphenVal').value || "&shy;";
+            const hyphenVal = document.getElementById('hyphenVal').value || "-;";
             const commaVal = document.getElementById('commaVal').value || ",";
             
-            // Link replacement options
-            const isReplaceLinks = document.getElementById('isReplaceLinks').checked;
-            const aliasPrefix = document.getElementById('aliasPrefix').value || "XX_00";
-            const currentHeader = document.getElementById('currentHeader').value || "DisclaimerText";
-            
             if (!text) return "";
-            
-            // Link replacement constants
-            const tag1 = `<span style="display: inline-block;"><a alias="`;
-            const tag1Close = `" href="`;
-            const tag3 = `</a>`;
-            const tag4 = `</span>`;
-            
-            // URL pattern
-            const urlPattern = /(https?:\/\/[^\s]+|www\.[^\s]+|[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})(:\d+)?(\/[^\s]*)?/gi;
-            const tag2Pattern = new RegExp(`<a[^>]*${escapeRegExp(tag2)}[^>]*>[\\s\\S]*?<\\/a>`, "gi");
 
-            // PROTECTION PHASE - Protect ALL HTML elements before any replacements
-            let spanBlocks = [];
-            let allLinkBlocks = [];
-            let tag2Blocks = [];
-
-            // Protect ALL <span> tags
-            text = text.replace(/<span[\s\S]*?<\/span>/gi, (match) => {
-                spanBlocks.push(match);
-                return `__SPAN_PLACEHOLDER_${spanBlocks.length - 1}__`;
-            });
-
-            // Protect ALL <a> tags
-            text = text.replace(/<a[\s\S]*?<\/a>/gi, (match) => {
-                // Check if this is a tag2 link
-                if (tag2Pattern.test(match)) {
-                    tag2Blocks.push(match);
-                    return `__TAG2_PLACEHOLDER_${tag2Blocks.length - 1}__`;
-                } else {
-                    allLinkBlocks.push(match);
-                    return `__ALL_LINK_PLACEHOLDER_${allLinkBlocks.length - 1}__`;
-                }
-            });
-
-            // LINK REPLACEMENT PHASE - Only work on unprotected text
-            if (isReplaceLinks && currentHeader === "DisclaimerText") {
-                const matches = text.match(urlPattern);
-                if (matches && matches.length > 0) {
-                    for (let i = 0; i < matches.length; i++) {
-                        let link = matches[i].replace(/&#44;/g, ",").replace(/&#45;/g, "-");
-
-                        // Check for trailing punctuation
-                        let trailChar = "";
-                        const matchTrail = link.match(/[.,]$/);
-                        if (matchTrail) {
-                            trailChar = matchTrail[0];
-                        }
-
-                        // Remove trailing punctuation before wrapping
-                        link = link.replace(/[.,]$/, "");
-
-                        const aliasName = aliasPrefix + "_legal";
-                        const processedLink =
-                            tag1 +
-                            aliasName +
-                            tag1Close +
-                            "https://" +
-                            link +
-                            tag2 +
-                            link +
-                            tag3 +
-                            trailChar +
-                            tag4;
-
-                        // Safe regex to replace only this exact link
-                        const linkSafe = matches[i].replace(
-                            /[.*+?^${}()|[\]\\]/g,
-                            "\\$&"
-                        );
-                        const replaceRegex = new RegExp(linkSafe, "g");
-
-                        text = text.replace(replaceRegex, processedLink);
-                    }
-                }
-            }
-
-            // CHARACTER REPLACEMENT PHASE - Only on unprotected text
+            // CHARACTER REPLACEMENT PHASE
             if (isReplaceChars) {
                 text = text
                     .replace(/&(?!#?\w+;)/g, "&amp;")
@@ -338,24 +239,10 @@
                     .replace(/¶/g, "&para;").replace(/'/g, "&#39;").replace(/,/g, commaVal);
             }
 
-            // RESTORATION PHASE - Restore all protected elements in reverse order
-            // Restore ALL <a> blocks (non-tag2)
-            text = text.replace(
-                /__ALL_LINK_PLACEHOLDER_(\d+)__/g,
-                (_, idx) => allLinkBlocks[parseInt(idx)]
-            );
-
-            // Restore tag2 <a> blocks
-            text = text.replace(
-                /__TAG2_PLACEHOLDER_(\d+)__/g,
-                (_, idx) => tag2Blocks[parseInt(idx)]
-            );
-
-            // Restore <span> blocks
-            text = text.replace(
-                /__SPAN_PLACEHOLDER_(\d+)__/g,
-                (_, idx) => spanBlocks[parseInt(idx)]
-            );
+            // FINAL FIX: Replace &amp; with & in all href attributes after all processing is done
+            text = text.replace(/href="([^"]*)"/g, (match, url) => {
+                return `href="${url.replace(/&amp;/g, '&')}"`;
+            });
 
             return text;
         };
