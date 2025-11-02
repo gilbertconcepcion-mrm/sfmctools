@@ -106,6 +106,14 @@
       background: #0b7dda;
     }
 
+    .btn-orange {
+      background: #FF9800;
+    }
+
+    .btn-orange:hover {
+      background: #F57C00;
+    }
+
     .btn:disabled {
       opacity: 0.5;
       cursor: not-allowed;
@@ -218,7 +226,7 @@
     }
 
     .action-col {
-      width: 80px;
+      width: 120px; /* Increased width to accommodate two buttons */
     }
 
     tfoot tr { 
@@ -265,6 +273,7 @@
       border-radius: 4px;
       cursor: pointer;
       font-size: 1em;
+      margin-right: 4px;
     }
 
     .delete-row-btn:hover {
@@ -274,6 +283,26 @@
     .delete-row-btn:disabled {
       opacity: 0.5;
       cursor: not-allowed;
+    }
+
+    .recalculate-row-btn {
+      background: #2196F3;
+      color: white;
+      border: none;
+      padding: 0.01em 0.01em;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 1.8em;
+    }
+
+    .recalculate-row-btn:hover {
+      background: #0b7dda;
+    }
+
+    .action-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 4px;
     }
 
     .save-container {
@@ -463,7 +492,7 @@
           <input type="checkbox" id="autoRecalculate" onchange="onAutoRecalculateChange()" checked style="cursor: pointer; width: 16px; height: 16px; display: none; visibility: hidden;">
           <span style="font-weight: 600; color: #555; display: none;">Auto Recalculate</span>
         </label>
-        <button class="btn btn-blue" id="recalculateBtn" onclick="recalculateDistribution()" style="display: none;">🔄 Recalculate</button>
+        <button class="btn btn-orange" id="resetBtn" onclick="resetAllSettings()" style="display: block;">🔄 Reset All</button>
       </div>
     </div>
 
@@ -823,6 +852,31 @@
         }
     }
 
+    function recalculateSingleCampaignRow(campaignId) {
+        const campaign = campaigns.find(c => c.id === campaignId);
+        if (!campaign) return;
+        
+        const audienceInput = document.getElementById(`audience_${campaignId}`);
+        const targetAudience = parseNum(audienceInput ? audienceInput.value : campaign.audience);
+        
+        const offset = campaign.offset || 1;
+        campaign.hourValues = distributeAudience(targetAudience, hourCount, offset);
+        
+        for (let i = 0; i < hourCount; i++) {
+            const hourInput = document.getElementById(`hour_${campaignId}_${i}`);
+            if (hourInput) {
+                hourInput.value = fmt(campaign.hourValues[i] || 0);
+                // Update readonly state
+                const isEditable = i === (offset - 1);
+                hourInput.readOnly = !isEditable;
+                hourInput.style.background = isEditable ? '#ffffc1' : '#f5f5f5';
+                hourInput.style.cursor = isEditable ? 'text' : 'not-allowed';
+            }
+        }
+        
+        calculateTotals();
+    }
+
     function onOffsetChange(campaignId) {
         const campaign = campaigns.find(c => c.id === campaignId);
         if (!campaign) return;
@@ -847,7 +901,6 @@
                 // Update readonly state
                 const isEditable = i === (offsetValue - 1);
                 hourInput.readOnly = !isEditable;
-//                hourInput.style.background = isEditable ? 'white' : '#f5f5f5';
                 hourInput.style.background = isEditable ? '#ffffc1' : '#f5f5f5';
                 hourInput.style.cursor = isEditable ? 'text' : 'not-allowed';
             }
@@ -892,6 +945,33 @@
         });
         
         calculateTotals();
+    }
+
+    function resetAllSettings() {
+        // Reset to default values
+        hourCount = 4;
+        nextCampaignId = 1;
+        autoRecalculate = true;
+        showOffset = true;
+        viewAsPreview = false;
+        
+        // Reset campaigns to initial state
+        campaigns = [
+            { id: nextCampaignId++, name: 'Email_1', audience: 0, hourValues: [], offset: 1 }
+        ];
+        
+        // Reset date to today
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('startDate').value = today;
+        
+        // Reset time to default (10:00)
+        document.getElementById('startTimeSelect').value = '10:00';
+        
+        // Reset calculator
+        clearCalculator();
+        
+        // Rebuild the table with default settings
+        rebuildTable();
     }
 
     function rebuildTable() {
@@ -973,14 +1053,28 @@
             const actionTd = document.createElement('td');
             actionTd.className = 'center';
             
+            // Create a container for the action buttons
+            const actionButtons = document.createElement('div');
+            actionButtons.className = 'action-buttons';
+            
+            // Add recalculate button
+            const recalcBtn = document.createElement('button');
+            recalcBtn.className = 'recalculate-row-btn';
+            recalcBtn.innerHTML = '🔄';
+            recalcBtn.title = 'Recalculate';
+            recalcBtn.onclick = () => recalculateSingleCampaignRow(campaign.id);
+            actionButtons.appendChild(recalcBtn);
+            
+            // Add delete button
             const deleteBtn = document.createElement('button');
             deleteBtn.className = 'delete-row-btn';
             deleteBtn.innerHTML = '✕';
             deleteBtn.title = 'Delete';
             deleteBtn.onclick = () => deleteCampaignRow(campaign.id);
             deleteBtn.disabled = campaigns.length === 1;
-            actionTd.appendChild(deleteBtn);
+            actionButtons.appendChild(deleteBtn);
             
+            actionTd.appendChild(actionButtons);
             tr.appendChild(actionTd);
 
             tableBody.appendChild(tr);
