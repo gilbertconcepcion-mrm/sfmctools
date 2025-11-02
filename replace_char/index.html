@@ -101,11 +101,12 @@
             margin-right: 5px;
         }
         .tab.active {
-            background-color: white;
-            border-bottom: 1px solid white;
+            background-color: #2196F3;
+            color: white;
+            border-bottom: 1px solid #2196F3;
             margin-bottom: -1px;
         }
-        .tab-content {
+                .tab-content {
             display: none;
         }
         .tab-content.active {
@@ -306,6 +307,7 @@
                     .replace(/¶/g, "&para;").replace(/'/g, "&#39;").replace(/,/g, commaVal);
             }
            // LINK REPLACEMENT PHASE - Only work on unprotected text
+            // LINK REPLACEMENT PHASE - Only work on unprotected text
             if (isReplaceLinks && currentHeader === "DisclaimerText") {
                 const matches = text.match(urlPattern);
                 if (matches && matches.length > 0) {
@@ -322,13 +324,15 @@
                         // Remove trailing punctuation before wrapping
                         link = link.replace(/[.,]$/, "");
 
+                        // Check if link already has https:// or http://, if not add https://
+                        const fullLink = link.match(/^https?:\/\//i) ? link : "https://" + link;
+
                         const aliasName = aliasPrefix + "_legal";
                         const processedLink =
                             tag1 +
                             aliasName +
                             tag1Close +
-                            "https://" +
-                            link +
+                            fullLink +
                             tag2 +
                             link +
                             tag3 +
