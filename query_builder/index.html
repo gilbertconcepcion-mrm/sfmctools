@@ -10,6 +10,57 @@
     <!-- Prism.js Line Numbers Plugin CSS -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.css" rel="stylesheet" />
     <style>
+/* CSS Variables for Themes */
+:root {
+    /* Default Theme Variables */
+    --bg-primary: linear-gradient(135deg, #171b2f 0%, #0d0a10 100%);
+    --bg-secondary: white;
+    --bg-tertiary: #f8f9fa;
+    --bg-quaternary: #e9ecef;
+    --text-primary: #333;
+    --text-secondary: #495057;
+    --text-tertiary: #6c757d;
+    --text-inverse: white;
+    --accent: #667eea;
+    --accent-hover: #5a67d8;
+    --accent-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --border: #dee2e6;
+    --border-hover: #667eea;
+    --input-bg: white;
+    --input-disabled-bg: #e9ecef;
+    --input-focus-bg: #fff9db;
+    --code-bg: #282c34;
+    --code-text: #abb2bf;
+    --shadow: 0 20px 60px rgba(0,0,0,0.3);
+    --tab-active: #667eea;
+    --notification: #2ecc71;
+}
+
+/* Dark Theme Variables */
+[data-theme="dark"] {
+    --bg-primary: linear-gradient(135deg, #1a1a2e 0%, #0f0f1e 100%);
+    --bg-secondary: #1e1e2e;
+    --bg-tertiary: #252538;
+    --bg-quaternary: #2a2a3e;
+    --text-primary: #e0e0e0;
+    --text-secondary: #b0b0b0;
+    --text-tertiary: #888888;
+    --text-inverse: white;
+    --accent: #7c3aed;
+    --accent-hover: #6d28d9;
+    --accent-gradient: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+    --border: #3a3a4e;
+    --border-hover: #7c3aed;
+    --input-bg: #2a2a3e;
+    --input-disabled-bg: #3a3a4e;
+    --input-focus-bg: #3a3a4e;
+    --code-bg: #1a2332; /* Dark blue background for query output */
+    --code-text: #e0e0e0;
+    --shadow: 0 20px 60px rgba(0,0,0,0.5);
+    --tab-active: #7c3aed;
+    --notification: #10b981;
+}
+
 /* Reset and Base Styles */
 * {
     margin: 0;
@@ -19,29 +70,33 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #171b2f 0%, #0d0a10 100%);
+    background: var(--bg-primary);
     padding: 20px;
     line-height: 1.6;
     min-height: 100vh;
     overflow-y: scroll; /* Change from 'auto' to 'scroll' */
+    color: var(--text-primary);
+    transition: background 0.3s ease;
 }
 
 /* Main Container */
 .container {
     max-width: 1600px;
     margin: 0 auto;
-    background: white;
+    background: var(--bg-secondary);
     border-radius: 12px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    box-shadow: var(--shadow);
     overflow: auto;
+    transition: background 0.3s ease;
 }
 
 /* Header Section */
 .header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
+    background: var(--accent-gradient);
+    color: var(--text-inverse);
     padding: 25px 30px;
     text-align: center;
+    position: relative;
 }
 
 .header h1 {
@@ -49,6 +104,66 @@ body {
     text-transform: uppercase;
     letter-spacing: 3px;
     margin: 0;
+}
+
+/* Theme Toggle */
+.theme-toggle {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.theme-toggle-label {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.theme-switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 30px;
+}
+
+.theme-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 22px;
+    width: 22px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: var(--accent);
+}
+
+input:checked + .slider:before {
+    transform: translateX(30px);
 }
 
 /* Content Layout */
@@ -63,16 +178,17 @@ body {
 /* Left Dashboard Column */
 .main-dashboard {
     padding: 20px;
-    background: #f8f9fa;
-    border-right: 3px solid #dee2e6;
+    background: var(--bg-tertiary);
+    border-right: 3px solid var(--border);
     display: flex;
     flex-direction: column;
+    transition: background 0.3s ease, border-color 0.3s ease;
 }
 
 .dashboard-title {
     font-size: 1.3em;
     font-weight: 700;
-    color: #333;
+    color: var(--text-primary);
     margin-bottom: 15px;
     text-transform: uppercase;
     letter-spacing: 1px;
@@ -82,7 +198,7 @@ body {
 .campaign-type-selector {
     margin-bottom: 15px;
     padding-bottom: 15px;
-    border-bottom: 2px solid #dee2e6;
+    border-bottom: 2px solid var(--border);
 }
 
 .radio-group {
@@ -95,10 +211,10 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    background: #f8f9fa;
+    background: var(--bg-tertiary);
     padding: 10px 15px;
     border-radius: 6px;
-    border: 2px solid #dee2e6;
+    border: 2px solid var(--border);
     cursor: pointer;
     transition: all 0.3s ease;
     flex: 1;
@@ -106,8 +222,8 @@ body {
 }
 
 .radio-item:hover {
-    border-color: #667eea;
-    background: #e7e9fc;
+    border-color: var(--border-hover);
+    background: var(--bg-quaternary);
 }
 
 .radio-item input[type="radio"] {
@@ -116,7 +232,7 @@ body {
     width: 16px;
     height: 16px;
     cursor: pointer;
-    accent-color: #667eea;
+    accent-color: var(--accent);
 }
 
 .radio-item input[type="radio"] {
@@ -124,13 +240,13 @@ body {
     width: 16px;
     height: 16px;
     cursor: pointer;
-    accent-color: #667eea;
+    accent-color: var(--accent);
 }
 
 .radio-item label {
     cursor: pointer;
     font-weight: 600;
-    color: #333;
+    color: var(--text-primary);
     font-size: 11px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -142,12 +258,12 @@ body {
     flex-wrap: wrap;
     gap: 5px;
     margin-bottom: 15px;
-    border-bottom: 2px solid #dee2e6;
+    border-bottom: 2px solid var(--border);
 }
 
 .dashboard-tab {
     padding: 8px 12px;
-    background: #e9ecef;
+    background: var(--bg-quaternary);
     border: none;
     cursor: pointer;
     font-weight: 600;
@@ -155,25 +271,27 @@ body {
     transition: all 0.3s ease;
     font-size: 12px;
     margin-bottom: 2px;
+    color: var(--text-primary);
 }
 
 .dashboard-tab:hover {
-    background: #d3d8de;
+    background: var(--bg-quaternary);
 }
 
 .dashboard-tab.active {
-    background: #667eea;
-    color: white;
+    background: var(--tab-active);
+    color: var(--text-inverse);
 }
 
 /* Dashboard Content Area */
 .dashboard-content {
-    background: white;
+    background: var(--bg-secondary);
     border-radius: 8px;
-    border: 2px solid #dee2e6;
+    border: 2px solid var(--border);
     padding: 15px;
     min-height: 300px;
     flex-grow: 1;
+    transition: background 0.3s ease, border-color 0.3s ease;
 }
 
 .dashboard-section {
@@ -186,12 +304,12 @@ body {
 
 .section-title {
     font-weight: 600;
-    color: #495057;
+    color: var(--text-secondary);
     margin-bottom: 12px;
     font-size: 13px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    border-bottom: 2px solid #667eea;
+    border-bottom: 2px solid var(--accent);
     padding-bottom: 6px;
 }
 
@@ -206,7 +324,7 @@ body {
 
 .control-label {
     font-weight: 600;
-    color: #495057;
+    color: var(--text-secondary);
     margin-bottom: 8px;
     display: inline-block;
     font-size: 12px;
@@ -224,17 +342,17 @@ body {
 .checkbox-item {
     display: flex;
     align-items: center;
-    background: #f8f9fa;
+    background: var(--bg-tertiary);
     padding: 8px 10px;
     border-radius: 6px;
-    border: 2px solid #dee2e6;
+    border: 2px solid var(--border);
     cursor: pointer;
     transition: all 0.3s ease;
 }
 
 .checkbox-item:hover {
-    border-color: #667eea;
-    background: #e7e9fc;
+    border-color: var(--border-hover);
+    background: var(--bg-quaternary);
     transform: translateX(3px);
 }
 
@@ -248,7 +366,7 @@ body {
 .checkbox-item label {
     cursor: pointer;
     font-weight: 500;
-    color: #333;
+    color: var(--text-primary);
     font-size: 13px;
 }
 
@@ -256,16 +374,17 @@ body {
 select, input[type="text"] {
     width: 100%;
     padding: 8px 12px;
-    border: 2px solid #dee2e6;
+    border: 2px solid var(--border);
     border-radius: 6px;
     font-size: 13px;
     transition: border-color 0.3s ease;
-    background: white;
+    background: var(--input-bg);
+    color: var(--text-primary);
 }
 
 select:focus, input[type="text"]:focus {
     outline: none;
-    border-color: #667eea;
+    border-color: var(--accent);
 }
 
 .multi-select {
@@ -298,15 +417,16 @@ select:focus, input[type="text"]:focus {
 /* Status Box */
 .status-box {
     margin-top: 15px;
-    background: white;
-    border: 2px solid #667eea;
+    background: var(--bg-secondary);
+    border: 2px solid var(--accent);
     border-radius: 8px;
     padding: 15px;
+    transition: background 0.3s ease;
 }
 
 .status-title {
     font-weight: 600;
-    color: #667eea;
+    color: var(--accent);
     margin-bottom: 10px;
     font-size: 13px;
     text-transform: uppercase;
@@ -340,14 +460,14 @@ select:focus, input[type="text"]:focus {
 
 .status-content {
     font-size: 12px;
-    color: #495057;
+    color: var(--text-secondary);
     line-height: 1.5;
 }
 
 .status-section {
     margin-bottom: 8px;
     padding-bottom: 8px;
-    border-bottom: 1px solid #e9ecef;
+    border-bottom: 1px solid var(--bg-quaternary);
 }
 
 .status-section:last-child {
@@ -358,17 +478,17 @@ select:focus, input[type="text"]:focus {
 
 .status-label {
     font-weight: 600;
-    color: #667eea;
+    color: var(--accent);
     margin-bottom: 3px;
 }
 
 .status-value {
-    color: #333;
+    color: var(--text-primary);
     word-wrap: break-word;
 }
 
 .status-empty {
-    color: #adb5bd;
+    color: var(--text-tertiary);
     font-style: italic;
 }
 
@@ -382,7 +502,7 @@ select:focus, input[type="text"]:focus {
     padding: 20px 30px 0;
     font-size: 1.5em;
     font-weight: 700;
-    color: #333;
+    color: var(--text-primary);
     text-transform: uppercase;
     letter-spacing: 1px;
     text-align: left;
@@ -391,7 +511,7 @@ select:focus, input[type="text"]:focus {
 /* Query Tabs */
 .tabs-container {
     padding: 20px 30px 0;
-    background: white;
+    background: var(--bg-secondary);
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
@@ -400,47 +520,48 @@ select:focus, input[type="text"]:focus {
 .tabs {
     display: flex;
     gap: 5px;
-    border-bottom: 2px solid #dee2e6;
+    border-bottom: 2px solid var(--border);
     overflow-x: auto;
 }
 
 .tab {
     padding: 12px 24px;
-    background: #e9ecef;
+    background: var(--bg-quaternary);
     border: none;
     cursor: pointer;
     font-weight: 600;
     border-radius: 8px 8px 0 0;
     transition: all 0.3s ease;
     white-space: nowrap;
+    color: var(--text-primary);
 }
 
 .tab:hover {
-    background: #d3d8de;
+    background: var(--bg-quaternary);
 }
 
 .tab.active {
-    background: #667eea;
-    color: white;
+    background: var(--tab-active);
+    color: var(--text-inverse);
 }
 
 .tab.disabled {
-    background: #e9ecef;
-    color: #adb5bd;
+    background: var(--bg-quaternary);
+    color: var(--text-tertiary);
     cursor: not-allowed;
     opacity: 0.6;
 }
 
 .tab.disabled:hover {
-    background: #e9ecef;
+    background: var(--bg-quaternary);
     transform: none;
 }
 
 /* Generate Button */
 .generate-button {
     padding: 10px 20px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
+    background: var(--accent-gradient);
+    color: var(--text-inverse);
     border: none;
     border-radius: 6px;
     cursor: pointer;
@@ -465,7 +586,7 @@ select:focus, input[type="text"]:focus {
 /* Output Container */
 .output-container {
     padding: 30px;
-    background: white;
+    background: var(--bg-secondary);
     overflow-y: inherit;
 }
 
@@ -474,38 +595,39 @@ select:focus, input[type="text"]:focus {
     display: flex;
     gap: 5px;
     margin-bottom: 15px;
-    border-bottom: 2px solid #dee2e6;
+    border-bottom: 2px solid var(--border);
 }
 
 .query-part-tab {
     padding: 8px 16px;
-    background: #e9ecef;
+    background: var(--bg-quaternary);
     border: none;
     cursor: pointer;
     font-weight: 600;
     border-radius: 6px 6px 0 0;
     transition: all 0.3s ease;
     font-size: 14px;
+    color: var(--text-primary);
 }
 
 .query-part-tab:hover {
-    background: #d3d8de;
+    background: var(--bg-quaternary);
 }
 
 .query-part-tab.active {
-    background: #667eea;
-    color: white;
+    background: var(--tab-active);
+    color: var(--text-inverse);
 }
 
 .query-part-tab.disabled {
-    background: #e9ecef;
-    color: #adb5bd;
+    background: var(--bg-quaternary);
+    color: var(--text-tertiary);
     cursor: not-allowed;
     opacity: 0.6;
 }
 
 .query-part-tab.disabled:hover {
-    background: #e9ecef;
+    background: var(--bg-quaternary);
     transform: none;
 }
 
@@ -517,7 +639,7 @@ select:focus, input[type="text"]:focus {
 
 .query-part-label {
     font-weight: 600;
-    color: #495057;
+    color: var(--text-secondary);
     margin-bottom: 8px;
     font-size: 14px;
     text-transform: uppercase;
@@ -525,8 +647,8 @@ select:focus, input[type="text"]:focus {
 }
 
 .query-output {
-    background: #282c34;
-    color: #abb2bf;
+    background: var(--code-bg);
+    color: var(--code-text);
     padding: 20px;
     border-radius: 8px;
     font-family: 'Courier New', monospace;
@@ -561,7 +683,7 @@ select:focus, input[type="text"]:focus {
     background: transparent;
     padding: 0;
     font-family: 'Courier New', monospace;
-    color: #abb2bf;
+    color: var(--code-text);
     white-space: pre-wrap;
     word-wrap: break-word;
     word-break: break-word;
@@ -596,7 +718,7 @@ select:focus, input[type="text"]:focus {
 }
 
 .query-output .token.punctuation {
-    color: #abb2bf;
+    color: var(--code-text);
 }
 
 .query-output .token.property {
@@ -619,8 +741,8 @@ select:focus, input[type="text"]:focus {
 .copy-button {
     margin-top: 10px;
     padding: 8px 16px;
-    background: #667eea;
-    color: white;
+    background: var(--accent);
+    color: var(--text-inverse);
     border: none;
     border-radius: 6px;
     cursor: pointer;
@@ -629,7 +751,7 @@ select:focus, input[type="text"]:focus {
 }
 
 .copy-button:hover {
-    background: #5a67d8;
+    background: var(--accent-hover);
 }
 
 .copy-button.copied {
@@ -641,7 +763,7 @@ select:focus, input[type="text"]:focus {
     position: fixed;
     bottom: 20px;
     right: 20px;
-    background: #2ecc71;
+    background: var(--notification);
     color: white;
     padding: 10px 20px;
     border-radius: 4px;
@@ -660,37 +782,45 @@ input[type="text"]:not(:disabled) {
     background-color: #fffbea; /* light yellow */
 }
 
+[data-theme="dark"] input[type="text"]:not(:disabled) {
+    background-color: #3a3a4e; /* dark yellow */
+}
+
 input[type="text"]:not(:disabled):focus {
     background-color: #fff9db; /* slightly darker yellow on focus */
-    border-color: #667eea;
+    border-color: var(--accent);
+}
+
+[data-theme="dark"] input[type="text"]:not(:disabled):focus {
+    background-color: #4a4a5e; /* slightly darker yellow on focus in dark mode */
 }
 
 /* Disabled fields - greyish */
 input[type="text"]:disabled {
-    background-color: #e9ecef; /* greyish */
-    color: #6c757d; /* grey text */
+    background-color: var(--input-disabled-bg);
+    color: var(--text-tertiary);
     cursor: not-allowed;
     opacity: 0.7;
-    border-color: #ced4da;
+    border-color: var(--border);
 }
 /* Disable */
 select:disabled {
-    background-color: #e9ecef;
-    color: #6c757d;
+    background-color: var(--input-disabled-bg);
+    color: var(--text-tertiary);
     cursor: not-allowed;
     opacity: 0.7;
-    border-color: #ced4da;
+    border-color: var(--border);
 }
 .dashboard-tab.disabled {
-    background: #e9ecef;
-    color: #adb5bd;
+    background: var(--bg-quaternary);
+    color: var(--text-tertiary);
     cursor: not-allowed;
     opacity: 0.6;
     pointer-events: none;
 }
 
 .dashboard-tab.disabled:hover {
-    background: #e9ecef;
+    background: var(--bg-quaternary);
     transform: none;
 }
 /* Responsive Design */
@@ -702,7 +832,7 @@ select:disabled {
     
     .main-dashboard {
         border-right: none;
-        border-bottom: 3px solid #dee2e6;
+        border-bottom: 3px solid var(--border);
     }
 }
 
@@ -775,6 +905,14 @@ select:disabled {
     <div class="container">
         <div class="header">
             <h2>Query Builder Genre | Sendlist | Transactional</h2>
+            <div class="theme-toggle">
+                <span class="theme-toggle-label">Default</span>
+                <label class="theme-switch">
+                    <input type="checkbox" id="themeToggle">
+                    <span class="slider"></span>
+                </label>
+                <span class="theme-toggle-label">Dark</span>
+            </div>
         </div>
         
         <div class="content-wrapper">
@@ -1072,5 +1210,28 @@ select:disabled {
     <script src="prismHighlighter.js"></script>
     <script src="script.js"></script>
     
+    <script>
+        // Theme Toggle Functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const themeToggle = document.getElementById('themeToggle');
+            const body = document.body;
+            
+            // Set initial theme
+            const currentTheme = 'default'; // Always start with default theme
+            if (currentTheme === 'dark') {
+                body.setAttribute('data-theme', 'dark');
+                themeToggle.checked = true;
+            }
+            
+            // Toggle theme
+            themeToggle.addEventListener('change', function() {
+                if (this.checked) {
+                    body.setAttribute('data-theme', 'dark');
+                } else {
+                    body.removeAttribute('data-theme');
+                }
+            });
+        });
+    </script>
 </body>
 </html>
