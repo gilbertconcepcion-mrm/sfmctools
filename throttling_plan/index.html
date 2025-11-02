@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Throttle Plan</title>
+  <title>Throttling Plan</title>
   <style>
     :root { 
       font-family: Arial, Helvetica, sans-serif; 
@@ -1244,20 +1244,21 @@ function saveTableAsCSV() {
 
     // Create title
     const title = document.createElement('h2');
-    title.textContent = 'Counts and Throttle Plan';
-    title.style.cssText = 'margin: 0 0 15px 0; text-align: center; font-size: 24px; color: #2c3e50; font-weight: 700; letter-spacing: -0.5px;';
+    title.textContent = 'Counts and Throttling Plan';
+    title.style.cssText = 'margin: 0 0 2px 0; text-align: center; font-size: 12px; color: #2c3e50; font-weight: 700; letter-spacing: -0.5px;';
 
     // Create date/time info
     const startDateInput = document.getElementById('startDate');
     const startTimeSelect = document.getElementById('startTimeSelect');
     const dateTimeInfo = document.createElement('div');
-    dateTimeInfo.style.cssText = 'text-align: center; margin-bottom: 10px; color: #666; font-size: 12px;';
+    dateTimeInfo.style.cssText = 'text-align: center; margin-bottom: 2px; color: #666; font-size: 10px;';
+    dateTimeInfo.innerHTML = `<strong>Start Date/Time:</strong> ${startDateInput.value}<strong>&nbsp; | &nbsp;</strong>${startTimeSelect.options[startTimeSelect.selectedIndex].text}`;
     dateTimeInfo.innerHTML = `<strong>Start Date/Time:</strong> ${startDateInput.value}<strong>&nbsp; | &nbsp;</strong>${startTimeSelect.options[startTimeSelect.selectedIndex].text}`;
 
     // Create Campaigns display
     const campaignNames = campaigns.map(c => c.name).join(', ');
     const campaignNamesDiv = document.createElement('div');
-    campaignNamesDiv.style.cssText = 'text-align: center; margin-bottom: 15px; color: #444; font-size: 12px;';
+    campaignNamesDiv.style.cssText = 'text-align: center; margin-bottom: 2px; color: #444; font-size: 10px; display:none;';
     campaignNamesDiv.innerHTML = `<strong>Campaigns:</strong> ${campaignNames}`;
 
     // Create download button
@@ -1271,6 +1272,14 @@ function saveTableAsCSV() {
     container.appendChild(title);
     container.appendChild(dateTimeInfo);
     container.appendChild(campaignNamesDiv);
+    
+            // Create Campaigns display
+    const NOTE = "Total Counts in blue, throttle in yellow.";
+    const NOTEDiv = document.createElement('div');
+    NOTEDiv.style.cssText = 'text-align: center; margin-bottom: 2px; color: #444; font-size: 8px; display:block;';
+    NOTEDiv.innerHTML = `<strong>NOTE:</strong> ${NOTE}`;
+    
+    container.appendChild(NOTEDiv);
 
     // Get start date for hours display
     const startDate = new Date(startDateInput.value + 'T00:00:00');
@@ -1403,6 +1412,7 @@ function saveTableAsCSV() {
 
     tfoot.appendChild(footerRow);
     table.appendChild(tfoot);
+    
 
     // Assemble overlay
     overlay.appendChild(zoomContainer);
