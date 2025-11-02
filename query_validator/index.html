@@ -1111,6 +1111,10 @@
             document.getElementById('sqlQuery').value = '';
             document.getElementById('validationResults').innerHTML = '<div class="info result-item">Please select validation options and click "Validate Query" to see results.</div>';
             
+            // Add sample query to the textarea
+            document.getElementById('sqlQuery').value = ``;
+            
+            return;
             // Uncheck all checkboxes
             const checkboxes = document.querySelectorAll('input[type="checkbox"]');
             checkboxes.forEach(checkbox => {
@@ -1133,8 +1137,7 @@
             document.getElementById('emailOptIn').value = '';
         });
         
-        // Add sample query to the textarea
-        document.getElementById('sqlQuery').value = ``;
+
     </script>
 </body>
 </html>
