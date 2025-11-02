@@ -8,7 +8,6 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" rel="stylesheet" />
     <style>
         :root {
-
             --bg-primary: #f5f5f5;
             --bg-secondary: white;
             --bg-tertiary: #f9f9f9;
@@ -17,6 +16,7 @@
             --border-color: #ddd;
             --input-bg: white;
             --input-text: #333;
+            --disabled-color: #999;
         }
         
         body.light-theme {
@@ -28,6 +28,7 @@
             --border-color: #555;
             --input-bg: white;
             --input-text: #333;
+            --disabled-color: #666;
         }
         
         body {
@@ -192,6 +193,15 @@
             border-bottom: 1px solid #2196F3;
             margin-bottom: -1px;
         }
+        .tab.disabled {
+            cursor: not-allowed;
+            opacity: 0.6;
+            color: var(--disabled-color);
+        }
+        .tab.disabled:hover {
+            background-color: var(--bg-tertiary);
+            color: var(--disabled-color);
+        }
         .tab-content {
             display: none;
         }
@@ -269,7 +279,7 @@
         
         <div class="tabs">
             <div class="tab active" data-tab="input">Input</div>
-            <div class="tab" data-tab="output">Output</div>
+            <div class="tab disabled" data-tab="output">Output</div>
             <div class="tab" data-tab="options">Settings</div>
         </div>
         
@@ -499,6 +509,11 @@
 
         // Tab switching functionality
         function switchTab(tabName) {
+            // Check if output tab is being requested but is disabled
+            if (tabName === 'output' && document.querySelector('.tab[data-tab="output"]').classList.contains('disabled')) {
+                return false;
+            }
+            
             // Hide all tab contents
             document.querySelectorAll('.tab-content').forEach(tab => {
                 tab.classList.remove('active');
@@ -514,6 +529,20 @@
             
             // Add active class to the corresponding tab
             document.querySelector(`.tab[data-tab="${tabName}"]`).classList.add('active');
+            
+            return true;
+        }
+
+        // Enable output tab
+        function enableOutputTab() {
+            const outputTab = document.querySelector('.tab[data-tab="output"]');
+            outputTab.classList.remove('disabled');
+        }
+
+        // Disable output tab
+        function disableOutputTab() {
+            const outputTab = document.querySelector('.tab[data-tab="output"]');
+            outputTab.classList.add('disabled');
         }
 
         // Show notification
@@ -577,8 +606,11 @@
                 // Check if anything was replaced by comparing input and output
                 if (inputText === outputText) {
                     showNotification('No replacements were made. Text is unchanged.', false, 'input');
+                    // Keep output tab disabled if no changes were made
+                    disableOutputTab();
                 } else {
-                    // Switch to output tab only if replacements were made
+                    // Enable output tab and switch to it
+                    enableOutputTab();
                     switchTab('output');
                     showNotification('Text has been replaced successfully!', true, 'output');
                 }
