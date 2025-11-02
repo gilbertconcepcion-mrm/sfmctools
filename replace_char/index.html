@@ -4,42 +4,114 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Text Character Replacer</title>
+    <!-- Prism.js CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" rel="stylesheet" />
     <style>
+        :root {
+            --bg-primary: #2a2a2a;
+            --bg-secondary: #3a3a3a;
+            --bg-tertiary: #4a4a4a;
+            --text-primary: #e0e0e0;
+            --text-secondary: #333;
+            --border-color: #555;
+            --input-bg: white;
+            --input-text: #333;
+        }
+        
+        body.light-theme {
+            --bg-primary: #f5f5f5;
+            --bg-secondary: white;
+            --bg-tertiary: #f9f9f9;
+            --text-primary: #333;
+            --text-secondary: #333;
+            --border-color: #ddd;
+            --input-bg: white;
+            --input-text: #333;
+        }
+        
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             max-width: 900px;
             margin: 0 auto;
             padding: 20px;
-            background-color: #f5f5f5;
+            background-color: var(--bg-primary);
+            transition: background-color 0.3s;
         }
         .container {
-            background-color: white;
+            background-color: var(--bg-secondary);
             border-radius: 8px;
             padding: 25px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            transition: background-color 0.3s;
         }
         h1 {
-            color: #333;
+            color: var(--text-primary);
             margin-top: 0;
             margin-bottom: 20px;
+            transition: color 0.3s;
+        }
+        .theme-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            margin-bottom: 15px;
+            gap: 10px;
+        }
+        .theme-toggle label {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+        .theme-toggle select {
+            padding: 5px 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background-color: var(--bg-tertiary);
+            color: var(--text-primary);
+            cursor: pointer;
         }
         .textarea-container {
-            margin-bottom: 20px; padding: 0px 25px 0px 0px;
+            margin-bottom: 20px;
+            position: relative;
         }
         textarea {
             width: 100%;
             height: 300px;
             padding: 12px;
-            border: 1px solid #ddd;
+            border: 1px solid var(--border-color);
             border-radius: 4px;
             font-family: monospace;
             font-size: 14px;
             resize: vertical;
+            box-sizing: border-box;
+            background-color: var(--input-bg);
+            color: var(--input-text);
+            transition: border-color 0.3s;
+        }
+        #outputText {
+            display: none;
+        }
+        .output-container {
+            width: 100%;
+            height: 300px;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 14px;
+            overflow: auto;
+            box-sizing: border-box;
+            background-color: var(--input-bg);
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            padding-right: 25px;
+            color: var(--input-text);
+            transition: border-color 0.3s;
         }
         .button-container {
             display: flex;
             gap: 10px;
             margin-bottom: 20px;
+            align-items: center;
         }
         button {
             padding: 10px 20px;
@@ -48,7 +120,7 @@
             cursor: pointer;
             font-weight: bold;
             transition: background-color 0.3s;
-            height: 38px !important;
+            height: 38px;
         }
         #replaceBtn {
             background-color: #4CAF50;
@@ -67,38 +139,51 @@
         #backBtn {
             background-color: #FF9800;
             color: white;
-            display: none;
+            width: 38px;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
         }
         #backBtn:hover {
             background-color: #e68900;
         }
         .notification {
-            padding: 0px 10px 0px 10px;
-            margin-top: 0px;
+            padding: 0px 10px;
             border-radius: 4px;
             display: none;
-            height: 38px !important;
+            height: 38px;
             line-height: 38px;
             text-align: center;
+            flex-grow: 1;
         }
         .success {
             background-color: #d4edda;
             color: #155724;
             border: 1px solid #c3e6cb;
         }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
         .tabs {
             display: flex;
             margin-bottom: 15px;
-            border-bottom: 1px solid #ddd;
+            border-bottom: 1px solid var(--border-color);
+            transition: border-color 0.3s;
         }
         .tab {
             padding: 10px 15px;
             cursor: pointer;
-            background-color: #f1f1f1;
-            border: 1px solid #ddd;
+            background-color: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
             border-bottom: none;
             border-radius: 4px 4px 0 0;
             margin-right: 5px;
+            color: var(--text-primary);
+            transition: all 0.3s;
         }
         .tab.active {
             background-color: #2196F3;
@@ -106,7 +191,7 @@
             border-bottom: 1px solid #2196F3;
             margin-bottom: -1px;
         }
-                .tab-content {
+        .tab-content {
             display: none;
         }
         .tab-content.active {
@@ -115,41 +200,76 @@
         .options {
             margin-bottom: 15px;
             padding: 10px;
-            background-color: #f9f9f9;
+            background-color: var(--bg-tertiary);
             border-radius: 4px;
+            transition: background-color 0.3s;
         }
         .option {
             margin-bottom: 8px;
+            color: var(--text-primary);
+            transition: color 0.3s;
         }
         label {
             margin-right: 10px;
+            color: var(--text-primary);
+            transition: color 0.3s;
         }
         input[type="text"] {
             padding: 5px;
-            border: 1px solid #ddd;
+            border: 1px solid var(--border-color);
             border-radius: 4px;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            transition: all 0.3s;
         }
         .option-group {
             margin-bottom: 15px;
             padding: 10px;
-            border: 1px solid #ddd;
+            border: 1px solid var(--border-color);
             border-radius: 4px;
+            background-color: var(--bg-tertiary);
+            transition: all 0.3s;
         }
         .option-group h3 {
             margin-top: 0;
             margin-bottom: 10px;
-            color: #555;
+            color: var(--text-primary);
+            transition: color 0.3s;
+        }
+        /* Custom Prism.js styles for better word wrapping */
+        pre[class*="language-"] {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            padding: 12px;
+            margin: 0;
+            border-radius: 4px;
+            height: 300px;
+            overflow: auto;
+            box-sizing: border-box;
+            padding-right: 25px;
+        }
+        code[class*="language-"] {
+            white-space: pre-wrap;
+            word-wrap: break-word;
         }
     </style>
 </head>
 <body>
     <div class="container">
+        <div class="theme-toggle">
+            <label for="themeSelect">Theme:</label>
+            <select id="themeSelect">
+                <option value="dark">Dark</option>
+                <option value="light">Light</option>
+            </select>
+        </div>
+        
         <h1>Text Character Replacer</h1>
         
         <div class="tabs">
-            <div class="tab active" onclick="switchTab('input')">Input</div>
-            <div class="tab" onclick="switchTab('output')">Output</div>
-            <div class="tab" onclick="switchTab('options')">Settings</div>
+            <div class="tab active" data-tab="input">Input</div>
+            <div class="tab" data-tab="output">Output</div>
+            <div class="tab" data-tab="options">Settings</div>
         </div>
         
         <div id="input-tab" class="tab-content active">
@@ -158,18 +278,19 @@
             </div>
             <div class="button-container">
                 <button id="replaceBtn">REPLACE</button>
-                <button id="copyBtn" style="display: none;">Copy Output</button>
+                <div id="inputNotification" class="notification"></div>
             </div>
         </div>
         
         <div id="output-tab" class="tab-content">
             <div class="textarea-container">
                 <textarea id="outputText" readonly placeholder="Replaced text will appear here..."></textarea>
+                <pre class="output-container"><code id="highlightedOutput" class="language-html"></code></pre>
             </div>
             <div class="button-container">
-                <button id="backBtn">Back to Input</button>
+                <button id="backBtn" title="Back to Input">←</button>
                 <button id="copyOutputBtn">Copy Output</button>
-                <div id="notification" class="notification"></div>
+                <div id="outputNotification" class="notification"></div>
             </div>
         </div>
         
@@ -208,6 +329,10 @@
         </div>
     </div>
 
+    <!-- Prism.js JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markup.min.js"></script>
+    
     <script>
         // Define constants
         const regTag = `<sup style="vertical-align: top; font-size: 80%; line-height: 120%; mso-ansi-font-size:90%;">&#174;</sup>`;
@@ -265,8 +390,6 @@
                 }
             });
 
- 
-
             // CHARACTER REPLACEMENT PHASE - Only on unprotected text
             if (isReplaceChars) {
                 text = text
@@ -306,7 +429,7 @@
                     .replace(/&trade;/g, tmTag)
                     .replace(/¶/g, "&para;").replace(/'/g, "&#39;").replace(/,/g, commaVal);
             }
-           // LINK REPLACEMENT PHASE - Only work on unprotected text
+            
             // LINK REPLACEMENT PHASE - Only work on unprotected text
             if (isReplaceLinks && currentHeader === "DisclaimerText") {
                 const matches = text.match(urlPattern);
@@ -350,6 +473,7 @@
                     }
                 }
             }
+            
             // RESTORATION PHASE - Restore all protected elements in reverse order
             // Restore ALL <a> blocks (non-tag2)
             text = text.replace(
@@ -387,18 +511,14 @@
             // Show selected tab content
             document.getElementById(`${tabName}-tab`).classList.add('active');
             
-            // Add active class to clicked tab
-            if (event && event.target) {
-                event.target.classList.add('active');
-            } else {
-                // If called programmatically, find the correct tab
-                document.querySelector(`.tab:nth-child(${tabName === 'input' ? 1 : tabName === 'output' ? 2 : 3})`).classList.add('active');
-            }
+            // Add active class to the corresponding tab
+            document.querySelector(`.tab[data-tab="${tabName}"]`).classList.add('active');
         }
 
         // Show notification
-        function showNotification(message, isSuccess = true) {
-            const notification = document.getElementById('notification');
+        function showNotification(message, isSuccess = true, location = 'output') {
+            const notificationId = location === 'output' ? 'outputNotification' : 'inputNotification';
+            const notification = document.getElementById(notificationId);
             notification.textContent = message;
             notification.className = `notification ${isSuccess ? 'success' : 'error'}`;
             notification.style.display = 'block';
@@ -408,52 +528,80 @@
             }, 3000);
         }
 
-        // Replace button functionality
-        document.getElementById('replaceBtn').addEventListener('click', function() {
-            const inputText = document.getElementById('inputText').value;
-            const outputText = cleanUp(inputText);
-            document.getElementById('outputText').value = outputText;
-            
-            // Switch to output tab
-            switchTab('output');
-            
-            showNotification('Text has been replaced successfully!');
-        });
-
-        // Back button functionality
-        document.getElementById('backBtn').addEventListener('click', function() {
-            switchTab('input');
-        });
-
-        // Copy button functionality (from input tab)
-        document.getElementById('copyBtn').addEventListener('click', function() {
-            const outputText = document.getElementById('outputText').value;
-            
-            if (!outputText) {
-                showNotification('No text to copy. Please replace text first.', false);
-                return;
+        // Initialize event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load saved theme
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            if (savedTheme === 'light') {
+                document.body.classList.add('light-theme');
+                document.getElementById('themeSelect').value = 'light';
             }
             
-            navigator.clipboard.writeText(outputText).then(() => {
-                showNotification('Text copied to clipboard!');
-            }).catch(err => {
-                showNotification('Failed to copy text: ' + err, false);
+            // Theme toggle functionality
+            document.getElementById('themeSelect').addEventListener('change', function() {
+                const theme = this.value;
+                if (theme === 'light') {
+                    document.body.classList.add('light-theme');
+                } else {
+                    document.body.classList.remove('light-theme');
+                }
+                localStorage.setItem('theme', theme);
             });
-        });
+            
+            // Tab click events
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabName = this.getAttribute('data-tab');
+                    switchTab(tabName);
+                });
+            });
 
-        // Copy button functionality (from output tab)
-        document.getElementById('copyOutputBtn').addEventListener('click', function() {
-            const outputText = document.getElementById('outputText').value;
-            
-            if (!outputText) {
-                showNotification('No text to copy. Please replace text first.', false);
-                return;
-            }
-            
-            navigator.clipboard.writeText(outputText).then(() => {
-                showNotification('Text copied to clipboard!');
-            }).catch(err => {
-                showNotification('Failed to copy text: ' + err, false);
+            // Replace button functionality
+            document.getElementById('replaceBtn').addEventListener('click', function() {
+                const inputText = document.getElementById('inputText').value;
+                
+                if (!inputText.trim()) {
+                    showNotification('Please enter some text to replace.', false, 'input');
+                    return;
+                }
+                
+                const outputText = cleanUp(inputText);
+                document.getElementById('outputText').value = outputText;
+                
+                // Update the highlighted output
+                const highlightedOutput = document.getElementById('highlightedOutput');
+                highlightedOutput.textContent = outputText;
+                Prism.highlightElement(highlightedOutput);
+                
+                // Check if anything was replaced by comparing input and output
+                if (inputText === outputText) {
+                    showNotification('No replacements were made. Text is unchanged.', false, 'input');
+                } else {
+                    // Switch to output tab only if replacements were made
+                    switchTab('output');
+                    showNotification('Text has been replaced successfully!', true, 'output');
+                }
+            });
+
+            // Back button functionality
+            document.getElementById('backBtn').addEventListener('click', function() {
+                switchTab('input');
+            });
+
+            // Copy button functionality (from output tab)
+            document.getElementById('copyOutputBtn').addEventListener('click', function() {
+                const outputText = document.getElementById('outputText').value;
+                
+                if (!outputText) {
+                    showNotification('No text to copy. Please replace text first.', false, 'output');
+                    return;
+                }
+                
+                navigator.clipboard.writeText(outputText).then(() => {
+                    showNotification('Text copied to clipboard!', true, 'output');
+                }).catch(err => {
+                    showNotification('Failed to copy text: ' + err, false, 'output');
+                });
             });
         });
     </script>
