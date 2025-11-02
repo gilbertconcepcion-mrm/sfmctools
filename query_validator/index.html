@@ -756,11 +756,11 @@
                         'AMCStubsMemberRewardsEmailOptin',
                         'AMCStubsMemberRewardsSummaryEmailOptIn'
                     ];
-                    
+
                     let foundOptIns = [];
                     optInOptions.forEach(optIn => {
                         if (sqlQuery.includes(optIn)) {
-                            foundOptIns.push(optIn);
+                            foundOptIns.push(`s.[${optIn}] = 'Y'`);
                         }
                     });
                     
@@ -832,19 +832,40 @@
                 }
             }
             
-            // Tier Selection Validation - Simplified to check for tier values directly
+            // Tier Selection Validation - Fixed to handle exclusive words properly
             const selectedTierCheckbox = document.querySelector('input[name="tier"]:checked');
             const selectedTier = selectedTierCheckbox ? selectedTierCheckbox.value : null;
             const selectedTierName = selectedTierCheckbox ? selectedTierCheckbox.getAttribute('data-tier-name') : null;
             const tierSelectionChecked = selectedTierCheckbox !== null; // If any tier is selected, consider it checked
             
             // Define all possible tier values with exact match patterns
+            // Order matters here - check for A-List_Classic before A-List to avoid false matches
             const tierPatterns = [
-                { value: 'A-List_Classic', name: 'A-List Classic', pattern: /A-List_Classic/g },
-                { value: 'A-List', name: 'A-List', pattern: /\bA-List\b/g },
-                { value: 'Insider', name: 'Insider', pattern: /\bInsider\b/g },
-                { value: 'Premiere', name: 'Premiere', pattern: /\bPremiere\b/g },
-                { value: 'PremiereGo', name: 'PremiereGo', pattern: /\bPremiereGo\b/g }
+              { 
+                value: 'A-List_Classic', 
+                name: 'A-List Classic', 
+                pattern: /'A-List Classic'/g 
+              },
+              { 
+                value: 'A-List', 
+                name: 'A-List', 
+                pattern: /'A-List'(?! Classic)/g  // Negative lookahead to exclude 'A-List Classic'
+              },
+              { 
+                value: 'Insider', 
+                name: 'Insider', 
+                pattern: /'Insider'/g 
+              },
+              { 
+                value: 'Premiere', 
+                name: 'Premiere', 
+                pattern: /'Premiere'(?!Go)/g  // Negative lookahead to exclude 'PremiereGo'
+              },
+              { 
+                value: 'PremiereGo', 
+                name: 'PremiereGo', 
+                pattern: /'PremiereGo'/g 
+              }
             ];
             
             // Find all tier values that exist in the query using exact matching
@@ -1111,10 +1132,6 @@
             document.getElementById('sqlQuery').value = '';
             document.getElementById('validationResults').innerHTML = '<div class="info result-item">Please select validation options and click "Validate Query" to see results.</div>';
             
-            // Add sample query to the textarea
-            document.getElementById('sqlQuery').value = ``;
-            
-            return;
             // Uncheck all checkboxes
             const checkboxes = document.querySelectorAll('input[type="checkbox"]');
             checkboxes.forEach(checkbox => {
@@ -1137,7 +1154,8 @@
             document.getElementById('emailOptIn').value = '';
         });
         
-
+        // Add sample query to the textarea
+        document.getElementById('sqlQuery').value = ``;
     </script>
 </body>
 </html>
