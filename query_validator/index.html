@@ -759,7 +759,7 @@
 
                     let foundOptIns = [];
                     optInOptions.forEach(optIn => {
-                        if (sqlQuery.includes(optIn)) {
+                        if (sqlQuery.includes(`s.[${optIn}] = 'Y'`)) {
                             foundOptIns.push(`s.[${optIn}] = 'Y'`);
                         }
                     });
@@ -774,7 +774,7 @@
                     }
                 } else {
                     // Check if selected opt-in exists in query
-                    if (sqlQuery.includes(selectedOptIn)) {
+                    if (sqlQuery.includes(`s.[${selectedOptIn}] = 'Y'`)) {
                         successCount++;
                         resultsHTML += '<div class="success result-item">✓ Opt-in Selector: Selected opt-in condition is present in query</div>';
                         resultsHTML += '<div class="optin-match">Selected opt-in: ' + selectedOptIn + '</div>';
@@ -794,8 +794,8 @@
                         
                         let foundOptIns = [];
                         optInOptions.forEach(optIn => {
-                            if (sqlQuery.includes(optIn)) {
-                                foundOptIns.push(optIn);
+                            if (sqlQuery.includes(`s.[${optIn}] = 'Y'`)) {
+                                foundOptIns.push(`s.[${optIn}] = 'Y'`);
                             }
                         });
                         
