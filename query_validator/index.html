@@ -750,17 +750,17 @@
                 if (selectedOptIn === '') {
                     // Check if any opt-in conditions exist in the query
                     const optInOptions = [
-                        'AMCStubsSpecialOfferOptInIndicator',
-                        'AMCMyMoviesQueueOptIn',
-                        'AMCStubsAccountInformationEmailOptin',
-                        'AMCStubsMemberRewardsEmailOptin',
-                        'AMCStubsMemberRewardsSummaryEmailOptIn'
+                        `s.[AMCStubsSpecialOfferOptInIndicator = 'Y'`,
+                        `s.[AMCMyMoviesQueueOptIn = 'Y'`,
+                        `s.[AMCStubsAccountInformationEmailOptin = 'Y'`,
+                        `s.[AMCStubsMemberRewardsEmailOptin = 'Y'`,
+                        `s.[AMCStubsMemberRewardsSummaryEmailOptIn = 'Y'`
                     ];
 
                     let foundOptIns = [];
                     optInOptions.forEach(optIn => {
-                        if (sqlQuery.includes(`s.[${optIn}] = 'Y'`)) {
-                            foundOptIns.push(`s.[${optIn}] = 'Y'`);
+                        if (sqlQuery.includes(optIn)) {
+                            foundOptIns.push(optIn);
                         }
                     });
                     
