@@ -1,6 +1,14 @@
-const config{
-   "INNER JOIN [AMC_Genre_targeting]",
-   "AND s.MemberStatus = 'Member'",
-   "WHERE Tier = 'A-List'",
-   
-}
+
+INNER JOIN [AMC_Genre_targeting] al ON al.LOYALTYACCOUNTID = s.AMCStubsKobieAccountID   //if genre is selected, then AMC_Genre_targeting should be seen
+WHERE 1=1
+AND s.MemberStatus = 'Member' // if Member checkbox is checked, then MemberStatus should be "Member" else if unchecked, it should be "Non-Member"
+AND s.[AMCStubsSpecialOfferOptInIndicator] = 'Y' //check which one is selected in the opt-in selector, and match. If nothing is selected then any of the values from the selector should not be seen
+AND s.LoyaltyAccountPortfolioID IN (SELECT LoyaltyAccountPortfolioID FROM [Master_LoyaltyPortfolioID] WHERE Tier = 'A-List Classic' AND ActiveStatus='True') // if Tier is selected match based on the checked tiers in the checkbox
+AND (al.[ACTION] = 'True') //if Genre is selected then match if any of the selector values match what is inside  al.[]. If nothing is selected then warn that nothing is selected as well.
+AND (ISNULL(s.[DateOfBirth], '') <> '' AND s.DateOfBirth <= DATEADD(year, -13, GETDATE())) // if Age is selected, match if 13,18 or 21, if nothing is selected or NA, then flag if 13,18,21 is found
+AND EXISTS (SELECT 1 FROM All_Subscribers_Status_Staging AS sub WITH (NOLOCK) WHERE s.EmailAddress = sub.SubscriberKey AND sub.Status = 'Active') // if active checkbox is checked, validated as correct, if not checked and Status = 'Active' exist, then flag
+AND NOT EXISTS (SELECT 1 FROM _Complaint AS com WITH (NOLOCK) WHERE s.EmailAddress = com.SubscriberKey)  //if complaint is checked look for this _Complaint, if not checked then _Complaint should not exist
+AND NOT EXISTS(SELECT 1 FROM [AMC_MasterSuppression] AS cpesl WITH (NOLOCK) WHERE s.EmailAddress = cpesl.EmailAddress) //if AMC_MasterSuppression is checked then AMC_MasterSuppression should exist, if not checked then flag also
+AND s.amcStubsCardNumber IS NOT NULL AND s.amcStubsCardNumber NOT LIKE '1104%' AND s.amcStubsCardNumber NOT LIKE '11094%' // if associate suprresion is checked, then NOT LIKE '1104%' AND s.amcStubsCardNumber NOT LIKE '11094%' should be seen, if not checked and this exist flag also
+AND NOT EXISTS ( SELECT 1 FROM FreshAddress_Exclusions_MRM AS f WITH (NOLOCK) WHERE s.EmailAddress = f.EmailAddress) // if fresh address is checked then FreshAddress_Exclusions_MRM should be seen, if not checked, and this FreshAddress_Exclusions_MRM exist flag also
+AND (EXISTS (SELECT 1 FROM CLICK_ENGAGEMENT_LAST_6_MONTHS AS c WITH (NOLOCK) WHERE s.EmailAddress = c.SubscriberKey) OR EXISTS (SELECT 1 FROM LastOpen_6Months AS o WITH (NOLOCK) WHERE s.EmailAddress = o.EmailAddress)) //if Engagement is checked, then  this should be seen CLICK_ENGAGEMENT_LAST_6_MONTHS and LastOpen_6Months, if not checked and this exist then flag also
