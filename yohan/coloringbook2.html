@@ -185,6 +185,26 @@
             text-align: center;
         }
 
+        /* --- Color Picker --- */
+        #colorPicker {
+            width: 50px;
+            height: 50px;
+            border: 2px solid var(--swatch-active-border);
+            border-radius: 8px;
+            cursor: pointer;
+            background: none;
+            padding: 0;
+        }
+
+        #colorPicker::-webkit-color-swatch-wrapper {
+            padding: 0;
+        }
+
+        #colorPicker::-webkit-color-swatch {
+            border: none;
+            border-radius: 6px;
+        }
+
         button {
             padding: 10px 20px;
             font-size: 16px;
@@ -268,6 +288,11 @@
                 height: 40px;
             }
 
+            #colorPicker {
+                width: 40px;
+                height: 40px;
+            }
+
             .control-group label {
                 font-size: 14px;
             }
@@ -305,6 +330,11 @@
         </div>
 
         <div class="control-group">
+            <label for="colorPicker">Color:</label>
+            <input type="color" id="colorPicker" value="#000000">
+        </div>
+
+        <div class="control-group">
             <label for="brushSize">Size:</label>
             <input type="range" id="brushSize" min="5" max="100" value="15">
             <span id="sizeValue">15</span>
@@ -335,6 +365,7 @@
         const imageCanvas = document.getElementById('imageCanvas');
         const imageCtx = imageCanvas.getContext('2d');
         const colorPalette = document.getElementById('colorPalette');
+        const colorPicker = document.getElementById('colorPicker');
         const brushSizeSlider = document.getElementById('brushSize');
         const opacitySlider = document.getElementById('opacitySlider');
         const clearButton = document.getElementById('clearButton');
@@ -577,6 +608,15 @@
             });
             e.target.classList.add('active');
             currentColor = e.target.dataset.color;
+            colorPicker.value = currentColor; // Update color picker to match
+        }
+
+        function selectColorFromPicker(e) {
+            currentColor = e.target.value;
+            // Remove active class from all swatches
+            document.querySelectorAll('.color-swatch').forEach(swatch => {
+                swatch.classList.remove('active');
+            });
         }
 
         // 6. EVENT LISTENERS
@@ -607,6 +647,8 @@
         });
 
         // Control events
+        colorPicker.addEventListener('input', selectColorFromPicker);
+        
         brushSizeSlider.addEventListener('input', (e) => {
             currentLineWidth = e.target.value;
             sizeValue.textContent = e.target.value;
