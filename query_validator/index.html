@@ -131,37 +131,71 @@
             margin-top: 20px;
             flex-grow: 1;
             overflow-y: auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            grid-gap: 15px;
+            align-content: start;
         }
-        .result-item {
-            padding: 10px;
-            margin-bottom: 10px;
+        .result-group {
+            border: 1px solid #e0e0e0;
             border-radius: 5px;
+            padding: 12px;
+            background-color: #fff;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
         }
-        .success {
+        .result-group.success {
+            border-color: #28a745;
+            background-color: #f8fff9;
+        }
+        .result-group.warning {
+            border-color: #ffc107;
+            background-color: #fffdf7;
+        }
+        .result-group.error {
+            border-color: #dc3545;
+            background-color: #fff8f8;
+        }
+        .result-group.flag {
+            border-color: #fd7e14;
+            background-color: #fff9f5;
+        }
+        .result-group-header {
+            font-weight: bold;
+            margin-bottom: 8px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+        }
+        .result-group-icon {
+            margin-right: 8px;
+            font-size: 1.2rem;
+        }
+        .result-group-content {
+            font-size: 0.9rem;
+        }
+        .result-detail {
+            margin-top: 5px;
+            padding: 5px;
+            border-radius: 3px;
+            font-size: 0.85rem;
+        }
+        .match {
             background-color: #d4edda;
             color: #155724;
-            border: 1px solid #c3e6cb;
         }
-        .warning {
-            background-color: #fff3cd;
-            color: #856404;
-            border: 1px solid #ffeeba;
-        }
-        .error {
+        .mismatch {
             background-color: #f8d7da;
             color: #721c24;
-            border: 1px solid #f5c6cb;
         }
-        .info {
-            background-color: #d1ecf1;
-            color: #0c5460;
-            border: 1px solid #bee5eb;
-        }
-        .flag {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-            font-weight: bold;
+        .found-items {
+            margin-top: 5px;
+            padding: 5px;
+            background-color: #e2e3e5;
+            border-radius: 3px;
+            font-size: 0.85rem;
         }
         .flag-message {
             margin-top: 5px;
@@ -170,12 +204,14 @@
             color: #721c24;
             border-radius: 4px;
             border-left: 4px solid #dc3545;
+            font-size: 0.85rem;
         }
         .summary {
             padding: 15px;
             margin-bottom: 20px;
             border-radius: 5px;
             font-weight: bold;
+            grid-column: span 2; /* Make summary span two columns */
         }
         .summary-success {
             background-color: #d4edda;
@@ -198,18 +234,6 @@
         }
         .genre-dropdown, .age-dropdown, .optin-dropdown {
             width: 100%;
-        }
-        .genre-match, .age-match, .optin-match, .tier-match {
-            background-color: #d4edda;
-            padding: 5px;
-            border-radius: 3px;
-            margin-top: 5px;
-        }
-        .genre-mismatch, .age-mismatch, .optin-mismatch, .tier-mismatch {
-            background-color: #f8d7da;
-            padding: 5px;
-            border-radius: 3px;
-            margin-top: 5px;
         }
         .section-title {
             font-size: 1.2rem;
@@ -288,13 +312,6 @@
             font-weight: bold;
             margin-bottom: 10px;
         }
-        .found-genres, .found-optins, .found-tiers {
-            margin-top: 5px;
-            padding: 5px;
-            background-color: #e2e3e5;
-            border-radius: 3px;
-            font-size: 0.9rem;
-        }
         /* Compact button styles */
         .btn {
             padding: 0.375rem 0.75rem; /* Reduced padding for more compact look */
@@ -304,6 +321,16 @@
         .btn-primary, .btn-secondary {
             height: auto;
             min-height: 2rem; /* Ensure consistent height */
+        }
+        
+        /* Media query for smaller screens */
+        @media (max-width: 768px) {
+            .validation-result {
+                grid-template-columns: 1fr;
+            }
+            .summary {
+                grid-column: span 1;
+            }
         }
     </style>
 </head>
@@ -661,7 +688,7 @@
             resultsContainer.innerHTML = '';
             
             if (!sqlQuery.trim()) {
-                resultsContainer.innerHTML = '<div class="error result-item">Please enter a SQL query to validate.</div>';
+                resultsContainer.innerHTML = '<div class="error result-group"><div class="result-group-header"><span class="result-group-icon">✗</span>Error</div><div class="result-group-content">Please enter a SQL query to validate.</div></div>';
                 return;
             }
             
@@ -677,6 +704,9 @@
             let errorCount = 0;
             let flagCount = 0;
             let resultsHTML = '';
+            
+            // Create an object to store grouped results
+            const groupedResults = {};
             
             // Genre Selection Validation
             const genreSelectedChecked = document.getElementById('genreSelected').checked;
@@ -714,49 +744,77 @@
                 if (selectedGenre === 'NONE') {
                     if (foundGenreColumns.length === 0) {
                         successCount++;
-                        resultsHTML += '<div class="success result-item">✓ Genre Selection: N/A selected and no genre columns found in query</div>';
+                        groupedResults['genre'] = {
+                            status: 'success',
+                            title: 'Genre Selection',
+                            icon: '✓',
+                            content: 'N/A selected and no genre columns found in query'
+                        };
                         document.querySelector('[data-checkbox="genreSelected"]').classList.add('highlight-success');
                     } else {
                         errorCount++;
-                        resultsHTML += '<div class="error result-item">✗ Genre Selection: N/A selected but genre columns found in query</div>';
-                        resultsHTML += '<div class="genre-mismatch">Query contains: ' + foundGenreColumns.join(', ') + '</div>';
+                        groupedResults['genre'] = {
+                            status: 'error',
+                            title: 'Genre Selection',
+                            icon: '✗',
+                            content: 'N/A selected but genre columns found in query',
+                            details: 'Query contains: ' + foundGenreColumns.join(', ')
+                        };
                         document.querySelector('[data-checkbox="genreSelected"]').classList.add('highlight-error');
                     }
                 } else {
                     // Check if selected genre column exists in query
                     if (hasGenreJoin && hasGenreColumn) {
                         successCount++;
-                        resultsHTML += '<div class="success result-item">✓ Genre Selection: AMC_Genre_targeting is joined and genre column exists</div>';
-                        resultsHTML += '<div class="genre-match">Selected genre column: al.[' + selectedGenre + ']</div>';
+                        groupedResults['genre'] = {
+                            status: 'success',
+                            title: 'Genre Selection',
+                            icon: '✓',
+                            content: 'AMC_Genre_targeting is joined and genre column exists',
+                            details: 'Selected genre column: al.[' + selectedGenre + ']'
+                        };
                         document.querySelector('[data-checkbox="genreSelected"]').classList.add('highlight-success');
                     } else if (hasGenreJoin) {
                         warningCount++;
-                        resultsHTML += '<div class="warning result-item">⚠ Genre Selection: AMC_Genre_targeting is joined but genre column is missing</div>';
-                        resultsHTML += '<div class="genre-mismatch">Selected: al.[' + selectedGenre + '] | Not found in query</div>';
-                        
-                        // Show what genres were found in the query
-                        if (foundGenreColumns.length > 0) {
-                            resultsHTML += '<div class="found-genres">Found in query: ' + foundGenreColumns.join(', ') + '</div>';
-                        } else {
-                            resultsHTML += '<div class="found-genres">No genre columns found in query</div>';
-                        }
+                        let foundGenresText = foundGenreColumns.length > 0 ? 
+                            'Found in query: ' + foundGenreColumns.join(', ') : 
+                            'No genre columns found in query';
+                            
+                        groupedResults['genre'] = {
+                            status: 'warning',
+                            title: 'Genre Selection',
+                            icon: '⚠',
+                            content: 'AMC_Genre_targeting is joined but genre column is missing',
+                            details: 'Selected: al.[' + selectedGenre + '] | Not found in query',
+                            foundItems: foundGenresText
+                        };
                         document.querySelector('[data-checkbox="genreSelected"]').classList.add('highlight-warning');
                     } else {
                         errorCount++;
-                        resultsHTML += '<div class="error result-item">✗ Genre Selection: AMC_Genre_targeting join is missing</div>';
+                        groupedResults['genre'] = {
+                            status: 'error',
+                            title: 'Genre Selection',
+                            icon: '✗',
+                            content: 'AMC_Genre_targeting join is missing'
+                        };
                         document.querySelector('[data-checkbox="genreSelected"]').classList.add('highlight-error');
                     }
                 }
             } else if (hasGenreJoin || hasGenreAction) {
                 // Flag if checkbox is unchecked but condition exists in query
                 flagCount++;
-                resultsHTML += '<div class="flag result-item">🚩 FLAG: Genre Selection is not checked but genre-related conditions exist in query</div>';
-                resultsHTML += '<div class="flag-message">Query contains genre-related conditions but the Genre Selection checkbox is not checked. This might indicate a mismatch between your selection and the query.</div>';
-                
-                // Show what genres were found in the query
-                if (foundGenreColumns.length > 0) {
-                    resultsHTML += '<div class="found-genres">Found in query: ' + foundGenreColumns.join(', ') + '</div>';
-                }
+                let foundGenresText = foundGenreColumns.length > 0 ? 
+                    'Found in query: ' + foundGenreColumns.join(', ') : 
+                    '';
+                    
+                groupedResults['genre'] = {
+                    status: 'flag',
+                    title: 'Genre Selection',
+                    icon: '🚩',
+                    content: 'Genre Selection is not checked but genre-related conditions exist in query',
+                    flagMessage: 'Query contains genre-related conditions but the Genre Selection checkbox is not checked. This might indicate a mismatch between your selection and the query.',
+                    foundItems: foundGenresText
+                };
                 document.querySelector('[data-checkbox="genreSelected"]').classList.add('highlight-flag');
             }
             
@@ -769,22 +827,42 @@
                 hasValidations = true;
                 if (hasMemberStatus) {
                     successCount++;
-                    resultsHTML += '<div class="success result-item">✓ Member Status: MemberStatus is set to "Member"</div>';
+                    groupedResults['memberStatus'] = {
+                        status: 'success',
+                        title: 'Member Status',
+                        icon: '✓',
+                        content: 'MemberStatus is set to "Member"'
+                    };
                     document.querySelector('[data-checkbox="memberStatus"]').classList.add('highlight-success');
                 } else if (hasNonMemberStatus) {
                     successCount++;
-                    resultsHTML += '<div class="success result-item">✓ Member Status: MemberStatus is set to "Non-Member"</div>';
+                    groupedResults['memberStatus'] = {
+                        status: 'success',
+                        title: 'Member Status',
+                        icon: '✓',
+                        content: 'MemberStatus is set to "Non-Member"'
+                    };
                     document.querySelector('[data-checkbox="memberStatus"]').classList.add('highlight-success');
                 } else {
                     errorCount++;
-                    resultsHTML += '<div class="error result-item">✗ Member Status: MemberStatus condition is missing</div>';
+                    groupedResults['memberStatus'] = {
+                        status: 'error',
+                        title: 'Member Status',
+                        icon: '✗',
+                        content: 'MemberStatus condition is missing'
+                    };
                     document.querySelector('[data-checkbox="memberStatus"]').classList.add('highlight-error');
                 }
             } else if (hasMemberStatus || hasNonMemberStatus) {
                 // Flag if checkbox is unchecked but condition exists in query
                 flagCount++;
-                resultsHTML += '<div class="flag result-item">🚩 FLAG: Member Status is not checked but MemberStatus condition exists in query</div>';
-                resultsHTML += '<div class="flag-message">Query contains MemberStatus condition but the Member Status checkbox is not checked. This might indicate a mismatch between your selection and the query.</div>';
+                groupedResults['memberStatus'] = {
+                    status: 'flag',
+                    title: 'Member Status',
+                    icon: '🚩',
+                    content: 'Member Status is not checked but MemberStatus condition exists in query',
+                    flagMessage: 'Query contains MemberStatus condition but the Member Status checkbox is not checked. This might indicate a mismatch between your selection and the query.'
+                };
                 document.querySelector('[data-checkbox="memberStatus"]').classList.add('highlight-flag');
             }
             
@@ -815,26 +893,38 @@
                     
                     if (foundOptIns.length === 0) {
                         successCount++;
-                        resultsHTML += '<div class="success result-item">✓ Opt-in Selector: N/A selected and no opt-in conditions found in query</div>';
+                        groupedResults['optIn'] = {
+                            status: 'success',
+                            title: 'Opt-in Selector',
+                            icon: '✓',
+                            content: 'N/A selected and no opt-in conditions found in query'
+                        };
                         document.querySelector('[data-checkbox="optInSelector"]').classList.add('highlight-success');
                     } else {
                         errorCount++;
-                        resultsHTML += '<div class="error result-item">✗ Opt-in Selector: N/A selected but opt-in conditions found in query</div>';
-                        resultsHTML += '<div class="optin-mismatch">Query contains: ' + foundOptIns.join(', ') + '</div>';
+                        groupedResults['optIn'] = {
+                            status: 'error',
+                            title: 'Opt-in Selector',
+                            icon: '✗',
+                            content: 'N/A selected but opt-in conditions found in query',
+                            details: 'Query contains: ' + foundOptIns.join(', ')
+                        };
                         document.querySelector('[data-checkbox="optInSelector"]').classList.add('highlight-error');
                     }
                 } else {
                     // Check if selected opt-in exists in query
                     if (sqlQuery.includes(`s.[${selectedOptIn}] = 'Y'`)) {
                         successCount++;
-                        resultsHTML += '<div class="success result-item">✓ Opt-in Selector: Selected opt-in condition is present in query</div>';
-                        resultsHTML += '<div class="optin-match">Selected opt-in: ' + selectedOptIn + '</div>';
+                        groupedResults['optIn'] = {
+                            status: 'success',
+                            title: 'Opt-in Selector',
+                            icon: '✓',
+                            content: 'Selected opt-in condition is present in query',
+                            details: 'Selected opt-in: ' + selectedOptIn
+                        };
                         document.querySelector('[data-checkbox="optInSelector"]').classList.add('highlight-success');
                     } else {
                         errorCount++;
-                        resultsHTML += '<div class="error result-item">✗ Opt-in Selector: Selected opt-in condition is missing</div>';
-                        resultsHTML += '<div class="optin-mismatch">Selected: ' + selectedOptIn + ' | Not found in query</div>';
-                        
                         // Show what opt-ins were found in the query
                         const optInOptions = [
                             'AMCStubsSpecialOfferOptInIndicator',
@@ -851,11 +941,18 @@
                             }
                         });
                         
-                        if (foundOptIns.length > 0) {
-                            resultsHTML += '<div class="found-optins">Found in query: ' + foundOptIns.join(', ') + '</div>';
-                        } else {
-                            resultsHTML += '<div class="found-optins">No opt-in conditions found in query</div>';
-                        }
+                        let foundOptInsText = foundOptIns.length > 0 ? 
+                            'Found in query: ' + foundOptIns.join(', ') : 
+                            'No opt-in conditions found in query';
+                            
+                        groupedResults['optIn'] = {
+                            status: 'error',
+                            title: 'Opt-in Selector',
+                            icon: '✗',
+                            content: 'Selected opt-in condition is missing',
+                            details: 'Selected: ' + selectedOptIn + ' | Not found in query',
+                            foundItems: foundOptInsText
+                        };
                         document.querySelector('[data-checkbox="optInSelector"]').classList.add('highlight-error');
                     }
                 }
@@ -879,9 +976,14 @@
                 if (foundOptIns.length > 0) {
                     // Flag if checkbox is unchecked but condition exists in query
                     flagCount++;
-                    resultsHTML += '<div class="flag result-item">🚩 FLAG: Opt-in Selector is not checked but opt-in conditions exist in query</div>';
-                    resultsHTML += '<div class="flag-message">Query contains opt-in conditions but the Opt-in Selector checkbox is not checked. This might indicate a mismatch between your selection and the query.</div>';
-                    resultsHTML += '<div class="optin-mismatch">Query contains: ' + foundOptIns.join(', ') + '</div>';
+                    groupedResults['optIn'] = {
+                        status: 'flag',
+                        title: 'Opt-in Selector',
+                        icon: '🚩',
+                        content: 'Opt-in Selector is not checked but opt-in conditions exist in query',
+                        flagMessage: 'Query contains opt-in conditions but the Opt-in Selector checkbox is not checked. This might indicate a mismatch between your selection and the query.',
+                        details: 'Query contains: ' + foundOptIns.join(', ')
+                    };
                     document.querySelector('[data-checkbox="optInSelector"]').classList.add('highlight-flag');
                 }
             }
@@ -938,14 +1040,16 @@
                 // Check if selected tier exists in query
                 if (foundTiers.includes(selectedTier)) {
                     successCount++;
-                    resultsHTML += '<div class="success result-item">✓ Tier Selection: Selected tier matches query</div>';
-                    resultsHTML += '<div class="tier-match">Selected tier: ' + selectedTierName + '</div>';
+                    groupedResults['tier'] = {
+                        status: 'success',
+                        title: 'Tier Selection',
+                        icon: '✓',
+                        content: 'Selected tier matches query',
+                        details: 'Selected tier: ' + selectedTierName
+                    };
                     document.getElementById('tierSelectionContainer').classList.add('highlight-success');
                 } else if (foundTiers.length > 0) {
                     warningCount++;
-                    resultsHTML += '<div class="warning result-item">⚠ Tier Selection: Selected tier does not match query</div>';
-                    resultsHTML += '<div class="tier-mismatch">Selected: ' + selectedTierName + ' | Not found in query</div>';
-                    
                     // Convert found tier values to names for display
                     let foundTierNames = [];
                     foundTiers.forEach(tierValue => {
@@ -955,19 +1059,28 @@
                         }
                     });
                     
-                    resultsHTML += '<div class="found-tiers">Found in query: ' + foundTierNames.join(', ') + '</div>';
+                    groupedResults['tier'] = {
+                        status: 'warning',
+                        title: 'Tier Selection',
+                        icon: '⚠',
+                        content: 'Selected tier does not match query',
+                        details: 'Selected: ' + selectedTierName + ' | Not found in query',
+                        foundItems: 'Found in query: ' + foundTierNames.join(', ')
+                    };
                     document.getElementById('tierSelectionContainer').classList.add('highlight-warning');
                 } else {
                     errorCount++;
-                    resultsHTML += '<div class="error result-item">✗ Tier Selection: Tier condition is missing</div>';
+                    groupedResults['tier'] = {
+                        status: 'error',
+                        title: 'Tier Selection',
+                        icon: '✗',
+                        content: 'Tier condition is missing'
+                    };
                     document.getElementById('tierSelectionContainer').classList.add('highlight-error');
                 }
             } else if (foundTiers.length > 0) {
                 // Flag if no tier is selected but condition exists in query
                 flagCount++;
-                resultsHTML += '<div class="flag result-item">🚩 FLAG: No tier selected but tier condition exists in query</div>';
-                resultsHTML += '<div class="flag-message">Query contains tier condition but no tier is selected. This might indicate a mismatch between your selection and the query.</div>';
-                
                 // Convert found tier values to names for display
                 let foundTierNames = [];
                 foundTiers.forEach(tierValue => {
@@ -977,7 +1090,14 @@
                     }
                 });
                 
-                resultsHTML += '<div class="found-tiers">Found in query: ' + foundTierNames.join(', ') + '</div>';
+                groupedResults['tier'] = {
+                    status: 'flag',
+                    title: 'Tier Selection',
+                    icon: '🚩',
+                    content: 'No tier selected but tier condition exists in query',
+                    flagMessage: 'Query contains tier condition but no tier is selected. This might indicate a mismatch between your selection and the query.',
+                    foundItems: 'Found in query: ' + foundTierNames.join(', ')
+                };
                 document.getElementById('tierSelectionContainer').classList.add('highlight-flag');
             }
             
@@ -1014,38 +1134,68 @@
                 if (selectedAge === 'NA') {
                     if (queryAge === null) {
                         successCount++;
-                        resultsHTML += '<div class="success result-item">✓ Age Selection: N/A selected and no age conditions found in query</div>';
+                        groupedResults['age'] = {
+                            status: 'success',
+                            title: 'Age Selection',
+                            icon: '✓',
+                            content: 'N/A selected and no age conditions found in query'
+                        };
                         document.querySelector('[data-checkbox="ageSelection"]').classList.add('highlight-success');
                     } else {
                         errorCount++;
-                        resultsHTML += '<div class="error result-item">✗ Age Selection: N/A selected but age conditions found in query</div>';
-                        resultsHTML += '<div class="age-mismatch">Query contains age: ' + queryAge + ' (' + agePatternFound + ' pattern)</div>';
+                        groupedResults['age'] = {
+                            status: 'error',
+                            title: 'Age Selection',
+                            icon: '✗',
+                            content: 'N/A selected but age conditions found in query',
+                            details: 'Query contains age: ' + queryAge + ' (' + agePatternFound + ' pattern)'
+                        };
                         document.querySelector('[data-checkbox="ageSelection"]').classList.add('highlight-error');
                     }
                 } else {
                     // Check if selected age matches query age
                     if (queryAge !== null && selectedAge === queryAge) {
                         successCount++;
-                        resultsHTML += '<div class="success result-item">✓ Age Selection: DateOfBirth condition is present and age matches</div>';
-                        resultsHTML += '<div class="age-match">Selected age: ' + selectedAge + ' (' + agePatternFound + ' pattern)</div>';
+                        groupedResults['age'] = {
+                            status: 'success',
+                            title: 'Age Selection',
+                            icon: '✓',
+                            content: 'DateOfBirth condition is present and age matches',
+                            details: 'Selected age: ' + selectedAge + ' (' + agePatternFound + ' pattern)'
+                        };
                         document.querySelector('[data-checkbox="ageSelection"]').classList.add('highlight-success');
                     } else if (queryAge !== null) {
                         warningCount++;
-                        resultsHTML += '<div class="warning result-item">⚠ Age Selection: DateOfBirth condition is present but age does not match</div>';
-                        resultsHTML += '<div class="age-mismatch">Selected: ' + selectedAge + ' | Query: ' + queryAge + ' (' + agePatternFound + ' pattern)</div>';
+                        groupedResults['age'] = {
+                            status: 'warning',
+                            title: 'Age Selection',
+                            icon: '⚠',
+                            content: 'DateOfBirth condition is present but age does not match',
+                            details: 'Selected: ' + selectedAge + ' | Query: ' + queryAge + ' (' + agePatternFound + ' pattern)'
+                        };
                         document.querySelector('[data-checkbox="ageSelection"]').classList.add('highlight-warning');
                     } else {
                         errorCount++;
-                        resultsHTML += '<div class="error result-item">✗ Age Selection: DateOfBirth condition is missing</div>';
+                        groupedResults['age'] = {
+                            status: 'error',
+                            title: 'Age Selection',
+                            icon: '✗',
+                            content: 'DateOfBirth condition is missing'
+                        };
                         document.querySelector('[data-checkbox="ageSelection"]').classList.add('highlight-error');
                     }
                 }
             } else if (queryAge !== null) {
                 // Flag if checkbox is unchecked but condition exists in query
                 flagCount++;
-                resultsHTML += '<div class="flag result-item">🚩 FLAG: Age Selection is not checked but age condition exists in query</div>';
-                resultsHTML += '<div class="flag-message">Query contains age condition but the Age Selection checkbox is not checked. This might indicate a mismatch between your selection and the query.</div>';
-                resultsHTML += '<div class="age-mismatch">Query contains age: ' + queryAge + ' (' + agePatternFound + ' pattern)</div>';
+                groupedResults['age'] = {
+                    status: 'flag',
+                    title: 'Age Selection',
+                    icon: '🚩',
+                    content: 'Age Selection is not checked but age condition exists in query',
+                    flagMessage: 'Query contains age condition but the Age Selection checkbox is not checked. This might indicate a mismatch between your selection and the query.',
+                    details: 'Query contains age: ' + queryAge + ' (' + agePatternFound + ' pattern)'
+                };
                 document.querySelector('[data-checkbox="ageSelection"]').classList.add('highlight-flag');
             }
             
@@ -1057,18 +1207,33 @@
                 hasValidations = true;
                 if (hasActiveStatus) {
                     successCount++;
-                    resultsHTML += '<div class="success result-item">✓ Active Status: Subscriber status is checked for "Active"</div>';
+                    groupedResults['activeStatus'] = {
+                        status: 'success',
+                        title: 'Active Status',
+                        icon: '✓',
+                        content: 'Subscriber status is checked for "Active"'
+                    };
                     document.querySelector('[data-checkbox="activeStatus"]').classList.add('highlight-success');
                 } else {
                     errorCount++;
-                    resultsHTML += '<div class="error result-item">✗ Active Status: Active status condition is missing</div>';
+                    groupedResults['activeStatus'] = {
+                        status: 'error',
+                        title: 'Active Status',
+                        icon: '✗',
+                        content: 'Active status condition is missing'
+                    };
                     document.querySelector('[data-checkbox="activeStatus"]').classList.add('highlight-error');
                 }
             } else if (hasActiveStatus) {
                 // Flag if checkbox is unchecked but condition exists in query
                 flagCount++;
-                resultsHTML += '<div class="flag result-item">🚩 FLAG: Active Status is not checked but active status condition exists in query</div>';
-                resultsHTML += '<div class="flag-message">Query contains active status condition but the Active Status checkbox is not checked. This might indicate a mismatch between your selection and the query.</div>';
+                groupedResults['activeStatus'] = {
+                    status: 'flag',
+                    title: 'Active Status',
+                    icon: '🚩',
+                    content: 'Active Status is not checked but active status condition exists in query',
+                    flagMessage: 'Query contains active status condition but the Active Status checkbox is not checked. This might indicate a mismatch between your selection and the query.'
+                };
                 document.querySelector('[data-checkbox="activeStatus"]').classList.add('highlight-flag');
             }
             
@@ -1080,18 +1245,33 @@
                 hasValidations = true;
                 if (hasComplaintCheck) {
                     successCount++;
-                    resultsHTML += '<div class="success result-item">✓ Complaint: _Complaint is checked</div>';
+                    groupedResults['complaint'] = {
+                        status: 'success',
+                        title: 'Complaint',
+                        icon: '✓',
+                        content: '_Complaint is checked'
+                    };
                     document.querySelector('[data-checkbox="complaint"]').classList.add('highlight-success');
                 } else {
                     errorCount++;
-                    resultsHTML += '<div class="error result-item">✗ Complaint: _Complaint is missing</div>';
+                    groupedResults['complaint'] = {
+                        status: 'error',
+                        title: 'Complaint',
+                        icon: '✗',
+                        content: '_Complaint is missing'
+                    };
                     document.querySelector('[data-checkbox="complaint"]').classList.add('highlight-error');
                 }
             } else if (hasComplaintCheck) {
                 // Flag if checkbox is unchecked but condition exists in query
                 flagCount++;
-                resultsHTML += '<div class="flag result-item">🚩 FLAG: Complaint is not checked but _Complaint check exists in query</div>';
-                resultsHTML += '<div class="flag-message">Query contains complaint check but the Complaint checkbox is not checked. This might indicate a mismatch between your selection and the query.</div>';
+                groupedResults['complaint'] = {
+                    status: 'flag',
+                    title: 'Complaint',
+                    icon: '🚩',
+                    content: 'Complaint is not checked but _Complaint check exists in query',
+                    flagMessage: 'Query contains complaint check but the Complaint checkbox is not checked. This might indicate a mismatch between your selection and the query.'
+                };
                 document.querySelector('[data-checkbox="complaint"]').classList.add('highlight-flag');
             }
             
@@ -1103,18 +1283,33 @@
                 hasValidations = true;
                 if (hasMasterSuppression) {
                     successCount++;
-                    resultsHTML += '<div class="success result-item">✓ AMC Master Suppression: AMC_MasterSuppression table is checked</div>';
+                    groupedResults['masterSuppression'] = {
+                        status: 'success',
+                        title: 'AMC Master Suppression',
+                        icon: '✓',
+                        content: 'AMC_MasterSuppression table is checked'
+                    };
                     document.querySelector('[data-checkbox="masterSuppression"]').classList.add('highlight-success');
                 } else {
                     errorCount++;
-                    resultsHTML += '<div class="error result-item">✗ AMC Master Suppression: AMC_MasterSuppression check is missing</div>';
+                    groupedResults['masterSuppression'] = {
+                        status: 'error',
+                        title: 'AMC Master Suppression',
+                        icon: '✗',
+                        content: 'AMC_MasterSuppression check is missing'
+                    };
                     document.querySelector('[data-checkbox="masterSuppression"]').classList.add('highlight-error');
                 }
             } else if (hasMasterSuppression) {
                 // Flag if checkbox is unchecked but condition exists in query
                 flagCount++;
-                resultsHTML += '<div class="flag result-item">🚩 FLAG: AMC Master Suppression is not checked but AMC_MasterSuppression check exists in query</div>';
-                resultsHTML += '<div class="flag-message">Query contains master suppression check but the AMC Master Suppression checkbox is not checked. This might indicate a mismatch between your selection and the query.</div>';
+                groupedResults['masterSuppression'] = {
+                    status: 'flag',
+                    title: 'AMC Master Suppression',
+                    icon: '🚩',
+                    content: 'AMC Master Suppression is not checked but AMC_MasterSuppression check exists in query',
+                    flagMessage: 'Query contains master suppression check but the AMC Master Suppression checkbox is not checked. This might indicate a mismatch between your selection and the query.'
+                };
                 document.querySelector('[data-checkbox="masterSuppression"]').classList.add('highlight-flag');
             }
             
@@ -1126,18 +1321,33 @@
                 hasValidations = true;
                 if (hasAssociateSuppression) {
                     successCount++;
-                    resultsHTML += '<div class="success result-item">✓ Associate Suppression present</div>';
+                    groupedResults['associateSuppression'] = {
+                        status: 'success',
+                        title: 'Associate Suppression',
+                        icon: '✓',
+                        content: 'Associate Suppression present'
+                    };
                     document.querySelector('[data-checkbox="associateSuppression"]').classList.add('highlight-success');
                 } else {
                     errorCount++;
-                    resultsHTML += '<div class="error result-item">✗ Associate Suppression missing</div>';
+                    groupedResults['associateSuppression'] = {
+                        status: 'error',
+                        title: 'Associate Suppression',
+                        icon: '✗',
+                        content: 'Associate Suppression missing'
+                    };
                     document.querySelector('[data-checkbox="associateSuppression"]').classList.add('highlight-error');
                 }
             } else if (hasAssociateSuppression) {
                 // Flag if checkbox is unchecked but condition exists in query
                 flagCount++;
-                resultsHTML += '<div class="flag result-item">🚩 FLAG: Associate Suppression is not checked but conditions exist in query</div>';
-                resultsHTML += '<div class="flag-message">Query contains associate suppression conditions but the Associate Suppression checkbox is not checked. This might indicate a mismatch between your selection and the query.</div>';
+                groupedResults['associateSuppression'] = {
+                    status: 'flag',
+                    title: 'Associate Suppression',
+                    icon: '🚩',
+                    content: 'Associate Suppression is not checked but conditions exist in query',
+                    flagMessage: 'Query contains associate suppression conditions but the Associate Suppression checkbox is not checked. This might indicate a mismatch between your selection and the query.'
+                };
                 document.querySelector('[data-checkbox="associateSuppression"]').classList.add('highlight-flag');
             }
             
@@ -1149,18 +1359,33 @@
                 hasValidations = true;
                 if (hasFreshAddress) {
                     successCount++;
-                    resultsHTML += '<div class="success result-item">✓ Fresh Address: FreshAddress_Exclusions_MRM is checked</div>';
+                    groupedResults['freshAddress'] = {
+                        status: 'success',
+                        title: 'Fresh Address',
+                        icon: '✓',
+                        content: 'FreshAddress_Exclusions_MRM is checked'
+                    };
                     document.querySelector('[data-checkbox="freshAddress"]').classList.add('highlight-success');
                 } else {
                     errorCount++;
-                    resultsHTML += '<div class="error result-item">✗ Fresh Address: FreshAddress_Exclusions_MRM check is missing</div>';
+                    groupedResults['freshAddress'] = {
+                        status: 'error',
+                        title: 'Fresh Address',
+                        icon: '✗',
+                        content: 'FreshAddress_Exclusions_MRM check is missing'
+                    };
                     document.querySelector('[data-checkbox="freshAddress"]').classList.add('highlight-error');
                 }
             } else if (hasFreshAddress) {
                 // Flag if checkbox is unchecked but condition exists in query
                 flagCount++;
-                resultsHTML += '<div class="flag result-item">🚩 FLAG: Fresh Address is not checked but FreshAddress_Exclusions_MRM check exists in query</div>';
-                resultsHTML += '<div class="flag-message">Query contains fresh address check but the Fresh Address checkbox is not checked. This might indicate a mismatch between your selection and the query.</div>';
+                groupedResults['freshAddress'] = {
+                    status: 'flag',
+                    title: 'Fresh Address',
+                    icon: '🚩',
+                    content: 'Fresh Address is not checked but FreshAddress_Exclusions_MRM check exists in query',
+                    flagMessage: 'Query contains fresh address check but the Fresh Address checkbox is not checked. This might indicate a mismatch between your selection and the query.'
+                };
                 document.querySelector('[data-checkbox="freshAddress"]').classList.add('highlight-flag');
             }
             
@@ -1172,19 +1397,59 @@
                 hasValidations = true;
                 if (hasEngagement) {
                     successCount++;
-                    resultsHTML += '<div class="success result-item">✓ Engagement: CLICK_ENGAGEMENT_LAST_6_MONTHS and LastOpen_6Months tables are checked</div>';
+                    groupedResults['engagement'] = {
+                        status: 'success',
+                        title: 'Engagement',
+                        icon: '✓',
+                        content: 'CLICK_ENGAGEMENT_LAST_6_MONTHS and LastOpen_6Months tables are checked'
+                    };
                     document.querySelector('[data-checkbox="engagement"]').classList.add('highlight-success');
                 } else {
                     errorCount++;
-                    resultsHTML += '<div class="error result-item">✗ Engagement: Engagement tables check is missing</div>';
+                    groupedResults['engagement'] = {
+                        status: 'error',
+                        title: 'Engagement',
+                        icon: '✗',
+                        content: 'Engagement tables check is missing'
+                    };
                     document.querySelector('[data-checkbox="engagement"]').classList.add('highlight-error');
                 }
             } else if (hasEngagement) {
                 // Flag if checkbox is unchecked but condition exists in query
                 flagCount++;
-                resultsHTML += '<div class="flag result-item">🚩 FLAG: Engagement is not checked but engagement tables check exists in query</div>';
-                resultsHTML += '<div class="flag-message">Query contains engagement check but the Engagement checkbox is not checked. This might indicate a mismatch between your selection and the query.</div>';
+                groupedResults['engagement'] = {
+                    status: 'flag',
+                    title: 'Engagement',
+                    icon: '🚩',
+                    content: 'Engagement is not checked but engagement tables check exists in query',
+                    flagMessage: 'Query contains engagement check but the Engagement checkbox is not checked. This might indicate a mismatch between your selection and the query.'
+                };
                 document.querySelector('[data-checkbox="engagement"]').classList.add('highlight-flag');
+            }
+            
+            // Generate HTML from grouped results
+            for (const [key, result] of Object.entries(groupedResults)) {
+                let resultHTML = `<div class="result-group ${result.status}">
+                    <div class="result-group-header">
+                        <span class="result-group-icon">${result.icon}</span>
+                        ${result.title}
+                    </div>
+                    <div class="result-group-content">${result.content}`;
+                
+                if (result.details) {
+                    resultHTML += `<div class="result-detail ${result.status === 'success' ? 'match' : 'mismatch'}">${result.details}</div>`;
+                }
+                
+                if (result.foundItems) {
+                    resultHTML += `<div class="found-items">${result.foundItems}</div>`;
+                }
+                
+                if (result.flagMessage) {
+                    resultHTML += `<div class="flag-message">${result.flagMessage}</div>`;
+                }
+                
+                resultHTML += `</div></div>`;
+                resultsHTML += resultHTML;
             }
             
             // Add summary
@@ -1204,7 +1469,7 @@
                 
                 resultsHTML = `<div class="summary ${summaryClass}">${summaryText}</div>` + resultsHTML;
             } else {
-                resultsHTML = '<div class="warning result-item">Please select at least one validation option.</div>';
+                resultsHTML = '<div class="warning result-group"><div class="result-group-header"><span class="result-group-icon">⚠</span>Warning</div><div class="result-group-content">Please select at least one validation option.</div></div>';
             }
             
             resultsContainer.innerHTML = resultsHTML;
@@ -1212,7 +1477,7 @@
         
         document.getElementById('clearBtn').addEventListener('click', function() {
             document.getElementById('sqlQuery').value = '';
-            document.getElementById('validationResults').innerHTML = '<div class="info result-item">Please select validation options and click "Validate Query" to see results.</div>';
+            document.getElementById('validationResults').innerHTML = '<div class="info result-group"><div class="result-group-header"><span class="result-group-icon">ℹ</span>Info</div><div class="result-group-content">Please select validation options and click "Validate Query" to see results.</div></div>';
             
             // Uncheck all checkboxes
             const checkboxes = document.querySelectorAll('input[type="checkbox"]');
