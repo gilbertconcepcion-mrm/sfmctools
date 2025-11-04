@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yohan's SketchPad</title>
+    <style>
+        /* --- CSS Variables for Easy Theming --- */
+        :root {
+            --header-height: 60px;
+            --footer-height: 180px;
+            --bg-color: #2c3e50;
+            --header-footer-bg: #34495e;
+            --swatch-active-border: #ecf0f1;
+            --status-on-color: #2ecc71;
+            --status-off-color: #e74c3c;
+        }
+
+        /* --- Fullscreen Layout --- */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: var(--bg-color);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- Header --- */
+        header {
+            flex-shrink: 0;
+            height: var(--header-height);
+            background-color: var(--header-footer-bg);
+            color: var(--swatch-active-border);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            position: relative; /* For positioning the status box */
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+
+        #statusBox {
+            position: absolute;
+            right: 20px;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            background-color: var(--status-off-color);
+            transition: background-color 0.3s ease;
+        }
+
+        #statusBox.active {
+            background-color: var(--status-on-color);
+        }
+
+        /* --- Main Canvas Area --- */
+        main {
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f0f0f0; /* A subtle background */
+        }
+
+        #drawingCanvas {
+            cursor: crosshair;
+            background-color: white;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+            max-width: 100%; /* Prevents canvas from overflowing on small screens */
+            max-height: 100%;
+        }
+
+        /* --- Footer Controls --- */
+        footer {
+            flex-shrink: 0;
+            height: var(--footer-height);
+            background-color: var(--header-footer-bg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.2);
+            flex-wrap: wrap; /* Allows items to wrap on smaller screens */
+            padding: 10px;
+        }
+
+        /* --- Color Palette --- */
+        .color-palette {
+            display: flex;
+            gap: 15px;
+        }
+
+        .color-swatch {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 4px solid transparent;
+            cursor: pointer;
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+
+        .color-swatch:hover {
+            transform: scale(1.1);
+        }
+
+        .color-swatch.active {
+            border-color: var(--swatch-active-border);
+            box-shadow: 0 0 15px var(--swatch-active-border);
+        }
+
+        /* --- Other Controls --- */
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--swatch-active-border);
+        }
+
+        .control-group label {
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        input[type="range"] {
+            width: 100px;
+        }
+
+        #sizeValue {
+            font-weight: bold;
+            font-size: 16px;
+            min-width: 25px;
+            text-align: center;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            color: white;
+            background-color: #e74c3c;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        button:hover {
+            background-color: #c0392b;
+            transform: scale(1.05);
+        }
+
+        /* --- Image Loader --- */
+        .image-loader {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .image-input-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        #imageUrl {
+            flex-grow: 1;
+            padding: 8px;
+            border-radius: 4px;
+            border: none;
+            font-size: 14px;
+        }
+
+        #loadImageButton {
+            background-color: #3498db;
+            padding: 8px 15px;
+            font-size: 14px;
+        }
+
+        #loadImageButton:hover {
+            background-color: #2980b9;
+        }
+
+        /* --- Responsive Design --- */
+        @media (max-width: 768px) {
+            :root {
+                --footer-height: 220px; /* Increase height for wrapping items */
+            }
+
+            h1 {
+                font-size: 22px;
+            }
+
+            #statusBox {
+                font-size: 12px;
+                right: 10px;
+                padding: 6px 12px;
+            }
+
+            footer {
+                gap: 15px;
+            }
+
+            .color-swatch {
+                width: 40px;
+                height: 40px;
+            }
+
+            .control-group label {
+                font-size: 14px;
+            }
+
+            button {
+                padding: 8px 15px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Yohan's SketchPad</h1>
+        <div id="statusBox">Auto Sketch: OFF</div>
+    </header>
+
+    <main>
+        <canvas id="drawingCanvas"></canvas>
+    </main>
+
+    <footer>
+        <div class="color-palette" id="colorPalette">
+            <!-- Color swatches will be generated by JavaScript -->
+        </div>
+
+        <div class="control-group">
+            <label for="brushSize">Size:</label>
+            <input type="range" id="brushSize" min="5" max="100" value="15">
+            <span id="sizeValue">15</span>
+        </div>
+        
+        <button id="clearButton">Clear</button>
+        
+        <div class="image-loader">
+            <div class="image-input-group">
+                <input type="text" id="imageUrl" placeholder="Enter image URL">
+                <button id="loadImageButton">Load Image</button>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // --- JAVASCRIPT LOGIC ---
+
+        // 1. SETUP
+        const canvas = document.getElementById('drawingCanvas');
+        const ctx = canvas.getContext('2d');
+        const colorPalette = document.getElementById('colorPalette');
+        const brushSizeSlider = document.getElementById('brushSize');
+        const clearButton = document.getElementById('clearButton');
+        const sizeValue = document.getElementById('sizeValue');
+        const statusBox = document.getElementById('statusBox');
+        const header = document.querySelector('header');
+        const footer = document.querySelector('footer');
+        const imageUrlInput = document.getElementById('imageUrl');
+        const loadImageButton = document.getElementById('loadImageButton');
+
+        // Drawing state
+        let isDrawing = false;
+        let isAutoDrawing = false;
+        let currentColor = '#000000';
+        let currentLineWidth = 15;
+        let backgroundImage = null;
+
+        // Define the colors for the palette
+        const colors = [
+            '#000000', '#FFFFFF', '#FF0000', '#00FF00', '#0000FF',
+            '#FFFF00', '#FF00FF', '#00FFFF', '#FFA500', '#800080',
+        ];
+
+        // 2. INITIALIZATION FUNCTIONS
+        function resizeCanvas() {
+            // Set canvas size to fill the window, minus header and footer height
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight - header.offsetHeight - footer.offsetHeight;
+            
+            // Redraw background image if it exists
+            if (backgroundImage) {
+                drawBackgroundImage();
+            }
+        }
+
+        function createColorPalette() {
+            colors.forEach(color => {
+                const swatch = document.createElement('button');
+                swatch.classList.add('color-swatch');
+                swatch.style.backgroundColor = color;
+                swatch.dataset.color = color;
+
+                if (color === currentColor) {
+                    swatch.classList.add('active');
+                }
+
+                swatch.addEventListener('click', selectColor);
+                colorPalette.appendChild(swatch);
+            });
+        }
+
+        // 3. DRAWING FUNCTIONS
+        function startDrawing(e) {
+            // Don't start a new path if we are just toggling auto-draw
+            if (isAutoDrawing) return;
+            
+            isDrawing = true;
+            const pos = getMousePos(e);
+            ctx.beginPath();
+            ctx.moveTo(pos.x, pos.y);
+        }
+
+        function draw(e) {
+            // Draw if mouse is held down OR if auto-draw is on
+            if (!isDrawing && !isAutoDrawing) return;
+
+            const pos = getMousePos(e);
+
+            ctx.lineWidth = currentLineWidth;
+            ctx.strokeStyle = currentColor;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+
+            ctx.lineTo(pos.x, pos.y);
+            ctx.stroke();
+            ctx.beginPath(); // Begin a new path for the next move
+            ctx.moveTo(pos.x, pos.y);
+        }
+
+        function stopDrawing() {
+            if (!isDrawing) return;
+            isDrawing = false;
+            ctx.beginPath();
+        }
+        
+        // Function to toggle auto-drawing mode
+        function toggleAutoDraw(e) {
+            // Prevent toggling if the user is actually trying to draw a line
+            if (isDrawing) return;
+
+            isAutoDrawing = !isAutoDrawing;
+            updateStatusBox();
+        }
+
+        function updateStatusBox() {
+            if (isAutoDrawing) {
+                statusBox.textContent = 'Auto Sketch: ON';
+                statusBox.classList.add('active');
+            } else {
+                statusBox.textContent = 'Auto Sketch: OFF';
+                statusBox.classList.remove('active');
+            }
+        }
+
+        // Helper to get mouse position
+        function getMousePos(e) {
+            const rect = canvas.getBoundingClientRect();
+            const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+            const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+            return {
+                x: clientX - rect.left,
+                y: clientY - rect.top
+            };
+        }
+
+        // 4. IMAGE LOADING FUNCTIONS
+        function loadImage() {
+            const url = imageUrlInput.value.trim();
+            if (!url) return;
+
+            const img = new Image();
+            img.crossOrigin = 'anonymous'; // Enable cross-origin image loading
+            
+            img.onload = function() {
+                // Create a temporary canvas to process the image
+                const tempCanvas = document.createElement('canvas');
+                const tempCtx = tempCanvas.getContext('2d');
+                
+                // Calculate scaling to fit the image in the canvas
+                const scale = Math.min(
+                    canvas.width / img.width,
+                    canvas.height / img.height,
+                    1
+                );
+                
+                const width = img.width * scale;
+                const height = img.height * scale;
+                
+                tempCanvas.width = width;
+                tempCanvas.height = height;
+                
+                // Draw the image to the temporary canvas
+                tempCtx.drawImage(img, 0, 0, width, height);
+                
+                // Get image data and convert to black and white
+                const imageData = tempCtx.getImageData(0, 0, width, height);
+                const data = imageData.data;
+                
+                // Convert to black and white with threshold
+                for (let i = 0; i < data.length; i += 4) {
+                    const r = data[i];
+                    const g = data[i + 1];
+                    const b = data[i + 2];
+                    
+                    // Calculate grayscale value
+                    const gray = 0.299 * r + 0.587 * g + 0.114 * b;
+                    
+                    // Apply threshold to create black and white image
+                    // Lower threshold means more black
+                    const threshold = 200;
+                    const value = gray > threshold ? 255 : 0;
+                    
+                    data[i] = value;     // Red
+                    data[i + 1] = value; // Green
+                    data[i + 2] = value; // Blue
+                    // Alpha channel (data[i + 3]) remains unchanged
+                }
+                
+                // Put the processed image data back
+                tempCtx.putImageData(imageData, 0, 0);
+                
+                // Store the processed image
+                backgroundImage = new Image();
+                backgroundImage.onload = function() {
+                    drawBackgroundImage();
+                };
+                backgroundImage.src = tempCanvas.toDataURL();
+            };
+            
+            img.onerror = function() {
+                alert('Failed to load image. Please check the URL and try again.');
+            };
+            
+            img.src = url;
+        }
+
+        function drawBackgroundImage() {
+            if (!backgroundImage) return;
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Calculate position to center the image
+            const x = (canvas.width - backgroundImage.width) / 2;
+            const y = (canvas.height - backgroundImage.height) / 2;
+            
+            // Draw the background image
+            ctx.drawImage(backgroundImage, x, y);
+        }
+
+        // 5. CONTROL HANDLERS
+        function selectColor(e) {
+            document.querySelectorAll('.color-swatch').forEach(swatch => {
+                swatch.classList.remove('active');
+            });
+            e.target.classList.add('active');
+            currentColor = e.target.dataset.color;
+        }
+
+        // 6. EVENT LISTENERS
+        // Drawing events
+        canvas.addEventListener('mousedown', startDrawing);
+        canvas.addEventListener('mousemove', draw);
+        canvas.addEventListener('mouseup', stopDrawing);
+        canvas.addEventListener('mouseout', stopDrawing);
+        canvas.addEventListener('click', toggleAutoDraw);
+
+        // Touch events for mobile
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault(); // Prevent scrolling/zooming
+            // On touch, we treat it as a click to toggle auto-draw
+            if (!isAutoDrawing) {
+                 startDrawing(e);
+            } else {
+                 toggleAutoDraw(e);
+            }
+        });
+        canvas.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            draw(e);
+        });
+        canvas.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            stopDrawing();
+        });
+
+        // Control events
+        brushSizeSlider.addEventListener('input', (e) => {
+            currentLineWidth = e.target.value;
+            sizeValue.textContent = e.target.value;
+        });
+
+        clearButton.addEventListener('click', () => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            backgroundImage = null;
+        });
+
+        loadImageButton.addEventListener('click', loadImage);
+        
+        // Allow loading image with Enter key
+        imageUrlInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                loadImage();
+            }
+        });
+
+        window.addEventListener('resize', resizeCanvas);
+
+        // --- INITIALIZE ---
+        createColorPalette();
+        resizeCanvas();
+        updateStatusBox(); // Set initial status
+    </script>
+</body>
+</html>
