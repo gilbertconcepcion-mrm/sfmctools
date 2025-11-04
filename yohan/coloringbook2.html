@@ -8,7 +8,7 @@
         /* --- CSS Variables for Easy Theming --- */
         :root {
             --header-height: 60px;
-            --footer-height: 180px;
+            --footer-height: 200px;
             --bg-color: #2c3e50;
             --header-footer-bg: #34495e;
             --swatch-active-border: #ecf0f1;
@@ -51,9 +51,15 @@
             letter-spacing: 1px;
         }
 
-        #statusBox {
+        .header-controls {
             position: absolute;
             right: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        #statusBox {
             padding: 8px 15px;
             border-radius: 20px;
             font-size: 14px;
@@ -66,6 +72,25 @@
             background-color: var(--status-on-color);
         }
 
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--swatch-active-border);
+            font-size: 14px;
+        }
+
+        .checkbox-container input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .checkbox-container label {
+            cursor: pointer;
+            user-select: none;
+        }
+
         /* --- Main Canvas Area --- */
         main {
             flex-grow: 1;
@@ -73,14 +98,29 @@
             justify-content: center;
             align-items: center;
             background-color: #f0f0f0; /* A subtle background */
+            position: relative;
+        }
+
+        .canvas-container {
+            position: relative;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+            background-color: white;
+        }
+
+        #drawingCanvas, #imageCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
         }
 
         #drawingCanvas {
+            z-index: 1; /* Bottom layer */
             cursor: crosshair;
-            background-color: white;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
-            max-width: 100%; /* Prevents canvas from overflowing on small screens */
-            max-height: 100%;
+        }
+
+        #imageCanvas {
+            z-index: 2; /* Top layer */
+            pointer-events: none; /* Allow clicks to pass through to drawing canvas */
         }
 
         /* --- Footer Controls --- */
@@ -138,10 +178,10 @@
             width: 100px;
         }
 
-        #sizeValue {
+        #sizeValue, #opacityValue {
             font-weight: bold;
             font-size: 16px;
-            min-width: 25px;
+            min-width: 35px;
             text-align: center;
         }
 
@@ -197,17 +237,26 @@
         /* --- Responsive Design --- */
         @media (max-width: 768px) {
             :root {
-                --footer-height: 220px; /* Increase height for wrapping items */
+                --footer-height: 260px; /* Increase height for wrapping items */
             }
 
             h1 {
                 font-size: 22px;
             }
 
+            .header-controls {
+                right: 10px;
+                flex-direction: column;
+                gap: 8px;
+            }
+
             #statusBox {
                 font-size: 12px;
-                right: 10px;
                 padding: 6px 12px;
+            }
+
+            .checkbox-container {
+                font-size: 12px;
             }
 
             footer {
@@ -234,11 +283,20 @@
 
     <header>
         <h1>Yohan's SketchPad</h1>
-        <div id="statusBox">Auto Sketch: OFF</div>
+        <div class="header-controls">
+            <div class="checkbox-container">
+                <input type="checkbox" id="autoSketchToggle" checked>
+                <label for="autoSketchToggle">Enable Auto Sketch</label>
+            </div>
+            <div id="statusBox">Auto Sketch: OFF</div>
+        </div>
     </header>
 
     <main>
-        <canvas id="drawingCanvas"></canvas>
+        <div class="canvas-container">
+            <canvas id="drawingCanvas"></canvas>
+            <canvas id="imageCanvas"></canvas>
+        </div>
     </main>
 
     <footer>
@@ -250,6 +308,12 @@
             <label for="brushSize">Size:</label>
             <input type="range" id="brushSize" min="5" max="100" value="15">
             <span id="sizeValue">15</span>
+        </div>
+
+        <div class="control-group">
+            <label for="opacitySlider">Opacity:</label>
+            <input type="range" id="opacitySlider" min="0" max="100" value="100">
+            <span id="opacityValue">100%</span>
         </div>
         
         <button id="clearButton">Clear</button>
@@ -266,24 +330,31 @@
         // --- JAVASCRIPT LOGIC ---
 
         // 1. SETUP
-        const canvas = document.getElementById('drawingCanvas');
-        const ctx = canvas.getContext('2d');
+        const drawingCanvas = document.getElementById('drawingCanvas');
+        const drawingCtx = drawingCanvas.getContext('2d');
+        const imageCanvas = document.getElementById('imageCanvas');
+        const imageCtx = imageCanvas.getContext('2d');
         const colorPalette = document.getElementById('colorPalette');
         const brushSizeSlider = document.getElementById('brushSize');
+        const opacitySlider = document.getElementById('opacitySlider');
         const clearButton = document.getElementById('clearButton');
         const sizeValue = document.getElementById('sizeValue');
+        const opacityValue = document.getElementById('opacityValue');
         const statusBox = document.getElementById('statusBox');
         const header = document.querySelector('header');
         const footer = document.querySelector('footer');
         const imageUrlInput = document.getElementById('imageUrl');
         const loadImageButton = document.getElementById('loadImageButton');
+        const autoSketchToggle = document.getElementById('autoSketchToggle');
 
         // Drawing state
         let isDrawing = false;
         let isAutoDrawing = false;
         let currentColor = '#000000';
         let currentLineWidth = 15;
+        let currentOpacity = 1;
         let backgroundImage = null;
+        let autoSketchEnabled = true;
 
         // Define the colors for the palette
         const colors = [
@@ -293,9 +364,27 @@
 
         // 2. INITIALIZATION FUNCTIONS
         function resizeCanvas() {
+            // Store current canvas content
+            const drawingData = drawingCtx.getImageData(0, 0, drawingCanvas.width, drawingCanvas.height);
+            const imageData = imageCtx.getImageData(0, 0, imageCanvas.width, imageCanvas.height);
+            
             // Set canvas size to fill the window, minus header and footer height
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight - header.offsetHeight - footer.offsetHeight;
+            const width = window.innerWidth;
+            const height = window.innerHeight - header.offsetHeight - footer.offsetHeight;
+            
+            drawingCanvas.width = width;
+            drawingCanvas.height = height;
+            imageCanvas.width = width;
+            imageCanvas.height = height;
+            
+            // Update canvas container size
+            const container = document.querySelector('.canvas-container');
+            container.style.width = width + 'px';
+            container.style.height = height + 'px';
+            
+            // Restore canvas content
+            drawingCtx.putImageData(drawingData, 0, 0);
+            imageCtx.putImageData(imageData, 0, 0);
             
             // Redraw background image if it exists
             if (backgroundImage) {
@@ -326,8 +415,8 @@
             
             isDrawing = true;
             const pos = getMousePos(e);
-            ctx.beginPath();
-            ctx.moveTo(pos.x, pos.y);
+            drawingCtx.beginPath();
+            drawingCtx.moveTo(pos.x, pos.y);
         }
 
         function draw(e) {
@@ -336,25 +425,31 @@
 
             const pos = getMousePos(e);
 
-            ctx.lineWidth = currentLineWidth;
-            ctx.strokeStyle = currentColor;
-            ctx.lineCap = 'round';
-            ctx.lineJoin = 'round';
+            drawingCtx.lineWidth = currentLineWidth;
+            drawingCtx.strokeStyle = currentColor;
+            drawingCtx.globalAlpha = currentOpacity;
+            drawingCtx.lineCap = 'round';
+            drawingCtx.lineJoin = 'round';
 
-            ctx.lineTo(pos.x, pos.y);
-            ctx.stroke();
-            ctx.beginPath(); // Begin a new path for the next move
-            ctx.moveTo(pos.x, pos.y);
+            drawingCtx.lineTo(pos.x, pos.y);
+            drawingCtx.stroke();
+            drawingCtx.beginPath(); // Begin a new path for the next move
+            drawingCtx.moveTo(pos.x, pos.y);
         }
 
         function stopDrawing() {
             if (!isDrawing) return;
             isDrawing = false;
-            ctx.beginPath();
+            drawingCtx.beginPath();
+            // Reset globalAlpha to ensure other operations aren't affected
+            drawingCtx.globalAlpha = 1;
         }
         
         // Function to toggle auto-drawing mode
         function toggleAutoDraw(e) {
+            // Check if auto-sketch is enabled in settings
+            if (!autoSketchEnabled) return;
+            
             // Prevent toggling if the user is actually trying to draw a line
             if (isDrawing) return;
 
@@ -374,7 +469,7 @@
 
         // Helper to get mouse position
         function getMousePos(e) {
-            const rect = canvas.getBoundingClientRect();
+            const rect = drawingCanvas.getBoundingClientRect();
             const clientX = e.clientX || (e.touches && e.touches[0].clientX);
             const clientY = e.clientY || (e.touches && e.touches[0].clientY);
             return {
@@ -398,8 +493,8 @@
                 
                 // Calculate scaling to fit the image in the canvas
                 const scale = Math.min(
-                    canvas.width / img.width,
-                    canvas.height / img.height,
+                    drawingCanvas.width / img.width,
+                    drawingCanvas.height / img.height,
                     1
                 );
                 
@@ -412,11 +507,11 @@
                 // Draw the image to the temporary canvas
                 tempCtx.drawImage(img, 0, 0, width, height);
                 
-                // Get image data and convert to black and white
+                // Get image data and convert to black lines with transparent background
                 const imageData = tempCtx.getImageData(0, 0, width, height);
                 const data = imageData.data;
                 
-                // Convert to black and white with threshold
+                // Convert to black lines with transparent background
                 for (let i = 0; i < data.length; i += 4) {
                     const r = data[i];
                     const g = data[i + 1];
@@ -425,15 +520,22 @@
                     // Calculate grayscale value
                     const gray = 0.299 * r + 0.587 * g + 0.114 * b;
                     
-                    // Apply threshold to create black and white image
-                    // Lower threshold means more black
+                    // Apply threshold to create black lines with transparent background
                     const threshold = 200;
-                    const value = gray > threshold ? 255 : 0;
                     
-                    data[i] = value;     // Red
-                    data[i + 1] = value; // Green
-                    data[i + 2] = value; // Blue
-                    // Alpha channel (data[i + 3]) remains unchanged
+                    if (gray > threshold) {
+                        // White area - make transparent
+                        data[i] = 0;       // Red
+                        data[i + 1] = 0;   // Green
+                        data[i + 2] = 0;   // Blue
+                        data[i + 3] = 0;   // Alpha (transparent)
+                    } else {
+                        // Dark area - make black
+                        data[i] = 0;       // Red
+                        data[i + 1] = 0;   // Green
+                        data[i + 2] = 0;   // Blue
+                        data[i + 3] = 255; // Alpha (opaque)
+                    }
                 }
                 
                 // Put the processed image data back
@@ -457,15 +559,15 @@
         function drawBackgroundImage() {
             if (!backgroundImage) return;
             
-            // Clear canvas
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            // Clear the image canvas
+            imageCtx.clearRect(0, 0, imageCanvas.width, imageCanvas.height);
             
             // Calculate position to center the image
-            const x = (canvas.width - backgroundImage.width) / 2;
-            const y = (canvas.height - backgroundImage.height) / 2;
+            const x = (imageCanvas.width - backgroundImage.width) / 2;
+            const y = (imageCanvas.height - backgroundImage.height) / 2;
             
-            // Draw the background image
-            ctx.drawImage(backgroundImage, x, y);
+            // Draw the image on the top canvas
+            imageCtx.drawImage(backgroundImage, x, y);
         }
 
         // 5. CONTROL HANDLERS
@@ -478,15 +580,15 @@
         }
 
         // 6. EVENT LISTENERS
-        // Drawing events
-        canvas.addEventListener('mousedown', startDrawing);
-        canvas.addEventListener('mousemove', draw);
-        canvas.addEventListener('mouseup', stopDrawing);
-        canvas.addEventListener('mouseout', stopDrawing);
-        canvas.addEventListener('click', toggleAutoDraw);
+        // Drawing events - only on the drawing canvas
+        drawingCanvas.addEventListener('mousedown', startDrawing);
+        drawingCanvas.addEventListener('mousemove', draw);
+        drawingCanvas.addEventListener('mouseup', stopDrawing);
+        drawingCanvas.addEventListener('mouseout', stopDrawing);
+        drawingCanvas.addEventListener('click', toggleAutoDraw);
 
         // Touch events for mobile
-        canvas.addEventListener('touchstart', (e) => {
+        drawingCanvas.addEventListener('touchstart', (e) => {
             e.preventDefault(); // Prevent scrolling/zooming
             // On touch, we treat it as a click to toggle auto-draw
             if (!isAutoDrawing) {
@@ -495,11 +597,11 @@
                  toggleAutoDraw(e);
             }
         });
-        canvas.addEventListener('touchmove', (e) => {
+        drawingCanvas.addEventListener('touchmove', (e) => {
             e.preventDefault();
             draw(e);
         });
-        canvas.addEventListener('touchend', (e) => {
+        drawingCanvas.addEventListener('touchend', (e) => {
             e.preventDefault();
             stopDrawing();
         });
@@ -510,8 +612,14 @@
             sizeValue.textContent = e.target.value;
         });
 
+        opacitySlider.addEventListener('input', (e) => {
+            currentOpacity = e.target.value / 100;
+            opacityValue.textContent = e.target.value + '%';
+        });
+
         clearButton.addEventListener('click', () => {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawingCtx.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
+            imageCtx.clearRect(0, 0, imageCanvas.width, imageCanvas.height);
             backgroundImage = null;
         });
 
@@ -524,12 +632,25 @@
             }
         });
 
+        // Auto-sketch toggle checkbox
+        autoSketchToggle.addEventListener('change', (e) => {
+            autoSketchEnabled = e.target.checked;
+            if (!autoSketchEnabled && isAutoDrawing) {
+                isAutoDrawing = false;
+                updateStatusBox();
+            }
+        });
+
         window.addEventListener('resize', resizeCanvas);
 
         // --- INITIALIZE ---
         createColorPalette();
         resizeCanvas();
         updateStatusBox(); // Set initial status
+        
+        // Initialize with a white background on the drawing canvas
+        drawingCtx.fillStyle = 'white';
+        drawingCtx.fillRect(0, 0, drawingCanvas.width, drawingCanvas.height);
     </script>
 </body>
 </html>
