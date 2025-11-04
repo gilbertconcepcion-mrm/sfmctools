@@ -45,10 +45,43 @@
             border-radius: 5px;
             background-color: #f9f9f9;
             cursor: pointer;
-            transition: background-color 0.2s ease;
+            transition: all 0.2s ease;
         }
         .checkbox-item:hover {
             background-color: #f0f0f0;
+        }
+        /* Highlight styles for validation results */
+        .checkbox-item.highlight-success {
+            border-color: #28a745;
+            background-color: #e9f7ef;
+        }
+        .checkbox-item.highlight-warning {
+            border-color: #ffc107;
+            background-color: #fffbeb;
+        }
+        .checkbox-item.highlight-error {
+            border-color: #dc3545;
+            background-color: #fdeeee;
+        }
+        .checkbox-item.highlight-flag {
+            border-color: #fd7e14;
+            background-color: #fff4e6;
+        }
+        .tier-selection-container.highlight-success {
+            border-color: #28a745;
+            background-color: #e9f7ef;
+        }
+        .tier-selection-container.highlight-warning {
+            border-color: #ffc107;
+            background-color: #fffbeb;
+        }
+        .tier-selection-container.highlight-error {
+            border-color: #dc3545;
+            background-color: #fdeeee;
+        }
+        .tier-selection-container.highlight-flag {
+            border-color: #fd7e14;
+            background-color: #fff4e6;
         }
         .form-check {
             margin-bottom: 10px;
@@ -443,7 +476,7 @@
             </div>
             
             <!-- Tier Selection moved here -->
-            <div class="tier-selection-container">
+            <div class="tier-selection-container" id="tierSelectionContainer">
                 <div class="tier-selection-title">Tier Selection</div>
                 
                 <div class="tier-selection">
@@ -632,6 +665,12 @@
                 return;
             }
             
+            // Clear all highlights before validation
+            document.querySelectorAll('.checkbox-item').forEach(item => {
+                item.classList.remove('highlight-success', 'highlight-warning', 'highlight-error', 'highlight-flag');
+            });
+            document.getElementById('tierSelectionContainer').classList.remove('highlight-success', 'highlight-warning', 'highlight-error', 'highlight-flag');
+            
             let hasValidations = false;
             let successCount = 0;
             let warningCount = 0;
@@ -676,10 +715,12 @@
                     if (foundGenreColumns.length === 0) {
                         successCount++;
                         resultsHTML += '<div class="success result-item">✓ Genre Selection: N/A selected and no genre columns found in query</div>';
+                        document.querySelector('[data-checkbox="genreSelected"]').classList.add('highlight-success');
                     } else {
                         errorCount++;
                         resultsHTML += '<div class="error result-item">✗ Genre Selection: N/A selected but genre columns found in query</div>';
                         resultsHTML += '<div class="genre-mismatch">Query contains: ' + foundGenreColumns.join(', ') + '</div>';
+                        document.querySelector('[data-checkbox="genreSelected"]').classList.add('highlight-error');
                     }
                 } else {
                     // Check if selected genre column exists in query
@@ -687,6 +728,7 @@
                         successCount++;
                         resultsHTML += '<div class="success result-item">✓ Genre Selection: AMC_Genre_targeting is joined and genre column exists</div>';
                         resultsHTML += '<div class="genre-match">Selected genre column: al.[' + selectedGenre + ']</div>';
+                        document.querySelector('[data-checkbox="genreSelected"]').classList.add('highlight-success');
                     } else if (hasGenreJoin) {
                         warningCount++;
                         resultsHTML += '<div class="warning result-item">⚠ Genre Selection: AMC_Genre_targeting is joined but genre column is missing</div>';
@@ -698,9 +740,11 @@
                         } else {
                             resultsHTML += '<div class="found-genres">No genre columns found in query</div>';
                         }
+                        document.querySelector('[data-checkbox="genreSelected"]').classList.add('highlight-warning');
                     } else {
                         errorCount++;
                         resultsHTML += '<div class="error result-item">✗ Genre Selection: AMC_Genre_targeting join is missing</div>';
+                        document.querySelector('[data-checkbox="genreSelected"]').classList.add('highlight-error');
                     }
                 }
             } else if (hasGenreJoin || hasGenreAction) {
@@ -713,6 +757,7 @@
                 if (foundGenreColumns.length > 0) {
                     resultsHTML += '<div class="found-genres">Found in query: ' + foundGenreColumns.join(', ') + '</div>';
                 }
+                document.querySelector('[data-checkbox="genreSelected"]').classList.add('highlight-flag');
             }
             
             // Member Status Validation
@@ -725,18 +770,22 @@
                 if (hasMemberStatus) {
                     successCount++;
                     resultsHTML += '<div class="success result-item">✓ Member Status: MemberStatus is set to "Member"</div>';
+                    document.querySelector('[data-checkbox="memberStatus"]').classList.add('highlight-success');
                 } else if (hasNonMemberStatus) {
                     successCount++;
                     resultsHTML += '<div class="success result-item">✓ Member Status: MemberStatus is set to "Non-Member"</div>';
+                    document.querySelector('[data-checkbox="memberStatus"]').classList.add('highlight-success');
                 } else {
                     errorCount++;
                     resultsHTML += '<div class="error result-item">✗ Member Status: MemberStatus condition is missing</div>';
+                    document.querySelector('[data-checkbox="memberStatus"]').classList.add('highlight-error');
                 }
             } else if (hasMemberStatus || hasNonMemberStatus) {
                 // Flag if checkbox is unchecked but condition exists in query
                 flagCount++;
                 resultsHTML += '<div class="flag result-item">🚩 FLAG: Member Status is not checked but MemberStatus condition exists in query</div>';
                 resultsHTML += '<div class="flag-message">Query contains MemberStatus condition but the Member Status checkbox is not checked. This might indicate a mismatch between your selection and the query.</div>';
+                document.querySelector('[data-checkbox="memberStatus"]').classList.add('highlight-flag');
             }
             
             // Opt-in Selector Validation
@@ -767,10 +816,12 @@
                     if (foundOptIns.length === 0) {
                         successCount++;
                         resultsHTML += '<div class="success result-item">✓ Opt-in Selector: N/A selected and no opt-in conditions found in query</div>';
+                        document.querySelector('[data-checkbox="optInSelector"]').classList.add('highlight-success');
                     } else {
                         errorCount++;
                         resultsHTML += '<div class="error result-item">✗ Opt-in Selector: N/A selected but opt-in conditions found in query</div>';
                         resultsHTML += '<div class="optin-mismatch">Query contains: ' + foundOptIns.join(', ') + '</div>';
+                        document.querySelector('[data-checkbox="optInSelector"]').classList.add('highlight-error');
                     }
                 } else {
                     // Check if selected opt-in exists in query
@@ -778,6 +829,7 @@
                         successCount++;
                         resultsHTML += '<div class="success result-item">✓ Opt-in Selector: Selected opt-in condition is present in query</div>';
                         resultsHTML += '<div class="optin-match">Selected opt-in: ' + selectedOptIn + '</div>';
+                        document.querySelector('[data-checkbox="optInSelector"]').classList.add('highlight-success');
                     } else {
                         errorCount++;
                         resultsHTML += '<div class="error result-item">✗ Opt-in Selector: Selected opt-in condition is missing</div>';
@@ -804,6 +856,7 @@
                         } else {
                             resultsHTML += '<div class="found-optins">No opt-in conditions found in query</div>';
                         }
+                        document.querySelector('[data-checkbox="optInSelector"]').classList.add('highlight-error');
                     }
                 }
             } else {
@@ -829,6 +882,7 @@
                     resultsHTML += '<div class="flag result-item">🚩 FLAG: Opt-in Selector is not checked but opt-in conditions exist in query</div>';
                     resultsHTML += '<div class="flag-message">Query contains opt-in conditions but the Opt-in Selector checkbox is not checked. This might indicate a mismatch between your selection and the query.</div>';
                     resultsHTML += '<div class="optin-mismatch">Query contains: ' + foundOptIns.join(', ') + '</div>';
+                    document.querySelector('[data-checkbox="optInSelector"]').classList.add('highlight-flag');
                 }
             }
             
@@ -886,6 +940,7 @@
                     successCount++;
                     resultsHTML += '<div class="success result-item">✓ Tier Selection: Selected tier matches query</div>';
                     resultsHTML += '<div class="tier-match">Selected tier: ' + selectedTierName + '</div>';
+                    document.getElementById('tierSelectionContainer').classList.add('highlight-success');
                 } else if (foundTiers.length > 0) {
                     warningCount++;
                     resultsHTML += '<div class="warning result-item">⚠ Tier Selection: Selected tier does not match query</div>';
@@ -901,9 +956,11 @@
                     });
                     
                     resultsHTML += '<div class="found-tiers">Found in query: ' + foundTierNames.join(', ') + '</div>';
+                    document.getElementById('tierSelectionContainer').classList.add('highlight-warning');
                 } else {
                     errorCount++;
                     resultsHTML += '<div class="error result-item">✗ Tier Selection: Tier condition is missing</div>';
+                    document.getElementById('tierSelectionContainer').classList.add('highlight-error');
                 }
             } else if (foundTiers.length > 0) {
                 // Flag if no tier is selected but condition exists in query
@@ -921,6 +978,7 @@
                 });
                 
                 resultsHTML += '<div class="found-tiers">Found in query: ' + foundTierNames.join(', ') + '</div>';
+                document.getElementById('tierSelectionContainer').classList.add('highlight-flag');
             }
             
             // Age Selection Validation - Enhanced to check for both patterns
@@ -957,10 +1015,12 @@
                     if (queryAge === null) {
                         successCount++;
                         resultsHTML += '<div class="success result-item">✓ Age Selection: N/A selected and no age conditions found in query</div>';
+                        document.querySelector('[data-checkbox="ageSelection"]').classList.add('highlight-success');
                     } else {
                         errorCount++;
                         resultsHTML += '<div class="error result-item">✗ Age Selection: N/A selected but age conditions found in query</div>';
                         resultsHTML += '<div class="age-mismatch">Query contains age: ' + queryAge + ' (' + agePatternFound + ' pattern)</div>';
+                        document.querySelector('[data-checkbox="ageSelection"]').classList.add('highlight-error');
                     }
                 } else {
                     // Check if selected age matches query age
@@ -968,13 +1028,16 @@
                         successCount++;
                         resultsHTML += '<div class="success result-item">✓ Age Selection: DateOfBirth condition is present and age matches</div>';
                         resultsHTML += '<div class="age-match">Selected age: ' + selectedAge + ' (' + agePatternFound + ' pattern)</div>';
+                        document.querySelector('[data-checkbox="ageSelection"]').classList.add('highlight-success');
                     } else if (queryAge !== null) {
                         warningCount++;
                         resultsHTML += '<div class="warning result-item">⚠ Age Selection: DateOfBirth condition is present but age does not match</div>';
                         resultsHTML += '<div class="age-mismatch">Selected: ' + selectedAge + ' | Query: ' + queryAge + ' (' + agePatternFound + ' pattern)</div>';
+                        document.querySelector('[data-checkbox="ageSelection"]').classList.add('highlight-warning');
                     } else {
                         errorCount++;
                         resultsHTML += '<div class="error result-item">✗ Age Selection: DateOfBirth condition is missing</div>';
+                        document.querySelector('[data-checkbox="ageSelection"]').classList.add('highlight-error');
                     }
                 }
             } else if (queryAge !== null) {
@@ -983,6 +1046,7 @@
                 resultsHTML += '<div class="flag result-item">🚩 FLAG: Age Selection is not checked but age condition exists in query</div>';
                 resultsHTML += '<div class="flag-message">Query contains age condition but the Age Selection checkbox is not checked. This might indicate a mismatch between your selection and the query.</div>';
                 resultsHTML += '<div class="age-mismatch">Query contains age: ' + queryAge + ' (' + agePatternFound + ' pattern)</div>';
+                document.querySelector('[data-checkbox="ageSelection"]').classList.add('highlight-flag');
             }
             
             // Active Status Validation
@@ -994,15 +1058,18 @@
                 if (hasActiveStatus) {
                     successCount++;
                     resultsHTML += '<div class="success result-item">✓ Active Status: Subscriber status is checked for "Active"</div>';
+                    document.querySelector('[data-checkbox="activeStatus"]').classList.add('highlight-success');
                 } else {
                     errorCount++;
                     resultsHTML += '<div class="error result-item">✗ Active Status: Active status condition is missing</div>';
+                    document.querySelector('[data-checkbox="activeStatus"]').classList.add('highlight-error');
                 }
             } else if (hasActiveStatus) {
                 // Flag if checkbox is unchecked but condition exists in query
                 flagCount++;
                 resultsHTML += '<div class="flag result-item">🚩 FLAG: Active Status is not checked but active status condition exists in query</div>';
                 resultsHTML += '<div class="flag-message">Query contains active status condition but the Active Status checkbox is not checked. This might indicate a mismatch between your selection and the query.</div>';
+                document.querySelector('[data-checkbox="activeStatus"]').classList.add('highlight-flag');
             }
             
             // Complaint Validation
@@ -1014,15 +1081,18 @@
                 if (hasComplaintCheck) {
                     successCount++;
                     resultsHTML += '<div class="success result-item">✓ Complaint: _Complaint is checked</div>';
+                    document.querySelector('[data-checkbox="complaint"]').classList.add('highlight-success');
                 } else {
                     errorCount++;
                     resultsHTML += '<div class="error result-item">✗ Complaint: _Complaint is missing</div>';
+                    document.querySelector('[data-checkbox="complaint"]').classList.add('highlight-error');
                 }
             } else if (hasComplaintCheck) {
                 // Flag if checkbox is unchecked but condition exists in query
                 flagCount++;
                 resultsHTML += '<div class="flag result-item">🚩 FLAG: Complaint is not checked but _Complaint check exists in query</div>';
                 resultsHTML += '<div class="flag-message">Query contains complaint check but the Complaint checkbox is not checked. This might indicate a mismatch between your selection and the query.</div>';
+                document.querySelector('[data-checkbox="complaint"]').classList.add('highlight-flag');
             }
             
             // Master Suppression Validation
@@ -1034,15 +1104,18 @@
                 if (hasMasterSuppression) {
                     successCount++;
                     resultsHTML += '<div class="success result-item">✓ AMC Master Suppression: AMC_MasterSuppression table is checked</div>';
+                    document.querySelector('[data-checkbox="masterSuppression"]').classList.add('highlight-success');
                 } else {
                     errorCount++;
                     resultsHTML += '<div class="error result-item">✗ AMC Master Suppression: AMC_MasterSuppression check is missing</div>';
+                    document.querySelector('[data-checkbox="masterSuppression"]').classList.add('highlight-error');
                 }
             } else if (hasMasterSuppression) {
                 // Flag if checkbox is unchecked but condition exists in query
                 flagCount++;
                 resultsHTML += '<div class="flag result-item">🚩 FLAG: AMC Master Suppression is not checked but AMC_MasterSuppression check exists in query</div>';
                 resultsHTML += '<div class="flag-message">Query contains master suppression check but the AMC Master Suppression checkbox is not checked. This might indicate a mismatch between your selection and the query.</div>';
+                document.querySelector('[data-checkbox="masterSuppression"]').classList.add('highlight-flag');
             }
             
             // Associate Suppression Validation
@@ -1054,15 +1127,18 @@
                 if (hasAssociateSuppression) {
                     successCount++;
                     resultsHTML += '<div class="success result-item">✓ Associate Suppression present</div>';
+                    document.querySelector('[data-checkbox="associateSuppression"]').classList.add('highlight-success');
                 } else {
                     errorCount++;
                     resultsHTML += '<div class="error result-item">✗ Associate Suppression missing</div>';
+                    document.querySelector('[data-checkbox="associateSuppression"]').classList.add('highlight-error');
                 }
             } else if (hasAssociateSuppression) {
                 // Flag if checkbox is unchecked but condition exists in query
                 flagCount++;
                 resultsHTML += '<div class="flag result-item">🚩 FLAG: Associate Suppression is not checked but conditions exist in query</div>';
                 resultsHTML += '<div class="flag-message">Query contains associate suppression conditions but the Associate Suppression checkbox is not checked. This might indicate a mismatch between your selection and the query.</div>';
+                document.querySelector('[data-checkbox="associateSuppression"]').classList.add('highlight-flag');
             }
             
             // Fresh Address Validation
@@ -1074,15 +1150,18 @@
                 if (hasFreshAddress) {
                     successCount++;
                     resultsHTML += '<div class="success result-item">✓ Fresh Address: FreshAddress_Exclusions_MRM is checked</div>';
+                    document.querySelector('[data-checkbox="freshAddress"]').classList.add('highlight-success');
                 } else {
                     errorCount++;
                     resultsHTML += '<div class="error result-item">✗ Fresh Address: FreshAddress_Exclusions_MRM check is missing</div>';
+                    document.querySelector('[data-checkbox="freshAddress"]').classList.add('highlight-error');
                 }
             } else if (hasFreshAddress) {
                 // Flag if checkbox is unchecked but condition exists in query
                 flagCount++;
                 resultsHTML += '<div class="flag result-item">🚩 FLAG: Fresh Address is not checked but FreshAddress_Exclusions_MRM check exists in query</div>';
                 resultsHTML += '<div class="flag-message">Query contains fresh address check but the Fresh Address checkbox is not checked. This might indicate a mismatch between your selection and the query.</div>';
+                document.querySelector('[data-checkbox="freshAddress"]').classList.add('highlight-flag');
             }
             
             // Engagement Validation
@@ -1094,15 +1173,18 @@
                 if (hasEngagement) {
                     successCount++;
                     resultsHTML += '<div class="success result-item">✓ Engagement: CLICK_ENGAGEMENT_LAST_6_MONTHS and LastOpen_6Months tables are checked</div>';
+                    document.querySelector('[data-checkbox="engagement"]').classList.add('highlight-success');
                 } else {
                     errorCount++;
                     resultsHTML += '<div class="error result-item">✗ Engagement: Engagement tables check is missing</div>';
+                    document.querySelector('[data-checkbox="engagement"]').classList.add('highlight-error');
                 }
             } else if (hasEngagement) {
                 // Flag if checkbox is unchecked but condition exists in query
                 flagCount++;
                 resultsHTML += '<div class="flag result-item">🚩 FLAG: Engagement is not checked but engagement tables check exists in query</div>';
                 resultsHTML += '<div class="flag-message">Query contains engagement check but the Engagement checkbox is not checked. This might indicate a mismatch between your selection and the query.</div>';
+                document.querySelector('[data-checkbox="engagement"]').classList.add('highlight-flag');
             }
             
             // Add summary
@@ -1152,6 +1234,12 @@
             
             // Reset opt-in selection
             document.getElementById('emailOptIn').value = '';
+            
+            // Clear all highlights
+            document.querySelectorAll('.checkbox-item').forEach(item => {
+                item.classList.remove('highlight-success', 'highlight-warning', 'highlight-error', 'highlight-flag');
+            });
+            document.getElementById('tierSelectionContainer').classList.remove('highlight-success', 'highlight-warning', 'highlight-error', 'highlight-flag');
         });
         
         // Add sample query to the textarea
