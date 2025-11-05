@@ -1340,17 +1340,113 @@
         }
         
         // Function to reset the image to original
-        function resetImage() {
-            if (!originalImageData || !ctx) return;
+//        function resetImage() {
+//            if (!originalImageData || !ctx) return;
+//
+//            if (isTraced) {
+//                // Re-trace the image to get fresh traced data
+//                traceImage();
+//            } else {
+//                // Reset to original
+//                ctx.putImageData(originalImageData, 0, 0);
+//            }
+//
+//            showToast("Image reset successfully");
+//        }
+// Function to reset the image to original
+function resetImage() {
+    if (!currentImage || !ctx) return;
+    
+    // Show loading indicator
+    document.getElementById('loadingIndicator').style.display = 'block';
+    
+    // Use setTimeout to allow the UI to update
+    setTimeout(() => {
+        // Clear the canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // Redraw the original image
+        ctx.drawImage(currentImage, 0, 0, canvas.width, canvas.height);
+        
+        // If the image was traced, re-trace it
+        if (isTraced) {
+            // Create a copy of the original image data
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const pixels = imageData.data;
             
-            if (isTraced && tracedImageData) {
-                ctx.putImageData(tracedImageData, 0, 0);
-            } else {
-                ctx.putImageData(originalImageData, 0, 0);
+            // First pass: convert to grayscale
+            for (let i = 0; i < pixels.length; i += 4) {
+                const gray = pixels[i] * 0.299 + pixels[i + 1] * 0.587 + pixels[i + 2] * 0.114;
+                pixels[i] = gray;
+                pixels[i + 1] = gray;
+                pixels[i + 2] = gray;
             }
-            showOriginal();
+            
+            // Second pass: apply edge detection using Sobel operator
+            const width = imageData.width;
+            const height = imageData.height;
+            const output = new Uint8ClampedArray(pixels.length);
+            
+            // Sobel kernels
+            const sobelX = [
+                [-1, 0, 1],
+                [-2, 0, 2],
+                [-1, 0, 1]
+            ];
+            
+            const sobelY = [
+                [-1, -2, -1],
+                [0, 0, 0],
+                [1, 2, 1]
+            ];
+            
+            for (let y = 1; y < height - 1; y++) {
+                for (let x = 1; x < width - 1; x++) {
+                    let pixelX = 0;
+                    let pixelY = 0;
+                    
+                    // Apply Sobel operator
+                    for (let j = -1; j <= 1; j++) {
+                        for (let i = -1; i <= 1; i++) {
+                            const idx = ((y + j) * width + (x + i)) * 4;
+                            const gray = pixels[idx];
+                            
+                            pixelX += gray * sobelX[j + 1][i + 1];
+                            pixelY += gray * sobelY[j + 1][i + 1];
+                        }
+                    }
+                    
+                    // Calculate magnitude
+                    const magnitude = Math.sqrt(pixelX * pixelX + pixelY * pixelY);
+                    
+                    // Apply threshold
+                    const idx = (y * width + x) * 4;
+                    const edge = magnitude > traceThreshold ? 0 : 255;
+                    
+                    output[idx] = edge;
+                    output[idx + 1] = edge;
+                    output[idx + 2] = edge;
+                    output[idx + 3] = 255;
+                }
+            }
+            
+            // Create traced image data
+            tracedImageData = new ImageData(output, width, height);
+            
+            // Apply the traced image to canvas
+            ctx.putImageData(tracedImageData, 0, 0);
+        } else {
+            // Update original image data
+            originalImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
         }
         
+        // Hide loading indicator
+        document.getElementById('loadingIndicator').style.display = 'none';
+        
+        // Show toast notification
+        showToast("Image reset successfully");
+    }, 10);
+}
         // Initialize the gallery when the page loads
         document.addEventListener('DOMContentLoaded', () => {
             createGallery();
