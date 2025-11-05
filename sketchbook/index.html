@@ -476,13 +476,13 @@
         .canvas-wrapper {
             position: relative;
             overflow: hidden;
-            cursor: grab;
+            cursor: crosshair;
             transform-origin: center center;
             transition: transform 0.1s ease;
         }
         
         .canvas-wrapper.grabbing {
-            cursor: grabbing;
+            cursor: crosshair;
         }
         
         .modal-canvas {
@@ -1060,12 +1060,13 @@
         // Function to update cursor based on selected tool
         function updateCursor() {
             if (!canvas) return;
-            
-            if (currentTool === 'pen') {
-                canvas.style.cursor = 'crosshair';
-            } else {
-                canvas.style.cursor = 'pointer';
-            }
+            canvas.style.cursor = 'crosshair';
+//            
+//            if (currentTool === 'pen') {
+//                canvas.style.cursor = 'crosshair !important';
+//            } else {
+//                canvas.style.cursor = 'crosshair !important';
+//            }
         }
         
         // Function to select a color
