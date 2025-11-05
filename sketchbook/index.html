@@ -118,7 +118,7 @@
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 10px;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
         }
         
         .color-swatch {
@@ -336,7 +336,7 @@
         }
         
         .image-header {
-            padding: 15px 20px;
+            padding: 10px 10px;
             background-color: #fff;
             border-bottom: 1px solid #e0e0e0;
             display: flex;
@@ -353,6 +353,8 @@
         .image-tools {
             display: flex;
             gap: 10px;
+            margin-right: 60px;
+            margin-top: 10px;
         }
         
         .tool-button {
@@ -412,7 +414,7 @@
             font-size: 24px;
             color: #666;
             cursor: pointer;
-            background-color: white;
+            background-color: #000;
             border-radius: 50%;
             width: 36px;
             height: 36px;
@@ -741,6 +743,7 @@
                 const swatch = document.createElement('div');
                 swatch.className = 'color-swatch';
                 swatch.style.backgroundColor = color;
+                swatch.style.borderColor = '#000000';
                 swatch.addEventListener('click', () => selectColor(color));
                 colorGrid.appendChild(swatch);
             });
