@@ -447,7 +447,7 @@
             const tierPatterns = [
               { 
                 value: 'A-List_Classic', 
-                name: 'A-List Classic', 
+                name: 'A-List_Classic', 
                 pattern: /'A-List_Classic'/g  // Changed from 'A-List Classic' to 'A-List_Classic'
               },
               { 
