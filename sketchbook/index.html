@@ -171,9 +171,61 @@
             width: 250px;
             background-color: #f8f9fa;
             border-right: 1px solid #e0e0e0;
-            padding: 20px;
-            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
             flex-shrink: 0;
+        }
+        
+        /* Tab navigation */
+        .tab-nav {
+            display: flex;
+            background-color: #e9ecef;
+            border-bottom: 1px solid #ced4da;
+        }
+        
+        .tab-button {
+            flex: 1;
+            padding: 12px 8px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            color: #6c757d;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        
+        .tab-button:hover {
+            background-color: #dee2e6;
+            color: #495057;
+        }
+        
+        .tab-button.active {
+            color: #007bff;
+            background-color: #f8f9fa;
+        }
+        
+        .tab-button.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: #007bff;
+        }
+        
+        /* Tab content */
+        .tab-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
         }
         
         .palette-header {
@@ -231,11 +283,50 @@
             margin-bottom: 8px;
         }
         
+        .selected-color-code-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
         .selected-color-code {
             font-family: monospace;
             font-size: 16px;
             font-weight: bold;
-            text-align: center;
+            flex: 1;
+        }
+        
+        .color-picker-icon {
+            width: 24px;
+            height: 24px;
+            background-color: #f0f0f0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background-color 0.2s ease;
+            position: relative;
+        }
+        
+        .color-picker-icon:hover {
+            background-color: #e0e0e0;
+        }
+        
+        .color-picker-icon svg {
+            width: 16px;
+            height: 16px;
+        }
+        
+        .color-picker {
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            opacity: 0;
+            cursor: pointer;
+            top: 0;
+            left: 0;
         }
         
         .color-presets {
@@ -253,7 +344,6 @@
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
-            display: none !important;
         }
         
         .preset-color {
@@ -641,67 +731,87 @@
             
             <!-- Main Content Area -->
             <div class="main-content">
-                <!-- Left Column: Color Palette -->
+                <!-- Left Column: Color Palette with Tabs -->
                 <div class="color-palette-column">
-                    <div class="palette-header">Color Palette</div>
-                    
-                    <div class="color-grid" id="colorGrid">
-                        <!-- Color swatches will be added here -->
+                    <!-- Tab Navigation -->
+                    <div class="tab-nav">
+                        <button class="tab-button active" id="paletteTab">Colors</button>
+                        <button class="tab-button" id="settingsTab">Settings</button>
                     </div>
                     
-                    <div class="selected-color">
-                        <div class="selected-color-label">Selected Color</div>
-                        <div class="selected-color-display" id="selectedColorDisplay"></div>
-                        <div class="selected-color-code" id="selectedColorCode">#000000</div>
-                    </div>
-                    
-                    <div class="color-presets">
-                        <div class="preset-title">Preset Colors</div>
-                        <div class="preset-colors" id="presetColors">
-                            <!-- Preset colors will be added here -->
-                        </div>
-                    </div>
-                    
-                    <div class="drawing-tools">
-                        <div class="tools-title">Drawing Tools</div>
-                        <div class="tool-options">
-                            <div class="tool-option">
-                                <input type="radio" id="floodFillTool" name="drawingTool" value="floodFill" checked>
-                                <label for="floodFillTool">Flood Fill</label>
-                            </div>
-                            <div class="tool-option">
-                                <input type="radio" id="penTool" name="drawingTool" value="pen">
-                                <label for="penTool">Pen</label>
-                            </div>
-                        </div>
-                        <div class="brush-size-container">
-                            <div class="brush-size-label">Brush Size</div>
-                            <input type="range" id="brushSize" class="brush-size-slider" min="1" max="20" value="5">
-                            <div class="brush-size-value" id="brushSizeValue">5px</div>
+                    <!-- Color Palette Tab Content -->
+                    <div class="tab-content active" id="paletteTabContent">
+                        <div class="palette-header">Color Palette</div>
+                        
+                        <div class="color-grid" id="colorGrid">
+                            <!-- Color swatches will be added here -->
                         </div>
                         
-                        <div class="coloring-options">
-                            <div class="option-title">Coloring Options</div>
-                            <div class="option-checkbox">
-                                <input type="checkbox" id="preserveOutlines" checked>
-                                <label for="preserveOutlines">Preserve Black Outlines</label>
-                            </div>
-                            <div class="option-checkbox">
-                                <input type="checkbox" id="toleranceOption">
-                                <label for="toleranceOption">Color Tolerance</label>
+                        <div class="selected-color">
+                            <div class="selected-color-label">Selected Color</div>
+                            <div class="selected-color-display" id="selectedColorDisplay"></div>
+                            <div class="selected-color-code-container">
+                                <div class="selected-color-code" id="selectedColorCode">#000000</div>
+                                <div class="color-picker-icon" id="colorPickerIcon" title="Pick custom color">
+                                    <input type="color" class="color-picker" id="colorPicker">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path>
+                                    </svg>
+                                </div>
                             </div>
                         </div>
                     </div>
                     
-                    <div class="image-processing">
-                        <div class="processing-title">Image Processing</div>
-                        <div class="processing-options">
-                            <button class="tool-button success" id="traceBtn">Trace Outlines</button>
-                            <button class="tool-button secondary" id="showOriginalBtn">Show Original</button>
-                            <div class="threshold-container">
-                                <div class="threshold-label">Trace Threshold</div>
-                                <input type="range" id="thresholdSlider" class="threshold-slider" min="50" max="200" value="100">
-                                <div class="threshold-value" id="thresholdValue">100</div>
+                    <!-- Settings Tab Content -->
+                    <div class="tab-content" id="settingsTabContent">
+                        <div class="color-presets">
+                            <div class="preset-title">Preset Colors</div>
+                            <div class="preset-colors" id="presetColors">
+                                <!-- Preset colors will be added here -->
+                            </div>
+                        </div>
+                        
+                        <div class="drawing-tools">
+                            <div class="tools-title">Drawing Tools</div>
+                            <div class="tool-options">
+                                <div class="tool-option">
+                                    <input type="radio" id="floodFillTool" name="drawingTool" value="floodFill" checked>
+                                    <label for="floodFillTool">Flood Fill</label>
+                                </div>
+                                <div class="tool-option">
+                                    <input type="radio" id="penTool" name="drawingTool" value="pen">
+                                    <label for="penTool">Pen</label>
+                                </div>
+                            </div>
+                            <div class="brush-size-container">
+                                <div class="brush-size-label">Brush Size</div>
+                                <input type="range" id="brushSize" class="brush-size-slider" min="1" max="20" value="5">
+                                <div class="brush-size-value" id="brushSizeValue">5px</div>
+                            </div>
+                            
+                            <div class="coloring-options">
+                                <div class="option-title">Coloring Options</div>
+                                <div class="option-checkbox">
+                                    <input type="checkbox" id="preserveOutlines" checked>
+                                    <label for="preserveOutlines">Preserve Black Outlines</label>
+                                </div>
+                                <div class="option-checkbox">
+                                    <input type="checkbox" id="toleranceOption">
+                                    <label for="toleranceOption">Color Tolerance</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="image-processing">
+                            <div class="processing-title">Image Processing</div>
+                            <div class="processing-options">
+                                <button class="tool-button success" id="traceBtn">Trace Outlines</button>
+                                <button class="tool-button secondary" id="showOriginalBtn">Show Original</button>
+                                <div class="threshold-container">
+                                    <div class="threshold-label">Trace Threshold</div>
+                                    <input type="range" id="thresholdSlider" class="threshold-slider" min="50" max="200" value="100">
+                                    <div class="threshold-value" id="thresholdValue">100</div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -872,6 +982,38 @@
             });
         }
         
+        // Function to initialize tabs
+        function initializeTabs() {
+            const paletteTab = document.getElementById('paletteTab');
+            const settingsTab = document.getElementById('settingsTab');
+            const paletteTabContent = document.getElementById('paletteTabContent');
+            const settingsTabContent = document.getElementById('settingsTabContent');
+            
+            paletteTab.addEventListener('click', () => {
+                // Remove active class from all tabs and contents
+                paletteTab.classList.remove('active');
+                settingsTab.classList.remove('active');
+                paletteTabContent.classList.remove('active');
+                settingsTabContent.classList.remove('active');
+                
+                // Add active class to palette tab and content
+                paletteTab.classList.add('active');
+                paletteTabContent.classList.add('active');
+            });
+            
+            settingsTab.addEventListener('click', () => {
+                // Remove active class from all tabs and contents
+                paletteTab.classList.remove('active');
+                settingsTab.classList.remove('active');
+                paletteTabContent.classList.remove('active');
+                settingsTabContent.classList.remove('active');
+                
+                // Add active class to settings tab and content
+                settingsTab.classList.add('active');
+                settingsTabContent.classList.add('active');
+            });
+        }
+        
         // Function to initialize color palette
         function initializeColorPalette() {
             const colorGrid = document.getElementById('colorGrid');
@@ -900,6 +1042,15 @@
             
             // Set initial selected color
             selectColor('#FF0000'); // Start with red instead of black
+            
+            // Initialize color picker
+            const colorPicker = document.getElementById('colorPicker');
+            
+            // Add change event to color picker
+            colorPicker.addEventListener('input', (e) => {
+                const color = e.target.value;
+                selectColor(color);
+            });
             
             // Initialize drawing tools
             document.getElementById('floodFillTool').addEventListener('change', (e) => {
@@ -1061,12 +1212,6 @@
         function updateCursor() {
             if (!canvas) return;
             canvas.style.cursor = 'crosshair';
-//            
-//            if (currentTool === 'pen') {
-//                canvas.style.cursor = 'crosshair !important';
-//            } else {
-//                canvas.style.cursor = 'crosshair !important';
-//            }
         }
         
         // Function to select a color
@@ -1076,6 +1221,9 @@
             // Update selected color display
             document.getElementById('selectedColorDisplay').style.backgroundColor = color;
             document.getElementById('selectedColorCode').textContent = color.toUpperCase();
+            
+            // Update color picker value
+            document.getElementById('colorPicker').value = color;
             
             // Update active swatch
             document.querySelectorAll('.color-swatch').forEach(swatch => {
@@ -1121,6 +1269,9 @@
             
             // Reset traced state
             isTraced = false;
+            
+            // Reset to palette tab
+            document.getElementById('paletteTab').click();
             
             // Show loading indicator
             loadingIndicator.style.display = 'block';
@@ -1712,6 +1863,7 @@
         // Initialize the gallery when the page loads
         document.addEventListener('DOMContentLoaded', () => {
             createGallery();
+            initializeTabs();
             initializeColorPalette();
             initializeZoomControls();
             
