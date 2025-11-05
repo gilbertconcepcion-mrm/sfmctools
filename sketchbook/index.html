@@ -95,7 +95,75 @@
             border-radius: 8px;
             overflow: hidden;
             display: flex;
-            flex-direction: row;
+            flex-direction: column;
+        }
+        
+        /* Top action bar */
+        .top-action-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #e0e0e0;
+            flex-shrink: 0;
+        }
+        
+        .image-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .tool-button {
+            padding: 6px 12px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.2s ease;
+        }
+        
+        .tool-button:hover {
+            background-color: #0056b3;
+        }
+        
+        .tool-button.secondary {
+            background-color: #6c757d;
+        }
+        
+        .tool-button.secondary:hover {
+            background-color: #5a6268;
+        }
+        
+        .tool-button.success {
+            background-color: #28a745;
+        }
+        
+        .tool-button.success:hover {
+            background-color: #218838;
+        }
+        
+        .tool-button.danger {
+            background-color: #dc3545;
+        }
+        
+        .tool-button.danger:hover {
+            background-color: #c82333;
+        }
+        
+        /* Main content area */
+        .main-content {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
         }
         
         /* Left column - Color Palette */
@@ -105,6 +173,7 @@
             border-right: 1px solid #e0e0e0;
             padding: 20px;
             overflow-y: auto;
+            flex-shrink: 0;
         }
         
         .palette-header {
@@ -334,59 +403,63 @@
             display: flex;
             flex-direction: column;
             position: relative;
+            overflow: hidden;
         }
         
-        .image-header {
-            padding: 10px 10px;
-            background-color: #fff;
-            border-bottom: 1px solid #e0e0e0;
+        /* Zoom controls */
+        .zoom-controls {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            padding: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .image-title {
-            font-size: 18px;
-            font-weight: bold;
-            color: #2c3e50;
-        }
-        
-        .image-tools {
-            display: flex;
+            flex-direction: column;
             gap: 10px;
-            margin-right: 60px;
-            margin-top: 10px;
+            z-index: 100;
         }
         
-        .tool-button {
-            padding: 6px 12px;
+        .zoom-buttons {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .zoom-button {
+            width: 36px;
+            height: 36px;
+            border: none;
             background-color: #007bff;
             color: white;
-            border: none;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 18px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             transition: background-color 0.2s ease;
         }
         
-        .tool-button:hover {
+        .zoom-button:hover {
             background-color: #0056b3;
         }
         
-        .tool-button.secondary {
-            background-color: #6c757d;
+        .zoom-slider-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
         
-        .tool-button.secondary:hover {
-            background-color: #5a6268;
+        .zoom-slider {
+            width: 100px;
         }
         
-        .tool-button.success {
-            background-color: #28a745;
-        }
-        
-        .tool-button.success:hover {
-            background-color: #218838;
+        .zoom-value {
+            font-size: 14px;
+            font-weight: bold;
+            min-width: 40px;
+            text-align: center;
         }
         
         .image-container {
@@ -396,44 +469,28 @@
             align-items: center;
             padding: 20px;
             background-color: #fafafa;
-            overflow: auto;
+            overflow: hidden;
             position: relative;
         }
         
+        .canvas-wrapper {
+            position: relative;
+            overflow: hidden;
+            cursor: grab;
+        }
+        
+        .canvas-wrapper.grabbing {
+            cursor: grabbing;
+        }
+        
         .modal-canvas {
-            max-width: 100%;
-            max-height: 100%;
+            display: block;
             border-radius: 4px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            cursor: crosshair;
+            transform-origin: center center;
+            transition: transform 0.1s ease;
         }
         
-        .close-modal {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            font-size: 24px;
-            color: #666;
-            cursor: pointer;
-            background-color: #000;
-            border-radius: 50%;
-            width: 36px;
-            height: 36px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1001;
-            transition: all 0.2s ease;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        
-        .close-modal:hover {
-            background-color: #f0f0f0;
-            color: #333;
-            transform: scale(1.1);
-        }
-        
-        /* Loading indicator */
         .loading-indicator {
             position: absolute;
             top: 50%;
@@ -485,9 +542,12 @@
             }
             
             .modal-content {
-                flex-direction: column;
                 width: 95%;
                 height: 90vh;
+            }
+            
+            .main-content {
+                flex-direction: column;
             }
             
             .color-palette-column {
@@ -499,6 +559,26 @@
             
             .color-grid {
                 grid-template-columns: repeat(8, 1fr);
+            }
+            
+            .action-buttons {
+                flex-wrap: wrap;
+                gap: 5px;
+            }
+            
+            .tool-button {
+                padding: 4px 8px;
+                font-size: 12px;
+            }
+            
+            .zoom-controls {
+                bottom: 10px;
+                right: 10px;
+                padding: 8px;
+            }
+            
+            .zoom-slider {
+                width: 80px;
             }
         }
         
@@ -514,6 +594,15 @@
             
             .color-grid {
                 grid-template-columns: repeat(6, 1fr);
+            }
+            
+            .image-title {
+                font-size: 14px;
+            }
+            
+            .tool-button {
+                padding: 3px 6px;
+                font-size: 11px;
             }
         }
     </style>
@@ -533,87 +622,107 @@
     <!-- Modal for viewing full-size images with color palette -->
     <div class="modal" id="imageModal">
         <div class="modal-content">
-            <!-- Left Column: Color Palette -->
-            <div class="color-palette-column">
-                <div class="palette-header">Color Palette</div>
-                
-                <div class="color-grid" id="colorGrid">
-                    <!-- Color swatches will be added here -->
-                </div>
-                
-                <div class="selected-color">
-                    <div class="selected-color-label">Selected Color</div>
-                    <div class="selected-color-display" id="selectedColorDisplay"></div>
-                    <div class="selected-color-code" id="selectedColorCode">#000000</div>
-                </div>
-                
-                <div class="color-presets">
-                    <div class="preset-title">Preset Colors</div>
-                    <div class="preset-colors" id="presetColors">
-                        <!-- Preset colors will be added here -->
-                    </div>
-                </div>
-                
-                <div class="drawing-tools">
-                    <div class="tools-title">Drawing Tools</div>
-                    <div class="tool-options">
-                        <div class="tool-option">
-                            <input type="radio" id="floodFillTool" name="drawingTool" value="floodFill" checked>
-                            <label for="floodFillTool">Flood Fill</label>
-                        </div>
-                        <div class="tool-option">
-                            <input type="radio" id="penTool" name="drawingTool" value="pen">
-                            <label for="penTool">Pen</label>
-                        </div>
-                    </div>
-                    <div class="brush-size-container">
-                        <div class="brush-size-label">Brush Size</div>
-                        <input type="range" id="brushSize" class="brush-size-slider" min="1" max="20" value="5">
-                        <div class="brush-size-value" id="brushSizeValue">5px</div>
-                    </div>
-                    
-                    <div class="coloring-options">
-                        <div class="option-title">Coloring Options</div>
-                        <div class="option-checkbox">
-                            <input type="checkbox" id="preserveOutlines" checked>
-                            <label for="preserveOutlines">Preserve Black Outlines</label>
-                        </div>
-                        <div class="option-checkbox">
-                            <input type="checkbox" id="toleranceOption">
-                            <label for="toleranceOption">Color Tolerance</label>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="image-processing">
-                    <div class="processing-title">Image Processing</div>
-                    <div class="processing-options">
-                        <button class="tool-button success" id="traceBtn">Trace Outlines</button>
-                        <button class="tool-button secondary" id="showOriginalBtn">Show Original</button>
-                        <div class="threshold-container">
-                            <div class="threshold-label">Trace Threshold</div>
-                            <input type="range" id="thresholdSlider" class="threshold-slider" min="50" max="200" value="100">
-                            <div class="threshold-value" id="thresholdValue">100</div>
-                        </div>
-                    </div>
+            <!-- Top Action Bar -->
+            <div class="top-action-bar">
+                <div class="image-title" id="modalImageTitle">Image Title</div>
+                <div class="action-buttons">
+                    <button class="tool-button" id="downloadBtn">Download</button>
+                    <button class="tool-button" id="applyColorBtn">Apply Color</button>
+                    <button class="tool-button secondary" id="resetBtn">Reset</button>
+                    <button class="tool-button danger" id="closeModalBtn">Close</button>
                 </div>
             </div>
             
-            <!-- Right Column: Image -->
-            <div class="image-column">
-                <div class="image-header">
-                    <div class="image-title" id="modalImageTitle">Image Title</div>
-                    <div class="image-tools">
-                        <button class="tool-button" id="downloadBtn">Download</button>
-                        <button class="tool-button" id="applyColorBtn">Apply Color</button>
-                        <button class="tool-button" id="resetBtn">Reset</button>
+            <!-- Main Content Area -->
+            <div class="main-content">
+                <!-- Left Column: Color Palette -->
+                <div class="color-palette-column">
+                    <div class="palette-header">Color Palette</div>
+                    
+                    <div class="color-grid" id="colorGrid">
+                        <!-- Color swatches will be added here -->
+                    </div>
+                    
+                    <div class="selected-color">
+                        <div class="selected-color-label">Selected Color</div>
+                        <div class="selected-color-display" id="selectedColorDisplay"></div>
+                        <div class="selected-color-code" id="selectedColorCode">#000000</div>
+                    </div>
+                    
+                    <div class="color-presets">
+                        <div class="preset-title">Preset Colors</div>
+                        <div class="preset-colors" id="presetColors">
+                            <!-- Preset colors will be added here -->
+                        </div>
+                    </div>
+                    
+                    <div class="drawing-tools">
+                        <div class="tools-title">Drawing Tools</div>
+                        <div class="tool-options">
+                            <div class="tool-option">
+                                <input type="radio" id="floodFillTool" name="drawingTool" value="floodFill" checked>
+                                <label for="floodFillTool">Flood Fill</label>
+                            </div>
+                            <div class="tool-option">
+                                <input type="radio" id="penTool" name="drawingTool" value="pen">
+                                <label for="penTool">Pen</label>
+                            </div>
+                        </div>
+                        <div class="brush-size-container">
+                            <div class="brush-size-label">Brush Size</div>
+                            <input type="range" id="brushSize" class="brush-size-slider" min="1" max="20" value="5">
+                            <div class="brush-size-value" id="brushSizeValue">5px</div>
+                        </div>
+                        
+                        <div class="coloring-options">
+                            <div class="option-title">Coloring Options</div>
+                            <div class="option-checkbox">
+                                <input type="checkbox" id="preserveOutlines" checked>
+                                <label for="preserveOutlines">Preserve Black Outlines</label>
+                            </div>
+                            <div class="option-checkbox">
+                                <input type="checkbox" id="toleranceOption">
+                                <label for="toleranceOption">Color Tolerance</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="image-processing">
+                        <div class="processing-title">Image Processing</div>
+                        <div class="processing-options">
+                            <button class="tool-button success" id="traceBtn">Trace Outlines</button>
+                            <button class="tool-button secondary" id="showOriginalBtn">Show Original</button>
+                            <div class="threshold-container">
+                                <div class="threshold-label">Trace Threshold</div>
+                                <input type="range" id="thresholdSlider" class="threshold-slider" min="50" max="200" value="100">
+                                <div class="threshold-value" id="thresholdValue">100</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="image-container">
-                    <canvas class="modal-canvas" id="modalCanvas"></canvas>
-                    <div class="loading-indicator" id="loadingIndicator"></div>
+                
+                <!-- Right Column: Image -->
+                <div class="image-column">
+                    <div class="image-container">
+                        <div class="canvas-wrapper" id="canvasWrapper">
+                            <canvas class="modal-canvas" id="modalCanvas"></canvas>
+                        </div>
+                        <div class="loading-indicator" id="loadingIndicator"></div>
+                    </div>
+                    
+                    <!-- Zoom Controls -->
+                    <div class="zoom-controls">
+                        <div class="zoom-buttons">
+                            <button class="zoom-button" id="zoomInBtn">+</button>
+                            <button class="zoom-button" id="zoomOutBtn">−</button>
+                            <button class="zoom-button" id="zoomResetBtn">⟲</button>
+                        </div>
+                        <div class="zoom-slider-container">
+                            <input type="range" id="zoomSlider" class="zoom-slider" min="50" max="300" value="100">
+                            <div class="zoom-value" id="zoomValue">100%</div>
+                        </div>
+                    </div>
                 </div>
-                <span class="close-modal" id="closeModal">&times;</span>
             </div>
         </div>
     </div>
@@ -682,6 +791,14 @@
         let ctx = null;
         let isTraced = false;
         let traceThreshold = 100;
+        
+        // Zoom variables
+        let zoomLevel = 1;
+        let isPanning = false;
+        let panStartX = 0;
+        let panStartY = 0;
+        let canvasOffsetX = 0;
+        let canvasOffsetY = 0;
         
         // Function to format the key into a readable title
         function formatTitle(key) {
@@ -802,6 +919,122 @@
             });
         }
         
+        // Function to initialize zoom controls
+        function initializeZoomControls() {
+            const zoomInBtn = document.getElementById('zoomInBtn');
+            const zoomOutBtn = document.getElementById('zoomOutBtn');
+            const zoomResetBtn = document.getElementById('zoomResetBtn');
+            const zoomSlider = document.getElementById('zoomSlider');
+            const zoomValue = document.getElementById('zoomValue');
+            const canvasWrapper = document.getElementById('canvasWrapper');
+            
+            // Zoom in button
+            zoomInBtn.addEventListener('click', () => {
+                setZoom(Math.min(zoomLevel + 0.25, 3));
+            });
+            
+            // Zoom out button
+            zoomOutBtn.addEventListener('click', () => {
+                setZoom(Math.max(zoomLevel - 0.25, 0.5));
+            });
+            
+            // Zoom reset button
+            zoomResetBtn.addEventListener('click', () => {
+                setZoom(1);
+                canvasOffsetX = 0;
+                canvasOffsetY = 0;
+                updateCanvasTransform();
+            });
+            
+            // Zoom slider
+            zoomSlider.addEventListener('input', (e) => {
+                setZoom(e.target.value / 100);
+            });
+            
+            // Pan functionality
+            canvasWrapper.addEventListener('mousedown', (e) => {
+                if (e.button === 0 && zoomLevel > 1) { // Left mouse button
+                    isPanning = true;
+                    panStartX = e.clientX - canvasOffsetX;
+                    panStartY = e.clientY - canvasOffsetY;
+                    canvasWrapper.classList.add('grabbing');
+                    e.preventDefault();
+                }
+            });
+            
+            canvasWrapper.addEventListener('mousemove', (e) => {
+                if (isPanning) {
+                    canvasOffsetX = e.clientX - panStartX;
+                    canvasOffsetY = e.clientY - panStartY;
+                    updateCanvasTransform();
+                }
+            });
+            
+            canvasWrapper.addEventListener('mouseup', () => {
+                isPanning = false;
+                canvasWrapper.classList.remove('grabbing');
+            });
+            
+            canvasWrapper.addEventListener('mouseleave', () => {
+                isPanning = false;
+                canvasWrapper.classList.remove('grabbing');
+            });
+            
+            // Touch support for mobile
+            let touchStartDistance = 0;
+            let touchStartZoom = 1;
+            
+            canvasWrapper.addEventListener('touchstart', (e) => {
+                if (e.touches.length === 2) {
+                    // Pinch zoom
+                    const dx = e.touches[0].clientX - e.touches[1].clientX;
+                    const dy = e.touches[0].clientY - e.touches[1].clientY;
+                    touchStartDistance = Math.sqrt(dx * dx + dy * dy);
+                    touchStartZoom = zoomLevel;
+                } else if (e.touches.length === 1 && zoomLevel > 1) {
+                    // Pan
+                    isPanning = true;
+                    panStartX = e.touches[0].clientX - canvasOffsetX;
+                    panStartY = e.touches[0].clientY - canvasOffsetY;
+                }
+            });
+            
+            canvasWrapper.addEventListener('touchmove', (e) => {
+                if (e.touches.length === 2) {
+                    // Pinch zoom
+                    const dx = e.touches[0].clientX - e.touches[1].clientX;
+                    const dy = e.touches[0].clientY - e.touches[1].clientY;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    const scale = distance / touchStartDistance;
+                    setZoom(Math.min(Math.max(touchStartZoom * scale, 0.5), 3));
+                } else if (e.touches.length === 1 && isPanning) {
+                    // Pan
+                    canvasOffsetX = e.touches[0].clientX - panStartX;
+                    canvasOffsetY = e.touches[0].clientY - panStartY;
+                    updateCanvasTransform();
+                }
+            });
+            
+            canvasWrapper.addEventListener('touchend', () => {
+                isPanning = false;
+            });
+        }
+        
+        // Function to set zoom level
+        function setZoom(level) {
+            zoomLevel = level;
+            document.getElementById('zoomSlider').value = zoomLevel * 100;
+            document.getElementById('zoomValue').textContent = Math.round(zoomLevel * 100) + '%';
+            updateCanvasTransform();
+        }
+        
+        // Function to update canvas transform
+        function updateCanvasTransform() {
+            if (!canvas) return;
+            
+            canvas.style.transform = `translate(${canvasOffsetX}px, ${canvasOffsetY}px) scale(${zoomLevel})`;
+        }
+        
         // Function to update cursor based on selected tool
         function updateCursor() {
             if (!canvas) return;
@@ -855,6 +1088,13 @@
             // Get canvas and context references
             canvas = modalCanvas;
             ctx = canvas.getContext('2d');
+            
+            // Reset zoom and pan
+            zoomLevel = 1;
+            canvasOffsetX = 0;
+            canvasOffsetY = 0;
+            updateCanvasTransform();
+            setZoom(1);
             
             // Reset traced state
             isTraced = false;
@@ -1036,6 +1276,8 @@
             // Add new event listeners based on current tool
             if (currentTool === 'floodFill') {
                 canvas.onmousedown = (e) => {
+                    if (zoomLevel > 1) return; // Don't allow flood fill when zoomed
+                    
                     const rect = canvas.getBoundingClientRect();
                     const x = Math.floor((e.clientX - rect.left) * (canvas.width / rect.width));
                     const y = Math.floor((e.clientY - rect.top) * (canvas.height / rect.height));
@@ -1044,6 +1286,8 @@
                 
                 // Touch support for mobile
                 canvas.ontouchstart = (e) => {
+                    if (zoomLevel > 1) return; // Don't allow flood fill when zoomed
+                    
                     e.preventDefault();
                     const rect = canvas.getBoundingClientRect();
                     const touch = e.touches[0];
@@ -1053,6 +1297,8 @@
                 };
             } else if (currentTool === 'pen') {
                 canvas.onmousedown = (e) => {
+                    if (zoomLevel > 1) return; // Don't allow pen when zoomed
+                    
                     isDrawing = true;
                     const rect = canvas.getBoundingClientRect();
                     lastX = (e.clientX - rect.left) * (canvas.width / rect.width);
@@ -1060,7 +1306,7 @@
                 };
                 
                 canvas.onmousemove = (e) => {
-                    if (!isDrawing) return;
+                    if (!isDrawing || zoomLevel > 1) return;
                     
                     const rect = canvas.getBoundingClientRect();
                     const currentX = (e.clientX - rect.left) * (canvas.width / rect.width);
@@ -1098,6 +1344,8 @@
                 
                 // Touch support for mobile
                 canvas.ontouchstart = (e) => {
+                    if (zoomLevel > 1) return; // Don't allow pen when zoomed
+                    
                     e.preventDefault();
                     isDrawing = true;
                     const rect = canvas.getBoundingClientRect();
@@ -1107,9 +1355,9 @@
                 };
                 
                 canvas.ontouchmove = (e) => {
-                    e.preventDefault();
-                    if (!isDrawing) return;
+                    if (!isDrawing || zoomLevel > 1) return;
                     
+                    e.preventDefault();
                     const rect = canvas.getBoundingClientRect();
                     const touch = e.touches[0];
                     const currentX = (touch.clientX - rect.left) * (canvas.width / rect.width);
@@ -1278,15 +1526,27 @@
             canvas = null;
             ctx = null;
             isTraced = false;
+            zoomLevel = 1;
+            canvasOffsetX = 0;
+            canvasOffsetY = 0;
         }
         
         // Function to download canvas as image
         function downloadCanvas() {
             if (!canvas) return;
             
+            // Create a temporary canvas to save the image without zoom
+            const tempCanvas = document.createElement('canvas');
+            const tempCtx = tempCanvas.getContext('2d');
+            tempCanvas.width = canvas.width;
+            tempCanvas.height = canvas.height;
+            
+            // Copy the current canvas content
+            tempCtx.drawImage(canvas, 0, 0);
+            
             const link = document.createElement('a');
             link.download = document.getElementById('modalImageTitle').textContent + '.png';
-            link.href = canvas.toDataURL();
+            link.href = tempCanvas.toDataURL();
             link.click();
         }
         
@@ -1340,120 +1600,108 @@
         }
         
         // Function to reset the image to original
-//        function resetImage() {
-//            if (!originalImageData || !ctx) return;
-//
-//            if (isTraced) {
-//                // Re-trace the image to get fresh traced data
-//                traceImage();
-//            } else {
-//                // Reset to original
-//                ctx.putImageData(originalImageData, 0, 0);
-//            }
-//
-//            showToast("Image reset successfully");
-//        }
-// Function to reset the image to original
-function resetImage() {
-    if (!currentImage || !ctx) return;
-    
-    // Show loading indicator
-    document.getElementById('loadingIndicator').style.display = 'block';
-    
-    // Use setTimeout to allow the UI to update
-    setTimeout(() => {
-        // Clear the canvas
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        
-        // Redraw the original image
-        ctx.drawImage(currentImage, 0, 0, canvas.width, canvas.height);
-        
-        // If the image was traced, re-trace it
-        if (isTraced) {
-            // Create a copy of the original image data
-            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-            const pixels = imageData.data;
+        function resetImage() {
+            if (!currentImage || !ctx) return;
             
-            // First pass: convert to grayscale
-            for (let i = 0; i < pixels.length; i += 4) {
-                const gray = pixels[i] * 0.299 + pixels[i + 1] * 0.587 + pixels[i + 2] * 0.114;
-                pixels[i] = gray;
-                pixels[i + 1] = gray;
-                pixels[i + 2] = gray;
-            }
+            // Show loading indicator
+            document.getElementById('loadingIndicator').style.display = 'block';
             
-            // Second pass: apply edge detection using Sobel operator
-            const width = imageData.width;
-            const height = imageData.height;
-            const output = new Uint8ClampedArray(pixels.length);
-            
-            // Sobel kernels
-            const sobelX = [
-                [-1, 0, 1],
-                [-2, 0, 2],
-                [-1, 0, 1]
-            ];
-            
-            const sobelY = [
-                [-1, -2, -1],
-                [0, 0, 0],
-                [1, 2, 1]
-            ];
-            
-            for (let y = 1; y < height - 1; y++) {
-                for (let x = 1; x < width - 1; x++) {
-                    let pixelX = 0;
-                    let pixelY = 0;
+            // Use setTimeout to allow the UI to update
+            setTimeout(() => {
+                // Clear the canvas
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // Redraw the original image
+                ctx.drawImage(currentImage, 0, 0, canvas.width, canvas.height);
+                
+                // If the image was traced, re-trace it
+                if (isTraced) {
+                    // Create a copy of the original image data
+                    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    const pixels = imageData.data;
                     
-                    // Apply Sobel operator
-                    for (let j = -1; j <= 1; j++) {
-                        for (let i = -1; i <= 1; i++) {
-                            const idx = ((y + j) * width + (x + i)) * 4;
-                            const gray = pixels[idx];
+                    // First pass: convert to grayscale
+                    for (let i = 0; i < pixels.length; i += 4) {
+                        const gray = pixels[i] * 0.299 + pixels[i + 1] * 0.587 + pixels[i + 2] * 0.114;
+                        pixels[i] = gray;
+                        pixels[i + 1] = gray;
+                        pixels[i + 2] = gray;
+                    }
+                    
+                    // Second pass: apply edge detection using Sobel operator
+                    const width = imageData.width;
+                    const height = imageData.height;
+                    const output = new Uint8ClampedArray(pixels.length);
+                    
+                    // Sobel kernels
+                    const sobelX = [
+                        [-1, 0, 1],
+                        [-2, 0, 2],
+                        [-1, 0, 1]
+                    ];
+                    
+                    const sobelY = [
+                        [-1, -2, -1],
+                        [0, 0, 0],
+                        [1, 2, 1]
+                    ];
+                    
+                    for (let y = 1; y < height - 1; y++) {
+                        for (let x = 1; x < width - 1; x++) {
+                            let pixelX = 0;
+                            let pixelY = 0;
                             
-                            pixelX += gray * sobelX[j + 1][i + 1];
-                            pixelY += gray * sobelY[j + 1][i + 1];
+                            // Apply Sobel operator
+                            for (let j = -1; j <= 1; j++) {
+                                for (let i = -1; i <= 1; i++) {
+                                    const idx = ((y + j) * width + (x + i)) * 4;
+                                    const gray = pixels[idx];
+                                    
+                                    pixelX += gray * sobelX[j + 1][i + 1];
+                                    pixelY += gray * sobelY[j + 1][i + 1];
+                                }
+                            }
+                            
+                            // Calculate magnitude
+                            const magnitude = Math.sqrt(pixelX * pixelX + pixelY * pixelY);
+                            
+                            // Apply threshold
+                            const idx = (y * width + x) * 4;
+                            const edge = magnitude > traceThreshold ? 0 : 255;
+                            
+                            output[idx] = edge;
+                            output[idx + 1] = edge;
+                            output[idx + 2] = edge;
+                            output[idx + 3] = 255;
                         }
                     }
                     
-                    // Calculate magnitude
-                    const magnitude = Math.sqrt(pixelX * pixelX + pixelY * pixelY);
+                    // Create traced image data
+                    tracedImageData = new ImageData(output, width, height);
                     
-                    // Apply threshold
-                    const idx = (y * width + x) * 4;
-                    const edge = magnitude > traceThreshold ? 0 : 255;
-                    
-                    output[idx] = edge;
-                    output[idx + 1] = edge;
-                    output[idx + 2] = edge;
-                    output[idx + 3] = 255;
+                    // Apply the traced image to canvas
+                    ctx.putImageData(tracedImageData, 0, 0);
+                } else {
+                    // Update original image data
+                    originalImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
                 }
-            }
-            
-            // Create traced image data
-            tracedImageData = new ImageData(output, width, height);
-            
-            // Apply the traced image to canvas
-            ctx.putImageData(tracedImageData, 0, 0);
-        } else {
-            // Update original image data
-            originalImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                
+                // Hide loading indicator
+                document.getElementById('loadingIndicator').style.display = 'none';
+                
+                // Show toast notification
+                showToast("Image reset successfully");
+            }, 10);
         }
         
-        // Hide loading indicator
-        document.getElementById('loadingIndicator').style.display = 'none';
-        
-        // Show toast notification
-        showToast("Image reset successfully");
-    }, 10);
-}
         // Initialize the gallery when the page loads
         document.addEventListener('DOMContentLoaded', () => {
             createGallery();
             initializeColorPalette();
+            initializeZoomControls();
             
             // Add event listeners
-            document.getElementById('closeModal').addEventListener('click', closeModal);
+            document.getElementById('closeModalBtn').addEventListener('click', closeModal);
             document.getElementById('downloadBtn').addEventListener('click', downloadCanvas);
             document.getElementById('applyColorBtn').addEventListener('click', applyColorFilter);
             document.getElementById('resetBtn').addEventListener('click', resetImage);
