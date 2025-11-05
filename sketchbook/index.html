@@ -184,6 +184,7 @@
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
+            display: none !important;
         }
         
         .preset-color {
@@ -746,7 +747,7 @@
                 swatch.className = 'color-swatch';
                 swatch.style.backgroundColor = color;
                 if(color === "#FFFFFF" || color === "white" || color === "#FFF"){
-                    swatch.style.border = '1px solid #000000';
+                    swatch.style.border = '1px solid #9b9b9b';
                 }
                 swatch.addEventListener('click', () => selectColor(color));
                 colorGrid.appendChild(swatch);
@@ -1340,13 +1341,13 @@
         
         // Function to reset the image to original
         function resetImage() {
-//            if (!originalImageData || !ctx) return;
-//            
-//            if (isTraced && tracedImageData) {
-//                ctx.putImageData(tracedImageData, 0, 0);
-//            } else {
-//                ctx.putImageData(originalImageData, 0, 0);
-//            }
+            if (!originalImageData || !ctx) return;
+            
+            if (isTraced && tracedImageData) {
+                ctx.putImageData(tracedImageData, 0, 0);
+            } else {
+                ctx.putImageData(originalImageData, 0, 0);
+            }
             showOriginal();
         }
         
