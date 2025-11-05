@@ -1,7 +1,7 @@
 // Update config object
 let config = {
     tier: {
-        mac: { key1: "A-List Classic", key2: "MAC", checked: "" },
+        mac: { key1: "A-List_Classic", key2: "MAC", checked: "" },
         mea: { key1: "A-List", key2: "MEA", checked: "" },
         mei: { key1: "Insider", key2: "MEI", checked: "" },
         mep: { key1: "Premiere", key2: "MEP", checked: "" },
