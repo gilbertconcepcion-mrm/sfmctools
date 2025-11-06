@@ -251,7 +251,17 @@ function generateQuerySendlist(config, tierName) {
     // Date of birth filter
     let qdob = ``;
     if (config.member.age && config.member.age !== "NA" && !isNaN(config.member.age)) {
-        qdob = `AND (ISNULL(s.[DateOfBirth], '') <> '' AND s.DateOfBirth <= DATEADD(year, -${parseInt(config.member.age)}, GETDATE()))`;
+        let configAge = parseInt(config.member.age);
+        const qob13 = `AND (s.Age13to18Indicator = 'Y' OR s.Age18to21Indicator = 'Y' OR s.Age21PlusIndicator = 'Y')`;
+        const qob18 = `AND (s.Age18to21Indicator = 'Y' OR s.Age21PlusIndicator = 'Y')`;
+        const qob21 = `AND s.Age21PlusIndicator = 'Y'`;
+        if(configAge === 13){
+            qdob = qob13;
+        }else if(configAge === 18){
+            qdob = qob18;
+        }else if(configAge === 21){
+            qdob = qob21;
+        }
     }
     
     // Active subscriber status
@@ -366,10 +376,23 @@ function generateQuery(config, tierName) {
     const qt = tierName ? `AND s.LoyaltyAccountPortfolioID IN (SELECT LoyaltyAccountPortfolioID FROM [Master_LoyaltyPortfolioID] WHERE Tier = '${tierName}' AND ActiveStatus='True')` : ``;
     // Only add genre WHERE clause if the campaign type is 'genre' AND a genre is selected
     const qg2 = ccampaign === 'genre' && config.genre && config.genre !== "NONE" ? `AND (al.[${config.genre}] = 'True')` : ``;
-    let qdob = ``;
+//    let qdob = ``;
+//    if (config.member.age && config.member.age !== "NA" && !isNaN(config.member.age)) {
+//        qdob = `AND (ISNULL(s.[DateOfBirth], '') <> '' AND s.DateOfBirth <= DATEADD(year, -${parseInt(config.member.age)}, GETDATE()))`;
+//    }
     if (config.member.age && config.member.age !== "NA" && !isNaN(config.member.age)) {
-        qdob = `AND (ISNULL(s.[DateOfBirth], '') <> '' AND s.DateOfBirth <= DATEADD(year, -${parseInt(config.member.age)}, GETDATE()))`;
-    }
+        let configAge = parseInt(config.member.age);
+        const qob13 = `AND (s.Age13to18Indicator = 'Y' OR s.Age18to21Indicator = 'Y' OR s.Age21PlusIndicator = 'Y')`;
+        const qob18 = `AND (s.Age18to21Indicator = 'Y' OR s.Age21PlusIndicator = 'Y')`;
+        const qob21 = `AND s.Age21PlusIndicator = 'Y'`;
+        if(configAge === 13){
+            qdob = qob13;
+        }else if(configAge === 18){
+            qdob = qob18;
+        }else if(configAge === 21){
+            qdob = qob21;
+        }
+    }    
     const qas = config.member.activeStatus === "Active" ? `AND EXISTS (SELECT 1 FROM All_Subscribers_Status_Staging AS sub WITH (NOLOCK) WHERE s.EmailAddress = sub.SubscriberKey AND sub.Status = 'Active')` : ``;
     const qc = config.complaintsRemoval === "Y" ? `AND NOT EXISTS (SELECT 1 FROM _Complaint AS com WITH (NOLOCK) WHERE s.EmailAddress = com.SubscriberKey)` : ``;
     const qams = config.amcMasterSuppression === "Y" ? `AND NOT EXISTS(SELECT 1 FROM [AMC_MasterSuppression] AS cpesl WITH (NOLOCK) WHERE s.EmailAddress = cpesl.EmailAddress)` : ``;
@@ -448,9 +471,22 @@ function generateQueryTransactional(config, tierName) {
     const qt = tierName ? `AND s.LoyaltyAccountPortfolioID IN ('${tierName}')` : ``;
     
     // Age condition - using DATEDIFF to match the template
-    let qdob = ``;
+//    let qdob = ``;
+//    if (config.member.age && config.member.age !== "NA" && !isNaN(config.member.age)) {
+//        qdob = `AND DATEDIFF(yy, s.DateOfBirth, GETDATE()) >= ${parseInt(config.member.age)}`;
+//    }
     if (config.member.age && config.member.age !== "NA" && !isNaN(config.member.age)) {
-        qdob = `AND DATEDIFF(yy, s.DateOfBirth, GETDATE()) >= ${parseInt(config.member.age)}`;
+        let configAge = parseInt(config.member.age);
+        const qob13 = `AND (s.Age13to18Indicator = 'Y' OR s.Age18to21Indicator = 'Y' OR s.Age21PlusIndicator = 'Y')`;
+        const qob18 = `AND (s.Age18to21Indicator = 'Y' OR s.Age21PlusIndicator = 'Y')`;
+        const qob21 = `AND s.Age21PlusIndicator = 'Y'`;
+        if(configAge === 13){
+            qdob = qob13;
+        }else if(configAge === 18){
+            qdob = qob18;
+        }else if(configAge === 21){
+            qdob = qob21;
+        }
     }
     
     // Active status condition - updated to match the template
