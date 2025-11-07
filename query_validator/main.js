@@ -1019,6 +1019,11 @@
             document.getElementById('sqlQuery').value = '';
             document.getElementById('validationResults').innerHTML = '<div class="info result-group"><div class="result-group-header"><span class="result-group-icon">ℹ</span>Info</div><div class="result-group-content">Please enter a SQL query and click "Validate Query" to see results.</div></div>';
             
+            const textarea = document.getElementById('sqlQuery');
+//            textarea.value = '';
+            textarea.style.height = 'auto';
+            textarea.style.height = '100px'; // or whatever your min-height is            
+            
             // Show all sections that might have been hidden
             showFullInterface();
         });
@@ -1049,6 +1054,14 @@
                 sqlToggleHeader.style.display = 'none';
                 this.style.display = 'flex';
             }
+        });
+
+        // Auto-resize textarea
+        const textarea = document.getElementById('sqlQuery');
+
+        textarea.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = this.scrollHeight + 'px';
         });
         
         // Add sample query to the textarea
