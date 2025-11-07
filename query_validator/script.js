@@ -552,41 +552,48 @@
             // Age Selection Validation - Enhanced to check for both patterns
             const ageSelectionChecked = document.getElementById('ageSelection').checked;
             const selectedAge = document.getElementById('age').value;
-            
-            // Extract age from the query using both patterns
-            let queryAge = null;
-            let agePatternFound = null;
-            
-            // Check for DATEADD pattern: DATEADD(year, -13, GETDATE())
-            if (sqlQuery.includes('DATEADD(year, -')) {
-                const ageMatch = sqlQuery.match(/DATEADD\(year,\s*-(\d+),\s*GETDATE\(\)\)/i);
-                if (ageMatch) {
-                    queryAge = ageMatch[1];
-                    agePatternFound = 'DATEADD';
-                }
-            }
-            
-            // Check for DATEDIFF pattern: DATEDIFF(yy, s.DateOfBirth, GETDATE()) >= 18
-            if (!queryAge && sqlQuery.includes('DATEDIFF(yy, s.DateOfBirth, GETDATE())')) {
-                const ageMatch = sqlQuery.match(/DATEDIFF\(yy,\s*s\.DateOfBirth,\s*GETDATE\(\)\)\s*>=\s*(\d+)/i);
-                if (ageMatch) {
-                    queryAge = ageMatch[1];
-                    agePatternFound = 'DATEDIFF';
-                }
-            }
-            
-            if (ageSelectionChecked) {
+
+            // Define age indicator patterns
+            const age13 = `AND (s.Age13to18Indicator = 'Y' OR s.Age18to21Indicator = 'Y' OR s.Age21PlusIndicator = 'Y')`;
+            const age18 = `AND (s.Age18to21Indicator = 'Y' OR s.Age21PlusIndicator = 'Y')`;
+            const age21 = `AND s.Age21PlusIndicator = 'Y'`;
+
+            // Check if query contains DateOfBirth patterns (these should NOT be used)
+            const ageFlags1 = sqlQuery.match(/DATEADD\(year,\s*-(\d+),\s*GETDATE\(\)\)/i);
+            const ageFlags2 = sqlQuery.match(/DATEDIFF\(yy,\s*s\.DateOfBirth,\s*GETDATE\(\)\)\s*>=\s*(\d+)/i);
+
+            // If DateOfBirth patterns are found, show error
+            if (ageFlags1 || ageFlags2) {
+                errorCount++;
                 hasValidations = true;
-                
+                const dobPattern = ageFlags1 ? 'DATEADD' : 'DATEDIFF';
+                const dobAge = ageFlags1 ? ageFlags1[1] : ageFlags2[1];
+
+                groupedResults['age'] = {
+                    status: 'error',
+                    title: 'Age Selection',
+                    icon: '✗',
+                    content: 'Query contains DateOfBirth condition - Age Indicators must be used instead',
+                    details: `Found ${dobPattern} pattern with age ${dobAge}. Please use Age Indicators (Age13to18Indicator, Age18to21Indicator, Age21PlusIndicator) instead of DateOfBirth calculations.`
+                };
+                document.querySelector('[data-checkbox="ageSelection"]').classList.add('highlight-error');
+            } else if (ageSelectionChecked) {
+                hasValidations = true;
+
                 // Check if NA is selected
                 if (selectedAge === 'NA') {
-                    if (queryAge === null) {
+                    // Check if any age indicator is present in query
+                    const hasAgeIndicator = sqlQuery.includes('Age13to18Indicator') || 
+                                           sqlQuery.includes('Age18to21Indicator') || 
+                                           sqlQuery.includes('Age21PlusIndicator');
+
+                    if (!hasAgeIndicator) {
                         successCount++;
                         groupedResults['age'] = {
                             status: 'success',
                             title: 'Age Selection',
                             icon: '✓',
-                            content: 'N/A selected and no age conditions found in query'
+                            content: 'N/A selected and no age indicators found in query'
                         };
                         document.querySelector('[data-checkbox="ageSelection"]').classList.add('highlight-success');
                     } else {
@@ -595,56 +602,71 @@
                             status: 'error',
                             title: 'Age Selection',
                             icon: '✗',
-                            content: 'N/A selected but age conditions found in query',
-                            details: 'Query contains age: ' + queryAge + ' (' + agePatternFound + ' pattern)'
+                            content: 'N/A selected but age indicators found in query'
                         };
                         document.querySelector('[data-checkbox="ageSelection"]').classList.add('highlight-error');
                     }
                 } else {
-                    // Check if selected age matches query age
-                    if (queryAge !== null && selectedAge === queryAge) {
+                    // Check if selected age matches query age indicators
+                    let expectedPattern = '';
+                    let patternFound = false;
+
+                    if (selectedAge === '13') {
+                        expectedPattern = age13;
+                        patternFound = sqlQuery.includes("Age13to18Indicator = 'Y'") && 
+                                      sqlQuery.includes("Age18to21Indicator = 'Y'") && 
+                                      sqlQuery.includes("Age21PlusIndicator = 'Y'");
+                    } else if (selectedAge === '18') {
+                        expectedPattern = age18;
+                        patternFound = sqlQuery.includes("Age18to21Indicator = 'Y'") && 
+                                      sqlQuery.includes("Age21PlusIndicator = 'Y'") &&
+                                      !sqlQuery.includes("Age13to18Indicator = 'Y'");
+                    } else if (selectedAge === '21') {
+                        expectedPattern = age21;
+                        patternFound = sqlQuery.includes("Age21PlusIndicator = 'Y'") &&
+                                      !sqlQuery.includes("Age13to18Indicator = 'Y'") &&
+                                      !sqlQuery.includes("Age18to21Indicator = 'Y'");
+                    }
+
+                    if (patternFound) {
                         successCount++;
                         groupedResults['age'] = {
                             status: 'success',
                             title: 'Age Selection',
                             icon: '✓',
-                            content: 'DateOfBirth condition is present and age matches',
-                            details: 'Selected age: ' + selectedAge + ' (' + agePatternFound + ' pattern)'
+                            content: 'Age indicators are present and match selection',
+                            details: 'Selected age: ' + selectedAge
                         };
                         document.querySelector('[data-checkbox="ageSelection"]').classList.add('highlight-success');
-                    } else if (queryAge !== null) {
-                        warningCount++;
-                        groupedResults['age'] = {
-                            status: 'warning',
-                            title: 'Age Selection',
-                            icon: '⚠',
-                            content: 'DateOfBirth condition is present but age does not match',
-                            details: 'Selected: ' + selectedAge + ' | Query: ' + queryAge + ' (' + agePatternFound + ' pattern)'
-                        };
-                        document.querySelector('[data-checkbox="ageSelection"]').classList.add('highlight-warning');
                     } else {
                         errorCount++;
                         groupedResults['age'] = {
                             status: 'error',
                             title: 'Age Selection',
                             icon: '✗',
-                            content: 'DateOfBirth condition is missing'
+                            content: 'Age indicators are missing or do not match selection',
+                            details: 'Selected age: ' + selectedAge + ' | Expected pattern: ' + expectedPattern
                         };
                         document.querySelector('[data-checkbox="ageSelection"]').classList.add('highlight-error');
                     }
                 }
-            } else if (queryAge !== null) {
-                // Flag if checkbox is unchecked but condition exists in query
-                flagCount++;
-                groupedResults['age'] = {
-                    status: 'flag',
-                    title: 'Age Selection',
-                    icon: '🚩',
-                    content: 'Age Selection is not checked but age condition exists in query',
-                    flagMessage: 'Query contains age condition but the Age Selection checkbox is not checked. This might indicate a mismatch between your selection and the query.',
-                    details: 'Query contains age: ' + queryAge + ' (' + agePatternFound + ' pattern)'
-                };
-                document.querySelector('[data-checkbox="ageSelection"]').classList.add('highlight-flag');
+            } else {
+                // Check if age indicators exist when checkbox is unchecked
+                const hasAgeIndicator = sqlQuery.includes('Age13to18Indicator') || 
+                                       sqlQuery.includes('Age18to21Indicator') || 
+                                       sqlQuery.includes('Age21PlusIndicator');
+
+                if (hasAgeIndicator) {
+                    flagCount++;
+                    groupedResults['age'] = {
+                        status: 'flag',
+                        title: 'Age Selection',
+                        icon: '🚩',
+                        content: 'Age Selection is not checked but age indicators exist in query',
+                        flagMessage: 'Query contains age indicators but the Age Selection checkbox is not checked. This might indicate a mismatch between your selection and the query.'
+                    };
+                    document.querySelector('[data-checkbox="ageSelection"]').classList.add('highlight-flag');
+                }
             }
             
             // Active Status Validation
