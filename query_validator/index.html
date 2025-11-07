@@ -3,353 +3,549 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SQL Query Validator</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.14.0-beta3/dist/css/bootstrap-select.min.css" rel="stylesheet">
+    <title>SQL Query Validation Tool</title>
     <style>
-        body {
-            padding: 20px;
-            background-color: #f8f9fa;
-            height: 100vh;
-            overflow: hidden;
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        .main-container {
-            display: flex;
-            height: calc(100vh - 40px);
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 30px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .validation-options {
             background-color: white;
             border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            overflow: hidden;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         }
-        .left-panel {
-            width: 400px;
-            flex-shrink: 0;
-            border-right: 1px solid #e0e0e0;
-            overflow-y: auto;
-            padding: 20px;
-        }
-        .right-panel {
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            padding: 20px;
-            overflow: hidden;
-        }
-        .validation-options {
-            margin-bottom: 20px;
-        }
-        .checkbox-item {
-            padding: 15px;
+        
+        .section-title {
+            font-size: 1.3rem;
             margin-bottom: 15px;
-            border: 1px solid #e0e0e0;
-            border-radius: 5px;
-            background-color: #f9f9f9;
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 5px;
+        }
+        
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
+        }
+        
+        .checkbox-item {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 12px;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
+            position: relative;
         }
+        
         .checkbox-item:hover {
-            background-color: #f0f0f0;
+            background-color: #e9f7fe;
+            border-color: #3498db;
         }
-        /* Highlight styles for validation results */
+        
         .checkbox-item.highlight-success {
+            background-color: #d4edda;
             border-color: #28a745;
-            background-color: #e9f7ef;
         }
+        
         .checkbox-item.highlight-warning {
+            background-color: #fff3cd;
             border-color: #ffc107;
-            background-color: #fffbeb;
         }
+        
         .checkbox-item.highlight-error {
+            background-color: #f8d7da;
             border-color: #dc3545;
-            background-color: #fdeeee;
         }
+        
         .checkbox-item.highlight-flag {
-            border-color: #fd7e14;
-            background-color: #fff4e6;
+            background-color: #e2e3e5;
+            border-color: #6c757d;
         }
-        .tier-selection-container.highlight-success {
-            border-color: #28a745;
-            background-color: #e9f7ef;
-        }
-        .tier-selection-container.highlight-warning {
-            border-color: #ffc107;
-            background-color: #fffbeb;
-        }
-        .tier-selection-container.highlight-error {
-            border-color: #dc3545;
-            background-color: #fdeeee;
-        }
-        .tier-selection-container.highlight-flag {
-            border-color: #fd7e14;
-            background-color: #fff4e6;
-        }
+        
         .form-check {
-            margin-bottom: 10px;
-            pointer-events: none; /* Prevent clicks on the form-check from bubbling up */
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
         }
+        
         .form-check-input {
-            pointer-events: auto; /* Re-enable pointer events for the checkbox itself */
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
         }
-        .sql-header {
+        
+        .form-check-label {
+            font-weight: 500;
+            cursor: pointer;
+            font-size: 0.95rem;
+        }
+        
+        .dropdown-container {
+            margin-top: 8px;
+            margin-left: 28px;
+        }
+        
+        .small-text {
+            font-size: 0.8rem;
+            color: #6c757d;
+            margin-top: 3px;
+        }
+        
+        select {
+            width: 100%;
+            padding: 6px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            background-color: white;
+            font-size: 0.9rem;
+        }
+        
+        .tier-selection {
+            margin-bottom: 20px;
+            background-color: white;
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .tier-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .tier-checkbox-item {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 10px 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+        }
+        
+        .tier-checkbox-item:hover {
+            background-color: #e9f7fe;
+            border-color: #3498db;
+        }
+        
+        .tier-checkbox-item.selected {
+            background-color: #e9f7fe;
+            border-color: #3498db;
+        }
+        
+        .tier-checkbox-item.highlight-success {
+            background-color: #d4edda;
+            border-color: #28a745;
+        }
+        
+        .tier-checkbox-item.highlight-warning {
+            background-color: #fff3cd;
+            border-color: #ffc107;
+        }
+        
+        .tier-checkbox-item.highlight-error {
+            background-color: #f8d7da;
+            border-color: #dc3545;
+        }
+        
+        .tier-checkbox-item.highlight-flag {
+            background-color: #e2e3e5;
+            border-color: #6c757d;
+        }
+        
+        .sql-section {
+            background-color: white;
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .sql-toggle-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 10px;
+            cursor: pointer;
+            margin-bottom: 15px;
         }
+        
+        .sql-toggle-header.collapsed {
+            margin-bottom: 0;
+        }
+        
+        .toggle-icon {
+            transition: transform 0.3s ease;
+        }
+        
+        .sql-toggle-header.collapsed .toggle-icon {
+            transform: rotate(180deg);
+        }
+        
         .sql-container {
+            margin-bottom: 20px;
+        }
+        
+        textarea {
+            width: 100%;
+            min-height: 200px;
+            padding: 15px;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            resize: vertical;
+        }
+        
+        .button-container {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #2980b9;
+        }
+        
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+        
+        .btn-success {
+            background-color: #28a745;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background-color: #218838;
+        }
+        
+        .btn-back {
+            background-color: #17a2b8;
+            color: white;
+            display: none;
+            margin-bottom: 20px;
+        }
+        
+        .btn-back:hover {
+            background-color: #138496;
+        }
+        
+        .sql-toggle-button {
+            display: none;
+            justify-content: center;
+            align-items: center;
+            background-color: #3498db;
+            color: white;
+            border-radius: 5px;
+            padding: 8px 15px;
+            cursor: pointer;
             margin-bottom: 15px;
             transition: all 0.3s ease;
         }
-        .sql-input {
-            font-family: monospace;
-            height: 300px;
-            resize: none;
+        
+        .sql-toggle-button:hover {
+            background-color: #2980b9;
         }
-        .sql-toggle {
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 5px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 4px;
-            transition: all 0.2s ease;
+        
+        .results-section {
+            background-color: white;
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         }
-        .sql-toggle:hover {
-            background-color: #f0f0f0;
-        }
-        .sql-toggle svg {
-            width: 20px;
-            height: 20px;
-            transition: transform 0.3s ease;
-        }
-        .sql-toggle.collapsed svg {
-            transform: rotate(180deg);
-        }
-        .validation-result {
-            margin-top: 20px;
-            flex-grow: 1;
-            overflow-y: auto;
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            grid-gap: 15px;
-            align-content: start;
-        }
+        
         .result-group {
-            border: 1px solid #e0e0e0;
-            border-radius: 5px;
-            padding: 12px;
-            background-color: #fff;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            display: flex;
-            flex-direction: column;
+            margin-bottom: 15px;
+            border-radius: 6px;
+            overflow: hidden;
         }
-        .result-group.success {
-            border-color: #28a745;
-            background-color: #f8fff9;
-        }
-        .result-group.warning {
-            border-color: #ffc107;
-            background-color: #fffdf7;
-        }
-        .result-group.error {
-            border-color: #dc3545;
-            background-color: #fff8f8;
-        }
-        .result-group.flag {
-            border-color: #fd7e14;
-            background-color: #fff9f5;
-        }
+        
         .result-group-header {
-            font-weight: bold;
-            margin-bottom: 8px;
-            padding-bottom: 5px;
-            border-bottom: 1px solid #eee;
+            padding: 10px 15px;
+            font-weight: 600;
             display: flex;
             align-items: center;
         }
+        
         .result-group-icon {
-            margin-right: 8px;
+            margin-right: 10px;
             font-size: 1.2rem;
         }
+        
         .result-group-content {
-            font-size: 0.9rem;
+            padding: 10px 15px 15px 15px;
         }
-        .result-detail {
-            margin-top: 5px;
-            padding: 5px;
-            border-radius: 3px;
-            font-size: 0.85rem;
+        
+        .result-group.success {
+            border: 1px solid #28a745;
         }
-        .match {
+        
+        .result-group.success .result-group-header {
             background-color: #d4edda;
             color: #155724;
         }
-        .mismatch {
+        
+        .result-group.warning {
+            border: 1px solid #ffc107;
+        }
+        
+        .result-group.warning .result-group-header {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        
+        .result-group.error {
+            border: 1px solid #dc3545;
+        }
+        
+        .result-group.error .result-group-header {
             background-color: #f8d7da;
             color: #721c24;
         }
-        .found-items {
-            margin-top: 5px;
-            padding: 5px;
+        
+        .result-group.flag {
+            border: 1px solid #6c757d;
+        }
+        
+        .result-group.flag .result-group-header {
             background-color: #e2e3e5;
-            border-radius: 3px;
-            font-size: 0.85rem;
+            color: #383d41;
         }
-        .flag-message {
-            margin-top: 5px;
+        
+        .result-group.info {
+            border: 1px solid #17a2b8;
+        }
+        
+        .result-group.info .result-group-header {
+            background-color: #d1ecf1;
+            color: #0c5460;
+        }
+        
+        .result-detail {
+            margin-top: 8px;
             padding: 8px;
-            background-color: #f8d7da;
-            color: #721c24;
             border-radius: 4px;
-            border-left: 4px solid #dc3545;
-            font-size: 0.85rem;
+            font-size: 0.9rem;
         }
+        
+        .result-detail.match {
+            background-color: rgba(40, 167, 69, 0.1);
+        }
+        
+        .result-detail.mismatch {
+            background-color: rgba(220, 53, 69, 0.1);
+        }
+        
+        .found-items {
+            margin-top: 8px;
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+        
+        .flag-message {
+            margin-top: 8px;
+            padding: 8px;
+            background-color: rgba(108, 117, 125, 0.1);
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+        
         .summary {
-            padding: 15px;
+            padding: 12px 15px;
+            border-radius: 6px;
             margin-bottom: 20px;
-            border-radius: 5px;
-            font-weight: bold;
-            grid-column: span 2; /* Make summary span two columns */
+            font-weight: 600;
         }
+        
         .summary-success {
             background-color: #d4edda;
             color: #155724;
             border: 1px solid #c3e6cb;
         }
+        
         .summary-warning {
             background-color: #fff3cd;
             color: #856404;
             border: 1px solid #ffeeba;
         }
+        
         .summary-error {
             background-color: #f8d7da;
             color: #721c24;
             border: 1px solid #f5c6cb;
         }
-        .genre-container, .age-container, .optin-container {
-            margin-top: 10px;
-            pointer-events: auto; /* Re-enable pointer events for dropdowns */
-        }
-        .genre-dropdown, .age-dropdown, .optin-dropdown {
+        
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
-        }
-        .section-title {
-            font-size: 1.2rem;
-            font-weight: bold;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #e0e0e0;
-        }
-        .button-container {
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
             display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-        .small-text {
-            font-size: 0.8rem;
-            color: #6c757d;
-            pointer-events: auto; /* Re-enable pointer events for small text */
-        }
-        .tier-selection {
-            margin-top: 10px;
-            margin-bottom: 15px;
-            pointer-events: auto; /* Re-enable pointer events for tier selection */
-        }
-        .tier-checkbox-group {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        .tier-checkbox-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 12px; /* Reduced padding for more compact look */
-            border: 1px solid #e0e0e0;
-            border-radius: 5px;
-            background-color: #f9f9f9;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            flex: 1;
-            min-width: 120px;
             justify-content: center;
-        }
-        .tier-checkbox-item:hover {
-            background-color: #f0f0f0;
-            border-color: #d0d0d0;
-        }
-        .tier-checkbox-item.selected {
-            background-color: #e7f3ff;
-            border-color: #007bff;
-        }
-        .tier-checkbox-item input[type="checkbox"] {
-            margin: 0;
-            pointer-events: none; /* Prevent direct checkbox clicks */
-        }
-        .tier-checkbox-item label {
-            margin: 0;
-            font-weight: normal;
-            cursor: pointer;
-            pointer-events: none; /* Prevent label clicks from bubbling up */
-        }
-        .sql-toggle-header {
-            display: none;
-        }
-        .sql-toggle-button {
-            display: none;
-        }
-        .tier-selection-container {
-            padding: 15px;
-            margin-bottom: 15px;
-            border: 1px solid #e0e0e0;
-            border-radius: 5px;
-            background-color: #f9f9f9;
-        }
-        .tier-selection-title {
-            font-size: 1.1rem;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-        /* Compact button styles */
-        .btn {
-            padding: 0.375rem 0.75rem; /* Reduced padding for more compact look */
-            font-size: 0.875rem;
-            line-height: 1.5;
-        }
-        .btn-primary, .btn-secondary {
-            height: auto;
-            min-height: 2rem; /* Ensure consistent height */
+            align-items: center;
+            z-index: 1000;
         }
         
-        /* Media query for smaller screens */
+        .modal-content {
+            background-color: white;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 1000px;
+            max-height: 85vh;
+            overflow: hidden;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #3498db;
+        }
+        
+        .modal-title {
+            font-size: 1.5rem;
+            color: #2c3e50;
+        }
+        
+        .modal-header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .step-indicator {
+            background-color: #3498db;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .modal-footer {
+            display: none; /* Hidden since we moved the button to header */
+        }
+        
+        .main-content {
+            display: none;
+        }
+        
+        .main-content.active {
+            display: block;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
         @media (max-width: 768px) {
-            .validation-result {
+            .options-grid {
                 grid-template-columns: 1fr;
             }
-            .summary {
-                grid-column: span 1;
+            
+            .button-container {
+                flex-direction: column;
+            }
+            
+            .modal-content {
+                width: 95%;
+                padding: 15px;
+            }
+            
+            .modal-title {
+                font-size: 1.3rem;
             }
         }
     </style>
 </head>
 <body>
-    <div class="main-container">
-        <div class="left-panel">
-            <div class="section-title">Validation Options</div>
+    <!-- Step 1: Modal for Validation Options Selection -->
+    <div class="modal-overlay" id="step1Modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Select Validation Options</h2>
+                <div class="modal-header-right">
+                    <div class="step-indicator">STEP 1</div>
+                    <button id="doneBtn" class="btn-success">Done</button>
+                </div>
+            </div>
             
-            <div class="validation-options">
+            <div class="options-grid">
                 <div class="checkbox-item" data-checkbox="genreSelected">
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="genreSelected">
-                        <label class="form-check-label" for="genreSelected">
-                            Genre Selection
-                        </label>
+                        <input type="checkbox" id="genreSelected" class="form-check-input">
+                        <label for="genreSelected" class="form-check-label">Genre Selection</label>
                     </div>
-                    <div class="genre-container">
-                        <select id="genres" class="form-select genre-dropdown">
-                            <option value="NONE" selected>N/A</option>
+                    <div class="dropdown-container">
+                        <select id="genres" class="genre-dropdown">
+                            <option value="NONE">N/A</option>
                             <option value="ACTION">ACTION</option>
                             <option value="ADVENTURE">ADVENTURE</option>
                             <option value="ANIMATION">ANIMATION</option>
@@ -375,186 +571,1232 @@
                             <option value="ARTISAN">ARTISAN</option>
                             <option value="THRILLS_AND_CHILLS">THRILLS_AND_CHILLS</option>
                         </select>
+                        <p class="small-text">Select genre to validate</p>
                     </div>
-                    <div class="small-text">Checks if selected genre column exists in query (e.g., al.[ACTION])</div>
                 </div>
                 
                 <div class="checkbox-item" data-checkbox="memberStatus">
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="memberStatus">
-                        <label class="form-check-label" for="memberStatus">
-                            Member Status
-                        </label>
+                        <input type="checkbox" id="memberStatus" class="form-check-input">
+                        <label for="memberStatus" class="form-check-label">Member Status</label>
                     </div>
-<!--                    <div class="small-text">Checks if MemberStatus is "Member" or "Non-Member"</div>-->
+                    <p class="small-text">Validate MemberStatus condition</p>
                 </div>
                 
                 <div class="checkbox-item" data-checkbox="optInSelector">
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="optInSelector">
-                        <label class="form-check-label" for="optInSelector">
-                            Opt-in Selector
-                        </label>
+                        <input type="checkbox" id="optInSelector" class="form-check-input">
+                        <label for="optInSelector" class="form-check-label">Opt-in Selector</label>
                     </div>
-                    <div class="optin-container">
-                        <select id="emailOptIn" class="form-select optin-dropdown">
-                            <option value="" selected>NA</option>
+                    <div class="dropdown-container">
+                        <select id="emailOptIn" class="optin-dropdown">
+                            <option value="">N/A</option>
                             <option value="AMCStubsSpecialOfferOptInIndicator">AMCStubsSpecialOfferOptInIndicator</option>
                             <option value="AMCMyMoviesQueueOptIn">AMCMyMoviesQueueOptIn</option>
                             <option value="AMCStubsAccountInformationEmailOptin">AMCStubsAccountInformationEmailOptin</option>
                             <option value="AMCStubsMemberRewardsEmailOptin">AMCStubsMemberRewardsEmailOptin</option>
                             <option value="AMCStubsMemberRewardsSummaryEmailOptIn">AMCStubsMemberRewardsSummaryEmailOptIn</option>
                         </select>
+                        <p class="small-text">Select opt-in to validate</p>
                     </div>
-<!--                    <div class="small-text">Checks if selected opt-in condition is present in query</div>-->
                 </div>
                 
                 <div class="checkbox-item" data-checkbox="ageSelection">
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="ageSelection">
-                        <label class="form-check-label" for="ageSelection">
-                            Age Selection
-                        </label>
+                        <input type="checkbox" id="ageSelection" class="form-check-input">
+                        <label for="ageSelection" class="form-check-label">Age Selection</label>
                     </div>
-                    <div class="age-container">
-                        <select id="age" class="form-select age-dropdown">
-                            <option value="NA" selected>N/A</option>
-                            <option value="13">13</option>
-                            <option value="18">18</option>
-                            <option value="21">21</option>
+                    <div class="dropdown-container">
+                        <select id="age" class="age-dropdown">
+                            <option value="NA">N/A</option>
+                            <option value="13">13+</option>
+                            <option value="18">18+</option>
+                            <option value="21">21+</option>
                         </select>
+                        <p class="small-text">Select age to validate</p>
                     </div>
-<!--                    <div class="small-text">Checks if DateOfBirth meets age criteria (13, 18, or 21)</div>-->
                 </div>
                 
                 <div class="checkbox-item" data-checkbox="activeStatus">
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="activeStatus">
-                        <label class="form-check-label" for="activeStatus">
-                            Active Status
-                        </label>
+                        <input type="checkbox" id="activeStatus" class="form-check-input">
+                        <label for="activeStatus" class="form-check-label">Active Status</label>
                     </div>
-<!--                    <div class="small-text">Checks if subscriber is active</div>-->
+                    <p class="small-text">Validate Active status condition</p>
                 </div>
                 
                 <div class="checkbox-item" data-checkbox="complaint">
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="complaint">
-                        <label class="form-check-label" for="complaint">
-                            Complaint
-                        </label>
+                        <input type="checkbox" id="complaint" class="form-check-input">
+                        <label for="complaint" class="form-check-label">Complaint</label>
                     </div>
-<!--                    <div class="small-text">Checks if subscriber exists in _Complaint</div>-->
+                    <p class="small-text">Validate _Complaint condition</p>
                 </div>
                 
                 <div class="checkbox-item" data-checkbox="masterSuppression">
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="masterSuppression">
-                        <label class="form-check-label" for="masterSuppression">
-                            AMC Master Suppression
-                        </label>
+                        <input type="checkbox" id="masterSuppression" class="form-check-input">
+                        <label for="masterSuppression" class="form-check-label">AMC Master Suppression</label>
                     </div>
-<!--                    <div class="small-text">Checks if subscriber exists in AMC_MasterSuppression</div>-->
+                    <p class="small-text">Validate AMC_MasterSuppression table</p>
                 </div>
                 
                 <div class="checkbox-item" data-checkbox="associateSuppression">
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="associateSuppression">
-                        <label class="form-check-label" for="associateSuppression">
-                            Associate Suppression
-                        </label>
+                        <input type="checkbox" id="associateSuppression" class="form-check-input">
+                        <label for="associateSuppression" class="form-check-label">Associate Suppression</label>
                     </div>
-<!--                    <div class="small-text">Checks if amcStubsCardNumber meets criteria</div>-->
+                    <p class="small-text">Validate associate suppression (1104%)</p>
                 </div>
                 
                 <div class="checkbox-item" data-checkbox="freshAddress">
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="freshAddress">
-                        <label class="form-check-label" for="freshAddress">
-                            Fresh Address
-                        </label>
+                        <input type="checkbox" id="freshAddress" class="form-check-input">
+                        <label for="freshAddress" class="form-check-label">Fresh Address</label>
                     </div>
-<!--                    <div class="small-text">Checks if subscriber exists in FreshAddress_Exclusions_MRM</div>-->
+                    <p class="small-text">Validate FreshAddress_Exclusions_MRM</p>
                 </div>
                 
                 <div class="checkbox-item" data-checkbox="engagement">
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="engagement">
-                        <label class="form-check-label" for="engagement">
-                            Engagement: CLICK_ENGAGEMENT_LAST_6_MONTHS or LastOpen_6Months
-                        </label>
+                        <input type="checkbox" id="engagement" class="form-check-input">
+                        <label for="engagement" class="form-check-label">Engagement</label>
                     </div>
-<!--                    <div class="small-text">Checks if subscriber exists in CLICK_ENGAGEMENT_LAST_6_MONTHS or LastOpen_6Months</div>-->
-                </div>
-            </div>
-        </div>
-        
-        <div class="right-panel">
-            <div class="sql-header">
-                <div class="section-title">SQL Query</div>
-                <button class="sql-toggle sql-toggle-header" id="sqlToggleHeader" title="Toggle SQL Query">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="6 9 12 15 18 9"></polyline>
-                    </svg>
-                </button>
-            </div>
-            <div class="sql-container" id="sqlContainer">
-                <textarea class="form-control sql-input" id="sqlQuery" placeholder="Enter your SQL query here..."></textarea>
-            </div>
-            
-            <!-- Tier Selection moved here -->
-            <div class="tier-selection-container" id="tierSelectionContainer">
-                <div class="tier-selection-title">Tier Selection</div>
-                
-                <div class="tier-selection">
-                    <div class="tier-checkbox-group">
-                        <div class="tier-checkbox-item" data-tier="mac">
-                            <input type="checkbox" id="mac" name="tier" value="A-List_Classic" data-tier-name="A-List Classic">
-                            <label for="mac">A-List Classic</label>
-                        </div>
-                        <div class="tier-checkbox-item" data-tier="mea">
-                            <input type="checkbox" id="mea" name="tier" value="A-List" data-tier-name="A-List">
-                            <label for="mea">A-List</label>
-                        </div>
-                        <div class="tier-checkbox-item" data-tier="mei">
-                            <input type="checkbox" id="mei" name="tier" value="Insider" data-tier-name="Insider">
-                            <label for="mei">Insider</label>
-                        </div>
-                        <div class="tier-checkbox-item" data-tier="mep">
-                            <input type="checkbox" id="mep" name="tier" value="Premiere" data-tier-name="Premiere">
-                            <label for="mep">Premiere</label>
-                        </div>
-                        <div class="tier-checkbox-item" data-tier="mpg">
-                            <input type="checkbox" id="mpg" name="tier" value="PremiereGo" data-tier-name="PremiereGo">
-                            <label for="mpg">PremiereGo</label>
-                        </div>
-                    </div>
-                </div>
-                <div class="small-text">Checks if selected tier matches the query</div>
-            </div>
-            
-            <div class="button-container">
-                <button class="btn btn-primary" id="validateBtn">Validate Query</button>
-                <button class="btn btn-secondary" id="clearBtn">Clear</button>
-                <button class="sql-toggle sql-toggle-button" id="sqlToggleButton" title="Toggle SQL Query">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="6 9 12 15 18 9"></polyline>
-                    </svg>
-                </button>
-            </div>
-            
-            <div class="section-title mt-4">Validation Results</div>
-            <div id="validationResults" class="validation-result">
-                <div class="info result-item">
-                    Please select validation options and click "Validate Query" to see results.
+                    <p class="small-text">Validate CLICK_ENGAGEMENT_LAST_6_MONTHS</p>
                 </div>
             </div>
         </div>
     </div>
+    
+    <!-- Step 2: Main Validation Page -->
+    <div class="main-content" id="mainContent">
+        <div class="container">
+            <header>
+                <h1>SQL Query Validation Tool</h1>
+                <p class="subtitle">Validate your SQL queries against selected criteria</p>
+            </header>
+            
+            <!-- Back Button -->
+            <button id="backBtn" class="btn-back">← Back to Full Interface</button>
+            
+            <!-- Tier Selection Section -->
+            <section class="tier-selection" id="tierSelectionContainer">
+                <h2 class="section-title">Tier Selection</h2>
+                <div class="tier-options">
+                    <div class="tier-checkbox-item">
+                        <input type="checkbox" id="tier1" name="tier" value="A-List_Classic" data-tier-name="A-List Classic">
+                        <label for="tier1">A-List Classic</label>
+                    </div>
+                    <div class="tier-checkbox-item">
+                        <input type="checkbox" id="tier2" name="tier" value="A-List" data-tier-name="A-List">
+                        <label for="tier2">A-List</label>
+                    </div>
+                    <div class="tier-checkbox-item">
+                        <input type="checkbox" id="tier3" name="tier" value="Insider" data-tier-name="Insider">
+                        <label for="tier3">Insider</label>
+                    </div>
+                    <div class="tier-checkbox-item">
+                        <input type="checkbox" id="tier4" name="tier" value="Premiere" data-tier-name="Premiere">
+                        <label for="tier4">Premiere</label>
+                    </div>
+                    <div class="tier-checkbox-item">
+                        <input type="checkbox" id="tier5" name="tier" value="PremiereGo" data-tier-name="PremiereGo">
+                        <label for="tier5">PremiereGo</label>
+                    </div>
+                </div>
+            </section>
+            
+            <section class="sql-section" id="sqlSection">
+                <div class="sql-toggle-header" id="sqlToggleHeader">
+                    <h2 class="section-title">SQL Query</h2>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                
+                <div class="sql-toggle-button" id="sqlToggleButton">
+                    <span>Show SQL Query</span>
+                </div>
+                
+                <div class="sql-container" id="sqlContainer">
+                    <textarea id="sqlQuery" placeholder="Enter your SQL query here..."></textarea>
+                    
+                    <div class="button-container">
+                        <button id="validateBtn" class="btn-primary">Validate Query</button>
+                        <button id="clearBtn" class="btn-secondary">Clear</button>
+                        <button id="changeOptionsBtn" class="btn-secondary">Change Options</button>
+                    </div>
+                </div>
+            </section>
+            
+            <section class="results-section" id="resultsSection">
+                <h2 class="section-title">Validation Results</h2>
+                <div id="validationResults">
+                    <div class="info result-group">
+                        <div class="result-group-header">
+                            <span class="result-group-icon">ℹ</span>Info
+                        </div>
+                        <div class="result-group-content">Please enter a SQL query and click "Validate Query" to see results.</div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
 
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.14.0-beta3/dist/js/bootstrap-select.min.js"></script>
-    <script src="script.js"></script>
+    <script>
+        // Function to reset all highlights to default
+        function resetHighlights() {
+            document.querySelectorAll('.checkbox-item').forEach(item => {
+                item.classList.remove('highlight-success', 'highlight-warning', 'highlight-error', 'highlight-flag');
+            });
+            document.getElementById('tierSelectionContainer').classList.remove('highlight-success', 'highlight-warning', 'highlight-error', 'highlight-flag');
+        }
+        
+        // Function to show the full interface
+        function showFullInterface() {
+            document.querySelector('header').classList.remove('hidden');
+            document.getElementById('tierSelectionContainer').classList.remove('hidden');
+            document.getElementById('sqlSection').classList.remove('hidden');
+            document.getElementById('backBtn').style.display = 'none';
+            
+            // Reset SQL container visibility
+            const sqlContainer = document.getElementById('sqlContainer');
+            const sqlToggleHeader = document.getElementById('sqlToggleHeader');
+            const sqlToggleButton = document.getElementById('sqlToggleButton');
+            
+            sqlContainer.style.display = 'block';
+            sqlToggleHeader.classList.remove('collapsed');
+            sqlToggleButton.classList.remove('collapsed');
+            sqlToggleHeader.style.display = 'flex';
+            sqlToggleButton.style.display = 'none';
+        }
+        
+        // Implement single selection for tier checkboxes
+        document.addEventListener('DOMContentLoaded', function() {
+            const tierCheckboxes = document.querySelectorAll('input[name="tier"]');
+            
+            tierCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    if (this.checked) {
+                        // Uncheck all other tier checkboxes
+                        tierCheckboxes.forEach(otherCheckbox => {
+                            if (otherCheckbox !== this) {
+                                otherCheckbox.checked = false;
+                                // Remove selected class from parent
+                                const parentItem = otherCheckbox.closest('.tier-checkbox-item');
+                                if (parentItem) {
+                                    parentItem.classList.remove('selected');
+                                }
+                            }
+                        });
+                        // Add selected class to parent
+                        const parentItem = this.closest('.tier-checkbox-item');
+                        if (parentItem) {
+                            parentItem.classList.add('selected');
+                        }
+                    } else {
+                        // Remove selected class from parent
+                        const parentItem = this.closest('.tier-checkbox-item');
+                        if (parentItem) {
+                            parentItem.classList.remove('selected');
+                        }
+                    }
+                });
+            });
+            
+            // Add click event listeners to tier checkbox items
+            const tierCheckboxItems = document.querySelectorAll('.tier-checkbox-item');
+
+            tierCheckboxItems.forEach(item => {
+                item.addEventListener('click', function(event) {
+                    // Check if the click was on the checkbox itself
+                    if (event.target.type === 'checkbox') {
+                        return; // Let the checkbox handle its own click
+                    }
+
+                    // Check if the click was on the label
+                    if (event.target.tagName === 'LABEL') {
+                        return; // Let the label handle its own click
+                    }
+
+                    // For clicks on the container (but not on checkbox or label)
+                    const checkbox = this.querySelector('input[type="checkbox"]');
+                    if (checkbox) {
+                        checkbox.checked = !checkbox.checked;
+                        // Trigger change event to update selection
+                        checkbox.dispatchEvent(new Event('change'));
+                    }
+                });
+            });
+            
+            // Add click event listeners to checkbox containers
+            const checkboxContainers = document.querySelectorAll('.checkbox-item');
+            
+            checkboxContainers.forEach(container => {
+                container.addEventListener('click', function(event) {
+                    // Don't toggle if clicking on dropdowns or their labels
+                    if (event.target.tagName === 'SELECT' || 
+                        event.target.tagName === 'OPTION' ||
+                        event.target.classList.contains('genre-dropdown') ||
+                        event.target.classList.contains('age-dropdown') ||
+                        event.target.classList.contains('optin-dropdown') ||
+                        event.target.classList.contains('small-text')) {
+                        return;
+                    }
+                    
+                    // Don't toggle if clicking directly on the checkbox (to avoid double toggle)
+                    if (event.target.classList.contains('form-check-input')) {
+                        return;
+                    }
+                    
+                    // Get the checkbox ID from the data attribute
+                    const checkboxId = this.getAttribute('data-checkbox');
+                    if (checkboxId) {
+                        const checkbox = document.getElementById(checkboxId);
+                        if (checkbox) {
+                            checkbox.checked = !checkbox.checked;
+                        }
+                    }
+                });
+            });
+            
+            // Done button - close modal and show main content
+            document.getElementById('doneBtn').addEventListener('click', function() {
+                document.getElementById('step1Modal').style.display = 'none';
+                document.getElementById('mainContent').classList.add('active');
+            });
+            
+            // Change Options button - show modal and hide main content
+            document.getElementById('changeOptionsBtn').addEventListener('click', function() {
+                // Reset highlights before showing modal
+                resetHighlights();
+                
+                document.getElementById('step1Modal').style.display = 'flex';
+                document.getElementById('mainContent').classList.remove('active');
+            });
+            
+            // Back button - show the full interface
+            document.getElementById('backBtn').addEventListener('click', function() {
+                showFullInterface();
+            });
+            
+            // SQL Container toggle functionality
+            const sqlContainer = document.getElementById('sqlContainer');
+            const sqlToggleHeader = document.getElementById('sqlToggleHeader');
+            const sqlToggleButton = document.getElementById('sqlToggleButton');
+            
+            // Initially show the header toggle and hide the button toggle
+            sqlToggleHeader.style.display = 'flex';
+            sqlToggleButton.style.display = 'none';
+            
+            // Function to toggle SQL container
+            function toggleSqlContainer() {
+                if (sqlContainer.style.display === 'none') {
+                    sqlContainer.style.display = 'block';
+                    sqlToggleHeader.classList.remove('collapsed');
+                    sqlToggleButton.classList.remove('collapsed');
+                    
+                    // Show header toggle, hide button toggle
+                    sqlToggleHeader.style.display = 'flex';
+                    sqlToggleButton.style.display = 'none';
+                } else {
+                    sqlContainer.style.display = 'none';
+                    sqlToggleHeader.classList.add('collapsed');
+                    sqlToggleButton.classList.add('collapsed');
+                    
+                    // Hide header toggle, show button toggle
+                    sqlToggleHeader.style.display = 'none';
+                    sqlToggleButton.style.display = 'flex';
+                }
+            }
+            
+            // Add event listeners to both toggle buttons
+            sqlToggleHeader.addEventListener('click', toggleSqlContainer);
+            sqlToggleButton.addEventListener('click', toggleSqlContainer);
+        });
+        
+        document.getElementById('validateBtn').addEventListener('click', function() {
+            const sqlQuery = document.getElementById('sqlQuery').value;
+            const resultsContainer = document.getElementById('validationResults');
+            const sqlContainer = document.getElementById('sqlContainer');
+            const sqlToggleHeader = document.getElementById('sqlToggleHeader');
+            const sqlToggleButton = document.getElementById('sqlToggleButton');
+            const tierSelectionContainer = document.getElementById('tierSelectionContainer');
+            const sqlSection = document.getElementById('sqlSection');
+            const header = document.querySelector('header');
+            const backBtn = document.getElementById('backBtn');
+            
+            // Hide everything except results section and the show SQL button
+            header.classList.add('hidden');
+            tierSelectionContainer.classList.add('hidden');
+            sqlSection.classList.add('hidden');
+            
+            // Show the back button
+            backBtn.style.display = 'block';
+            
+            // Make sure the show SQL button is visible
+            sqlToggleButton.style.display = 'flex';
+            
+            // Collapse the SQL container when validating
+            sqlContainer.style.display = 'none';
+            sqlToggleHeader.classList.add('collapsed');
+            sqlToggleButton.classList.add('collapsed');
+            
+            resultsContainer.innerHTML = '';
+            
+            if (!sqlQuery.trim()) {
+                resultsContainer.innerHTML = '<div class="error result-group"><div class="result-group-header"><span class="result-group-icon">✗</span>Error</div><div class="result-group-content">Please enter a SQL query to validate.</div></div>';
+                return;
+            }
+            
+            // Clear all highlights before validation
+            resetHighlights();
+            
+            let hasValidations = false;
+            let successCount = 0;
+            let warningCount = 0;
+            let errorCount = 0;
+            let flagCount = 0;
+            let resultsHTML = '';
+            
+            // Create an object to store grouped results
+            const groupedResults = {};
+            
+            // Genre Selection Validation
+            const genreSelectedChecked = document.getElementById('genreSelected').checked;
+            const selectedGenre = document.getElementById('genres').value;
+            const hasGenreJoin = sqlQuery.includes('INNER JOIN [AMC_Genre_targeting]');
+            const hasGenreAction = sqlQuery.includes('al.[ACTION] = \'True\'');
+            
+            // Check if the selected genre column exists in the query
+            let hasGenreColumn = false;
+            if (selectedGenre !== 'NONE') {
+                hasGenreColumn = sqlQuery.includes('' + selectedGenre + '');
+            }
+            
+            // Get all genre options for checking what's found in the query
+            const genreOptions = [
+                'ACTION', 'ADVENTURE', 'ANIMATION', 'CLASSIC_CONCERT', 'COMEDY', 
+                'DANCE', 'DOCUMENTARY', 'DRAMA', 'FAMILY', 'FANTASY', 'HORROR', 
+                'MUSICAL', 'OPERA', 'ROCK_POP_CONCERT', 'ROMANCE', 'ROMANTIC_COMEDY', 
+                'SCIENCE_FICTION', 'SPECIAL_EVENTS', 'SUSPENSE', 'THEATRE', 'WESTERN', 
+                'ANIME', 'ARTISAN', 'THRILLS_AND_CHILLS'
+            ];
+            
+            // Find all genre columns that exist in the query
+            let foundGenreColumns = [];
+            genreOptions.forEach(genre => {
+                if (sqlQuery.includes('al.[' + genre + ']') || sqlQuery.includes('al.' + genre + '')) {
+                    foundGenreColumns.push(genre);
+                }
+            });
+            
+            if (genreSelectedChecked) {
+                hasValidations = true;
+                
+                // Check if NONE is selected
+                if (selectedGenre === 'NONE') {
+                    if (foundGenreColumns.length === 0) {
+                        successCount++;
+                        groupedResults['genre'] = {
+                            status: 'success',
+                            title: 'Genre Selection',
+                            icon: '✓',
+                            content: 'N/A selected and no genre columns found in query'
+                        };
+                        document.querySelector('[data-checkbox="genreSelected"]').classList.add('highlight-success');
+                    } else {
+                        errorCount++;
+                        groupedResults['genre'] = {
+                            status: 'error',
+                            title: 'Genre Selection',
+                            icon: '✗',
+                            content: 'N/A selected but genre columns found in query',
+                            details: 'Query contains: ' + foundGenreColumns.join(', ')
+                        };
+                        document.querySelector('[data-checkbox="genreSelected"]').classList.add('highlight-error');
+                    }
+                } else {
+                    // Check if selected genre column exists in query
+                    if (hasGenreJoin && hasGenreColumn) {
+                        successCount++;
+                        groupedResults['genre'] = {
+                            status: 'success',
+                            title: 'Genre Selection',
+                            icon: '✓',
+                            content: 'AMC_Genre_targeting is joined and genre column exists',
+                            details: 'Selected genre column: ' + selectedGenre + ''
+                        };
+                        document.querySelector('[data-checkbox="genreSelected"]').classList.add('highlight-success');
+                    } else if (hasGenreJoin) {
+                        warningCount++;
+                        let foundGenresText = foundGenreColumns.length > 0 ? 
+                            'Found in query: ' + foundGenreColumns.join(', ') : 
+                            'No genre columns found in query';
+                            
+                        groupedResults['genre'] = {
+                            status: 'warning',
+                            title: 'Genre Selection',
+                            icon: '⚠',
+                            content: 'AMC_Genre_targeting is joined but genre column is missing',
+                            details: 'Selected: ' + selectedGenre + ' | Not found in query',
+                            foundItems: foundGenresText
+                        };
+                        document.querySelector('[data-checkbox="genreSelected"]').classList.add('highlight-warning');
+                    } else {
+                        errorCount++;
+                        groupedResults['genre'] = {
+                            status: 'error',
+                            title: 'Genre Selection',
+                            icon: '✗',
+                            content: 'AMC_Genre_targeting join is missing'
+                        };
+                        document.querySelector('[data-checkbox="genreSelected"]').classList.add('highlight-error');
+                    }
+                }
+            } else if (hasGenreJoin || hasGenreAction) {
+                // Flag if checkbox is unchecked but condition exists in query
+                flagCount++;
+                let foundGenresText = foundGenreColumns.length > 0 ? 
+                    'Found in query: ' + foundGenreColumns.join(', ') : 
+                    '';
+                    
+                groupedResults['genre'] = {
+                    status: 'flag',
+                    title: 'Genre Selection',
+                    icon: '🚩',
+                    content: 'Genre Selection is not checked but genre-related conditions exist in query',
+                    flagMessage: 'Query contains genre-related conditions but the Genre Selection checkbox is not checked. This might indicate a mismatch between your selection and the query.',
+                    foundItems: foundGenresText
+                };
+                document.querySelector('[data-checkbox="genreSelected"]').classList.add('highlight-flag');
+            }
+            
+            // Member Status Validation
+            const memberStatusChecked = document.getElementById('memberStatus').checked;
+            const hasMemberStatus = sqlQuery.includes('s.MemberStatus = \'Member\'');
+            const hasNonMemberStatus = sqlQuery.includes('s.MemberStatus = \'Non-Member\'');
+            
+            if (memberStatusChecked) {
+                hasValidations = true;
+                if (hasMemberStatus) {
+                    successCount++;
+                    groupedResults['memberStatus'] = {
+                        status: 'success',
+                        title: 'Member Status',
+                        icon: '✓',
+                        content: 'MemberStatus is set to "Member"'
+                    };
+                    document.querySelector('[data-checkbox="memberStatus"]').classList.add('highlight-success');
+                } else if (hasNonMemberStatus) {
+                    successCount++;
+                    groupedResults['memberStatus'] = {
+                        status: 'success',
+                        title: 'Member Status',
+                        icon: '✓',
+                        content: 'MemberStatus is set to "Non-Member"'
+                    };
+                    document.querySelector('[data-checkbox="memberStatus"]').classList.add('highlight-success');
+                } else {
+                    errorCount++;
+                    groupedResults['memberStatus'] = {
+                        status: 'error',
+                        title: 'Member Status',
+                        icon: '✗',
+                        content: 'MemberStatus condition is missing'
+                    };
+                    document.querySelector('[data-checkbox="memberStatus"]').classList.add('highlight-error');
+                }
+            } else if (hasMemberStatus || hasNonMemberStatus) {
+                // Flag if checkbox is unchecked but condition exists in query
+                flagCount++;
+                groupedResults['memberStatus'] = {
+                    status: 'flag',
+                    title: 'Member Status',
+                    icon: '🚩',
+                    content: 'Member Status is not checked but MemberStatus condition exists in query',
+                    flagMessage: 'Query contains MemberStatus condition but the Member Status checkbox is not checked. This might indicate a mismatch between your selection and the query.'
+                };
+                document.querySelector('[data-checkbox="memberStatus"]').classList.add('highlight-flag');
+            }
+            
+            // Opt-in Selector Validation
+            const optInSelectorChecked = document.getElementById('optInSelector').checked;
+            const selectedOptIn = document.getElementById('emailOptIn').value;
+            
+            if (optInSelectorChecked) {
+                hasValidations = true;
+                
+                // Check if NA is selected
+                if (selectedOptIn === '') {
+                    // Check if any opt-in conditions exist in the query
+                    const optInOptions = [
+                        `s.[AMCStubsSpecialOfferOptInIndicator] = 'Y'`,
+                        `s.[AMCMyMoviesQueueOptIn] = 'Y'`,
+                        `s.[AMCStubsAccountInformationEmailOptin] = 'Y'`,
+                        `s.[AMCStubsMemberRewardsEmailOptin] = 'Y'`,
+                        `s.AMCStubsMemberRewardsSummaryEmailOptIn = 'Y'`,
+                        `s.AMCStubsSpecialOfferOptInIndicator = 'Y'`,
+                        `s.AMCMyMoviesQueueOptIn = 'Y'`,
+                        `s.AMCStubsAccountInformationEmailOptin = 'Y'`,
+                        `s.AMCStubsMemberRewardsEmailOptin = 'Y'`,
+                        `s.AMCStubsMemberRewardsSummaryEmailOptIn = 'Y'`
+                    ];
+
+                    let foundOptIns = [];
+                    optInOptions.forEach(optIn => {
+                        if (sqlQuery.includes(optIn)) {
+                            foundOptIns.push(optIn);
+                        }
+                    });
+                    
+                    if (foundOptIns.length === 0) {
+                        successCount++;
+                        groupedResults['optIn'] = {
+                            status: 'success',
+                            title: 'Opt-in Selector',
+                            icon: '✓',
+                            content: 'N/A selected and no opt-in conditions found in query'
+                        };
+                        document.querySelector('[data-checkbox="optInSelector"]').classList.add('highlight-success');
+                    } else {
+                        errorCount++;
+                        groupedResults['optIn'] = {
+                            status: 'error',
+                            title: 'Opt-in Selector',
+                            icon: '✗',
+                            content: 'N/A selected but opt-in conditions found in query',
+                            details: 'Query contains: ' + foundOptIns.join(', ')
+                        };
+                        document.querySelector('[data-checkbox="optInSelector"]').classList.add('highlight-error');
+                    }
+                } else {
+                    // Check if selected opt-in exists in query
+                    if (sqlQuery.includes(`s.[${selectedOptIn}] = 'Y'`) || sqlQuery.includes(`s.${selectedOptIn} = 'Y'`)) {
+                        successCount++;
+                        groupedResults['optIn'] = {
+                            status: 'success',
+                            title: 'Opt-in Selector',
+                            icon: '✓',
+                            content: 'Selected opt-in condition is present in query',
+                            details: 'Selected opt-in: ' + selectedOptIn
+                        };
+                        document.querySelector('[data-checkbox="optInSelector"]').classList.add('highlight-success');
+                    } else {
+                        errorCount++;
+                        // Show what opt-ins were found in the query
+                        const optInOptions = [
+                            'AMCStubsSpecialOfferOptInIndicator',
+                            'AMCMyMoviesQueueOptIn',
+                            'AMCStubsAccountInformationEmailOptin',
+                            'AMCStubsMemberRewardsEmailOptin',
+                            'AMCStubsMemberRewardsSummaryEmailOptIn'
+                        ];
+                        
+                        let foundOptIns = [];
+                        optInOptions.forEach(optIn => {
+                            if (sqlQuery.includes(`s.[${optIn}] = 'Y'`)) {
+                                foundOptIns.push(`s.[${optIn}] = 'Y'`);
+                            }
+                        });
+                        
+                        let foundOptInsText = foundOptIns.length > 0 ? 
+                            'Found in query: ' + foundOptIns.join(', ') : 
+                            'No opt-in conditions found in query';
+                            
+                        groupedResults['optIn'] = {
+                            status: 'error',
+                            title: 'Opt-in Selector',
+                            icon: '✗',
+                            content: 'Selected opt-in condition is missing',
+                            details: 'Selected: ' + selectedOptIn + ' | Not found in query',
+                            foundItems: foundOptInsText
+                        };
+                        document.querySelector('[data-checkbox="optInSelector"]').classList.add('highlight-error');
+                    }
+                }
+            } else {
+                // Check if any opt-in conditions exist in the query for flagging
+                const optInOptions = [
+                    'AMCStubsSpecialOfferOptInIndicator',
+                    'AMCMyMoviesQueueOptIn',
+                    'AMCStubsAccountInformationEmailOptin',
+                    'AMCStubsMemberRewardsEmailOptin',
+                    'AMCStubsMemberRewardsSummaryEmailOptIn'
+                ];
+                
+                let foundOptIns = [];
+                optInOptions.forEach(optIn => {
+                    if (sqlQuery.includes(optIn)) {
+                        foundOptIns.push(optIn);
+                    }
+                });
+                
+                if (foundOptIns.length > 0) {
+                    // Flag if checkbox is unchecked but condition exists in query
+                    flagCount++;
+                    groupedResults['optIn'] = {
+                        status: 'flag',
+                        title: 'Opt-in Selector',
+                        icon: '🚩',
+                        content: 'Opt-in Selector is not checked but opt-in conditions exist in query',
+                        flagMessage: 'Query contains opt-in conditions but the Opt-in Selector checkbox is not checked. This might indicate a mismatch between your selection and the query.',
+                        details: 'Query contains: ' + foundOptIns.join(', ')
+                    };
+                    document.querySelector('[data-checkbox="optInSelector"]').classList.add('highlight-flag');
+                }
+            }
+            
+            // Tier Selection Validation - Fixed to handle exclusive words properly
+            const selectedTierCheckbox = document.querySelector('input[name="tier"]:checked');
+            const selectedTier = selectedTierCheckbox ? selectedTierCheckbox.value : null;
+            const selectedTierName = selectedTierCheckbox ? selectedTierCheckbox.getAttribute('data-tier-name') : null;
+            const tierSelectionChecked = selectedTierCheckbox !== null; // If any tier is selected, consider it checked
+            
+            // Define all possible tier values with exact match patterns
+            // Order matters here - check for A-List_Classic before A-List to avoid false matches
+            
+            const tierPatterns = [
+              { 
+                value: 'A-List_Classic', 
+                name: 'A-List_Classic', 
+                pattern: /'A-List_Classic'/g  // Changed from 'A-List Classic' to 'A-List_Classic'
+              },
+              { 
+                value: 'A-List', 
+                name: 'A-List', 
+                pattern: /'A-List'(?!_Classic| Classic)/g  // Updated to exclude both formats
+              },
+              { 
+                value: 'Insider', 
+                name: 'Insider', 
+                pattern: /'Insider'/g 
+              },
+              { 
+                value: 'Premiere', 
+                name: 'Premiere', 
+                pattern: /'Premiere'(?!Go)/g
+              },
+              { 
+                value: 'PremiereGo', 
+                name: 'PremiereGo', 
+                pattern: /'PremiereGo'/g 
+              }
+            ];
+            
+            // Find all tier values that exist in the query using exact matching
+            let foundTiers = [];
+            tierPatterns.forEach(tier => {
+                if (tier.pattern.test(sqlQuery)) {
+                    foundTiers.push(tier.value);
+                }
+                // Reset regex lastIndex for next test
+                tier.pattern.lastIndex = 0;
+            });
+            
+            if (tierSelectionChecked) {
+                hasValidations = true;
+                
+                // Check if selected tier exists in query
+                if (foundTiers.includes(selectedTier)) {
+                    successCount++;
+                    groupedResults['tier'] = {
+                        status: 'success',
+                        title: 'Tier Selection',
+                        icon: '✓',
+                        content: 'Selected tier matches query',
+                        details: 'Selected tier: ' + selectedTierName
+                    };
+                    document.getElementById('tierSelectionContainer').classList.add('highlight-success');
+                } else if (foundTiers.length > 0) {
+                    warningCount++;
+                    // Convert found tier values to names for display
+                    let foundTierNames = [];
+                    foundTiers.forEach(tierValue => {
+                        const tierPattern = tierPatterns.find(p => p.value === tierValue);
+                        if (tierPattern) {
+                            foundTierNames.push(tierPattern.name);
+                        }
+                    });
+                    
+                    groupedResults['tier'] = {
+                        status: 'warning',
+                        title: 'Tier Selection',
+                        icon: '⚠',
+                        content: 'Selected tier does not match query',
+                        details: 'Selected: ' + selectedTierName + ' | Not found in query',
+                        foundItems: 'Found in query: ' + foundTierNames.join(', ')
+                    };
+                    document.getElementById('tierSelectionContainer').classList.add('highlight-warning');
+                } else {
+                    errorCount++;
+                    groupedResults['tier'] = {
+                        status: 'error',
+                        title: 'Tier Selection',
+                        icon: '✗',
+                        content: 'Tier condition is missing'
+                    };
+                    document.getElementById('tierSelectionContainer').classList.add('highlight-error');
+                }
+            } else if (foundTiers.length > 0) {
+                // Flag if no tier is selected but condition exists in query
+                flagCount++;
+                // Convert found tier values to names for display
+                let foundTierNames = [];
+                foundTiers.forEach(tierValue => {
+                    const tierPattern = tierPatterns.find(p => p.value === tierValue);
+                    if (tierPattern) {
+                        foundTierNames.push(tierPattern.name);
+                    }
+                });
+                
+                groupedResults['tier'] = {
+                    status: 'flag',
+                    title: 'Tier Selection',
+                    icon: '🚩',
+                    content: 'No tier selected but tier condition exists in query',
+                    flagMessage: 'Query contains tier condition but no tier is selected. This might indicate a mismatch between your selection and the query.',
+                    foundItems: 'Found in query: ' + foundTierNames.join(', ')
+                };
+                document.getElementById('tierSelectionContainer').classList.add('highlight-flag');
+            }
+            
+            // Age Selection Validation - Enhanced to check for both patterns
+            const ageSelectionChecked = document.getElementById('ageSelection').checked;
+            const selectedAge = document.getElementById('age').value;
+
+            // Define age indicator patterns
+            const age13 = `AND (s.Age13to18Indicator = 'Y' OR s.Age18to21Indicator = 'Y' OR s.Age21PlusIndicator = 'Y')`;
+            const age18 = `AND (s.Age18to21Indicator = 'Y' OR s.Age21PlusIndicator = 'Y')`;
+            const age21 = `AND s.Age21PlusIndicator = 'Y'`;
+
+            // Check if query contains DateOfBirth patterns (these should NOT be used)
+            const ageFlags1 = sqlQuery.match(/DATEADD\(year,\s*-(\d+),\s*GETDATE\(\)\)/i);
+            const ageFlags2 = sqlQuery.match(/DATEDIFF\(yy,\s*s\.DateOfBirth,\s*GETDATE\(\)\)\s*>=\s*(\d+)/i);
+
+            // If DateOfBirth patterns are found, show error
+            if (ageFlags1 || ageFlags2) {
+                errorCount++;
+                hasValidations = true;
+                const dobPattern = ageFlags1 ? 'DATEADD' : 'DATEDIFF';
+                const dobAge = ageFlags1 ? ageFlags1[1] : ageFlags2[1];
+
+                groupedResults['age'] = {
+                    status: 'error',
+                    title: 'Age Selection',
+                    icon: '✗',
+                    content: 'Query contains DateOfBirth condition - Age Indicators must be used instead',
+                    details: `Found ${dobPattern} pattern with age ${dobAge}. Please use Age Indicators (Age13to18Indicator, Age18to21Indicator, Age21PlusIndicator) instead of DateOfBirth calculations.`
+                };
+                document.querySelector('[data-checkbox="ageSelection"]').classList.add('highlight-error');
+            } else if (ageSelectionChecked) {
+                hasValidations = true;
+
+                // Check if NA is selected
+                if (selectedAge === 'NA') {
+                    // Check if any age indicator is present in query
+                    const hasAgeIndicator = sqlQuery.includes('Age13to18Indicator') || 
+                                           sqlQuery.includes('Age18to21Indicator') || 
+                                           sqlQuery.includes('Age21PlusIndicator');
+
+                    if (!hasAgeIndicator) {
+                        successCount++;
+                        groupedResults['age'] = {
+                            status: 'success',
+                            title: 'Age Selection',
+                            icon: '✓',
+                            content: 'N/A selected and no age indicators found in query'
+                        };
+                        document.querySelector('[data-checkbox="ageSelection"]').classList.add('highlight-success');
+                    } else {
+                        errorCount++;
+                        groupedResults['age'] = {
+                            status: 'error',
+                            title: 'Age Selection',
+                            icon: '✗',
+                            content: 'N/A selected but age indicators found in query'
+                        };
+                        document.querySelector('[data-checkbox="ageSelection"]').classList.add('highlight-error');
+                    }
+                } else {
+                    // Check if selected age matches query age indicators
+                    let expectedPattern = '';
+                    let patternFound = false;
+
+                    if (selectedAge === '13') {
+                        expectedPattern = age13;
+                        patternFound = sqlQuery.includes("Age13to18Indicator = 'Y'") && 
+                                      sqlQuery.includes("Age18to21Indicator = 'Y'") && 
+                                      sqlQuery.includes("Age21PlusIndicator = 'Y'");
+                    } else if (selectedAge === '18') {
+                        expectedPattern = age18;
+                        patternFound = sqlQuery.includes("Age18to21Indicator = 'Y'") && 
+                                      sqlQuery.includes("Age21PlusIndicator = 'Y'") &&
+                                      !sqlQuery.includes("Age13to18Indicator = 'Y'");
+                    } else if (selectedAge === '21') {
+                        expectedPattern = age21;
+                        patternFound = sqlQuery.includes("Age21PlusIndicator = 'Y'") &&
+                                      !sqlQuery.includes("Age13to18Indicator = 'Y'") &&
+                                      !sqlQuery.includes("Age18to21Indicator = 'Y'");
+                    }
+
+                    if (patternFound) {
+                        successCount++;
+                        groupedResults['age'] = {
+                            status: 'success',
+                            title: 'Age Selection',
+                            icon: '✓',
+                            content: 'Age indicators are present and match selection',
+                            details: 'Selected age: ' + selectedAge
+                        };
+                        document.querySelector('[data-checkbox="ageSelection"]').classList.add('highlight-success');
+                    } else {
+                        errorCount++;
+                        groupedResults['age'] = {
+                            status: 'error',
+                            title: 'Age Selection',
+                            icon: '✗',
+                            content: 'Age indicators are missing or do not match selection',
+                            details: 'Selected age: ' + selectedAge + ' | Expected pattern: ' + expectedPattern
+                        };
+                        document.querySelector('[data-checkbox="ageSelection"]').classList.add('highlight-error');
+                    }
+                }
+            } else {
+                // Check if age indicators exist when checkbox is unchecked
+                const hasAgeIndicator = sqlQuery.includes('Age13to18Indicator') || 
+                                       sqlQuery.includes('Age18to21Indicator') || 
+                                       sqlQuery.includes('Age21PlusIndicator');
+
+                if (hasAgeIndicator) {
+                    flagCount++;
+                    groupedResults['age'] = {
+                        status: 'flag',
+                        title: 'Age Selection',
+                        icon: '🚩',
+                        content: 'Age Selection is not checked but age indicators exist in query',
+                        flagMessage: 'Query contains age indicators but the Age Selection checkbox is not checked. This might indicate a mismatch between your selection and the query.'
+                    };
+                    document.querySelector('[data-checkbox="ageSelection"]').classList.add('highlight-flag');
+                }
+            }
+            
+            // Active Status Validation
+            const activeStatusChecked = document.getElementById('activeStatus').checked;
+            const hasActiveStatus = sqlQuery.includes('Active');
+            
+            if (activeStatusChecked) {
+                hasValidations = true;
+                if (hasActiveStatus) {
+                    successCount++;
+                    groupedResults['activeStatus'] = {
+                        status: 'success',
+                        title: 'Active Status',
+                        icon: '✓',
+                        content: 'Subscriber status is checked for "Active"'
+                    };
+                    document.querySelector('[data-checkbox="activeStatus"]').classList.add('highlight-success');
+                } else {
+                    errorCount++;
+                    groupedResults['activeStatus'] = {
+                        status: 'error',
+                        title: 'Active Status',
+                        icon: '✗',
+                        content: 'Active status condition is missing'
+                    };
+                    document.querySelector('[data-checkbox="activeStatus"]').classList.add('highlight-error');
+                }
+            } else if (hasActiveStatus) {
+                // Flag if checkbox is unchecked but condition exists in query
+                flagCount++;
+                groupedResults['activeStatus'] = {
+                    status: 'flag',
+                    title: 'Active Status',
+                    icon: '🚩',
+                    content: 'Active Status is not checked but active status condition exists in query',
+                    flagMessage: 'Query contains active status condition but the Active Status checkbox is not checked. This might indicate a mismatch between your selection and the query.'
+                };
+                document.querySelector('[data-checkbox="activeStatus"]').classList.add('highlight-flag');
+            }
+            
+            // Complaint Validation
+            const complaintChecked = document.getElementById('complaint').checked;
+            const hasComplaintCheck = sqlQuery.includes('_Complaint');
+            
+            if (complaintChecked) {
+                hasValidations = true;
+                if (hasComplaintCheck) {
+                    successCount++;
+                    groupedResults['complaint'] = {
+                        status: 'success',
+                        title: 'Complaint',
+                        icon: '✓',
+                        content: '_Complaint is checked'
+                    };
+                    document.querySelector('[data-checkbox="complaint"]').classList.add('highlight-success');
+                } else {
+                    errorCount++;
+                    groupedResults['complaint'] = {
+                        status: 'error',
+                        title: 'Complaint',
+                        icon: '✗',
+                        content: '_Complaint is missing'
+                    };
+                    document.querySelector('[data-checkbox="complaint"]').classList.add('highlight-error');
+                }
+            } else if (hasComplaintCheck) {
+                // Flag if checkbox is unchecked but condition exists in query
+                flagCount++;
+                groupedResults['complaint'] = {
+                    status: 'flag',
+                    title: 'Complaint',
+                    icon: '🚩',
+                    content: 'Complaint is not checked but _Complaint check exists in query',
+                    flagMessage: 'Query contains complaint check but the Complaint checkbox is not checked. This might indicate a mismatch between your selection and the query.'
+                };
+                document.querySelector('[data-checkbox="complaint"]').classList.add('highlight-flag');
+            }
+            
+            // Master Suppression Validation
+            const masterSuppressionChecked = document.getElementById('masterSuppression').checked;
+            const hasMasterSuppression = sqlQuery.includes('AMC_MasterSuppression');
+            
+            if (masterSuppressionChecked) {
+                hasValidations = true;
+                if (hasMasterSuppression) {
+                    successCount++;
+                    groupedResults['masterSuppression'] = {
+                        status: 'success',
+                        title: 'AMC Master Suppression',
+                        icon: '✓',
+                        content: 'AMC_MasterSuppression table is checked'
+                    };
+                    document.querySelector('[data-checkbox="masterSuppression"]').classList.add('highlight-success');
+                } else {
+                    errorCount++;
+                    groupedResults['masterSuppression'] = {
+                        status: 'error',
+                        title: 'AMC Master Suppression',
+                        icon: '✗',
+                        content: 'AMC_MasterSuppression check is missing'
+                    };
+                    document.querySelector('[data-checkbox="masterSuppression"]').classList.add('highlight-error');
+                }
+            } else if (hasMasterSuppression) {
+                // Flag if checkbox is unchecked but condition exists in query
+                flagCount++;
+                groupedResults['masterSuppression'] = {
+                    status: 'flag',
+                    title: 'AMC Master Suppression',
+                    icon: '🚩',
+                    content: 'AMC Master Suppression is not checked but AMC_MasterSuppression check exists in query',
+                    flagMessage: 'Query contains master suppression check but the AMC Master Suppression checkbox is not checked. This might indicate a mismatch between your selection and the query.'
+                };
+                document.querySelector('[data-checkbox="masterSuppression"]').classList.add('highlight-flag');
+            }
+            
+            // Associate Suppression Validation
+            const associateSuppressionChecked = document.getElementById('associateSuppression').checked;
+            const hasAssociateSuppression = sqlQuery.includes(`1104%`);
+            
+            if (associateSuppressionChecked) {
+                hasValidations = true;
+                if (hasAssociateSuppression) {
+                    successCount++;
+                    groupedResults['associateSuppression'] = {
+                        status: 'success',
+                        title: 'Associate Suppression',
+                        icon: '✓',
+                        content: 'Associate Suppression present'
+                    };
+                    document.querySelector('[data-checkbox="associateSuppression"]').classList.add('highlight-success');
+                } else {
+                    errorCount++;
+                    groupedResults['associateSuppression'] = {
+                        status: 'error',
+                        title: 'Associate Suppression',
+                        icon: '✗',
+                        content: 'Associate Suppression missing'
+                    };
+                    document.querySelector('[data-checkbox="associateSuppression"]').classList.add('highlight-error');
+                }
+            } else if (hasAssociateSuppression) {
+                // Flag if checkbox is unchecked but condition exists in query
+                flagCount++;
+                groupedResults['associateSuppression'] = {
+                    status: 'flag',
+                    title: 'Associate Suppression',
+                    icon: '🚩',
+                    content: 'Associate Suppression is not checked but conditions exist in query',
+                    flagMessage: 'Query contains associate suppression conditions but the Associate Suppression checkbox is not checked. This might indicate a mismatch between your selection and the query.'
+                };
+                document.querySelector('[data-checkbox="associateSuppression"]').classList.add('highlight-flag');
+            }
+            
+            // Fresh Address Validation
+            const freshAddressChecked = document.getElementById('freshAddress').checked;
+            const hasFreshAddress = sqlQuery.includes('FreshAddress_Exclusions_MRM');
+            
+            if (freshAddressChecked) {
+                hasValidations = true;
+                if (hasFreshAddress) {
+                    successCount++;
+                    groupedResults['freshAddress'] = {
+                        status: 'success',
+                        title: 'Fresh Address',
+                        icon: '✓',
+                        content: 'FreshAddress_Exclusions_MRM is checked'
+                    };
+                    document.querySelector('[data-checkbox="freshAddress"]').classList.add('highlight-success');
+                } else {
+                    errorCount++;
+                    groupedResults['freshAddress'] = {
+                        status: 'error',
+                        title: 'Fresh Address',
+                        icon: '✗',
+                        content: 'FreshAddress_Exclusions_MRM check is missing'
+                    };
+                    document.querySelector('[data-checkbox="freshAddress"]').classList.add('highlight-error');
+                }
+            } else if (hasFreshAddress) {
+                // Flag if checkbox is unchecked but condition exists in query
+                flagCount++;
+                groupedResults['freshAddress'] = {
+                    status: 'flag',
+                    title: 'Fresh Address',
+                    icon: '🚩',
+                    content: 'Fresh Address is not checked but FreshAddress_Exclusions_MRM check exists in query',
+                    flagMessage: 'Query contains fresh address check but the Fresh Address checkbox is not checked. This might indicate a mismatch between your selection and the query.'
+                };
+                document.querySelector('[data-checkbox="freshAddress"]').classList.add('highlight-flag');
+            }
+            
+            // Engagement Validation
+            const engagementChecked = document.getElementById('engagement').checked;
+            const hasEngagement = sqlQuery.includes('CLICK_ENGAGEMENT_LAST_6_MONTHS');
+            
+            if (engagementChecked) {
+                hasValidations = true;
+                if (hasEngagement) {
+                    successCount++;
+                    groupedResults['engagement'] = {
+                        status: 'success',
+                        title: 'Engagement',
+                        icon: '✓',
+                        content: 'CLICK_ENGAGEMENT_LAST_6_MONTHS and LastOpen_6Months tables are checked'
+                    };
+                    document.querySelector('[data-checkbox="engagement"]').classList.add('highlight-success');
+                } else {
+                    errorCount++;
+                    groupedResults['engagement'] = {
+                        status: 'error',
+                        title: 'Engagement',
+                        icon: '✗',
+                        content: 'Engagement tables check is missing'
+                    };
+                    document.querySelector('[data-checkbox="engagement"]').classList.add('highlight-error');
+                }
+            } else if (hasEngagement) {
+                // Flag if checkbox is unchecked but condition exists in query
+                flagCount++;
+                groupedResults['engagement'] = {
+                    status: 'flag',
+                    title: 'Engagement',
+                    icon: '🚩',
+                    content: 'Engagement is not checked but engagement tables check exists in query',
+                    flagMessage: 'Query contains engagement check but the Engagement checkbox is not checked. This might indicate a mismatch between your selection and the query.'
+                };
+                document.querySelector('[data-checkbox="engagement"]').classList.add('highlight-flag');
+            }
+            
+            // Generate HTML from grouped results
+            for (const [key, result] of Object.entries(groupedResults)) {
+                let resultHTML = `<div class="result-group ${result.status}">
+                    <div class="result-group-header">
+                        <span class="result-group-icon">${result.icon}</span>
+                        ${result.title}
+                    </div>
+                    <div class="result-group-content">${result.content}`;
+                
+                if (result.details) {
+                    resultHTML += `<div class="result-detail ${result.status === 'success' ? 'match' : 'mismatch'}">${result.details}</div>`;
+                }
+                
+                if (result.foundItems) {
+                    resultHTML += `<div class="found-items">${result.foundItems}</div>`;
+                }
+                
+                if (result.flagMessage) {
+                    resultHTML += `<div class="flag-message">${result.flagMessage}</div>`;
+                }
+                
+                resultHTML += `</div></div>`;
+                resultsHTML += resultHTML;
+            }
+            
+            // Add summary
+            if (hasValidations || flagCount > 0) {
+                let summaryClass = 'summary-success';
+                let summaryText = `Validation Complete: ${successCount} passed, ${warningCount} warnings, ${errorCount} errors`;
+                
+                if (errorCount > 0) {
+                    summaryClass = 'summary-error';
+                } else if (warningCount > 0 || flagCount > 0) {
+                    summaryClass = 'summary-warning';
+                }
+                
+                if (flagCount > 0) {
+                    summaryText += `, ${flagCount} flags`;
+                }
+                
+                resultsHTML = `<div class="summary ${summaryClass}">${summaryText}</div>` + resultsHTML;
+            } else {
+                resultsHTML = '<div class="warning result-group"><div class="result-group-header"><span class="result-group-icon">⚠</span>Warning</div><div class="result-group-content">Please select at least one validation option.</div></div>';
+            }
+            
+            resultsContainer.innerHTML = resultsHTML;
+        });
+        
+        document.getElementById('clearBtn').addEventListener('click', function() {
+            // Reset highlights
+            resetHighlights();
+            
+            // Clear the SQL query
+            document.getElementById('sqlQuery').value = '';
+            document.getElementById('validationResults').innerHTML = '<div class="info result-group"><div class="result-group-header"><span class="result-group-icon">ℹ</span>Info</div><div class="result-group-content">Please enter a SQL query and click "Validate Query" to see results.</div></div>';
+            
+            // Show all sections that might have been hidden
+            showFullInterface();
+        });
+        
+        // Modify the SQL toggle button to show all hidden sections when clicked
+        document.getElementById('sqlToggleButton').addEventListener('click', function() {
+            // Show all sections that might have been hidden
+            showFullInterface();
+            
+            // Toggle the SQL container
+            const sqlContainer = document.getElementById('sqlContainer');
+            const sqlToggleHeader = document.getElementById('sqlToggleHeader');
+            
+            if (sqlContainer.style.display === 'none') {
+                sqlContainer.style.display = 'block';
+                sqlToggleHeader.classList.remove('collapsed');
+                this.classList.remove('collapsed');
+                
+                // Show header toggle, hide button toggle
+                sqlToggleHeader.style.display = 'flex';
+                this.style.display = 'none';
+            } else {
+                sqlContainer.style.display = 'none';
+                sqlToggleHeader.classList.add('collapsed');
+                this.classList.add('collapsed');
+                
+                // Hide header toggle, show button toggle
+                sqlToggleHeader.style.display = 'none';
+                this.style.display = 'flex';
+            }
+        });
+        
+        // Add sample query to the textarea
+        document.getElementById('sqlQuery').value = ``;
+    </script>
 </body>
 </html>

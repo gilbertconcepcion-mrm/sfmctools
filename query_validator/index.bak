@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SQL Query Validator</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.14.0-beta3/dist/css/bootstrap-select.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding: 20px;
+            background-color: #f8f9fa;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .main-container {
+            display: flex;
+            height: calc(100vh - 40px);
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .left-panel {
+            width: 400px;
+            flex-shrink: 0;
+            border-right: 1px solid #e0e0e0;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        .right-panel {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            overflow: hidden;
+        }
+        .validation-options {
+            margin-bottom: 20px;
+        }
+        .checkbox-item {
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .checkbox-item:hover {
+            background-color: #f0f0f0;
+        }
+        /* Highlight styles for validation results */
+        .checkbox-item.highlight-success {
+            border-color: #28a745;
+            background-color: #e9f7ef;
+        }
+        .checkbox-item.highlight-warning {
+            border-color: #ffc107;
+            background-color: #fffbeb;
+        }
+        .checkbox-item.highlight-error {
+            border-color: #dc3545;
+            background-color: #fdeeee;
+        }
+        .checkbox-item.highlight-flag {
+            border-color: #fd7e14;
+            background-color: #fff4e6;
+        }
+        .tier-selection-container.highlight-success {
+            border-color: #28a745;
+            background-color: #e9f7ef;
+        }
+        .tier-selection-container.highlight-warning {
+            border-color: #ffc107;
+            background-color: #fffbeb;
+        }
+        .tier-selection-container.highlight-error {
+            border-color: #dc3545;
+            background-color: #fdeeee;
+        }
+        .tier-selection-container.highlight-flag {
+            border-color: #fd7e14;
+            background-color: #fff4e6;
+        }
+        .form-check {
+            margin-bottom: 10px;
+            pointer-events: none; /* Prevent clicks on the form-check from bubbling up */
+        }
+        .form-check-input {
+            pointer-events: auto; /* Re-enable pointer events for the checkbox itself */
+        }
+        .sql-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .sql-container {
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+        .sql-input {
+            font-family: monospace;
+            height: 300px;
+            resize: none;
+        }
+        .sql-toggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+        .sql-toggle:hover {
+            background-color: #f0f0f0;
+        }
+        .sql-toggle svg {
+            width: 20px;
+            height: 20px;
+            transition: transform 0.3s ease;
+        }
+        .sql-toggle.collapsed svg {
+            transform: rotate(180deg);
+        }
+        .validation-result {
+            margin-top: 20px;
+            flex-grow: 1;
+            overflow-y: auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            grid-gap: 15px;
+            align-content: start;
+        }
+        .result-group {
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            padding: 12px;
+            background-color: #fff;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+        }
+        .result-group.success {
+            border-color: #28a745;
+            background-color: #f8fff9;
+        }
+        .result-group.warning {
+            border-color: #ffc107;
+            background-color: #fffdf7;
+        }
+        .result-group.error {
+            border-color: #dc3545;
+            background-color: #fff8f8;
+        }
+        .result-group.flag {
+            border-color: #fd7e14;
+            background-color: #fff9f5;
+        }
+        .result-group-header {
+            font-weight: bold;
+            margin-bottom: 8px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+        }
+        .result-group-icon {
+            margin-right: 8px;
+            font-size: 1.2rem;
+        }
+        .result-group-content {
+            font-size: 0.9rem;
+        }
+        .result-detail {
+            margin-top: 5px;
+            padding: 5px;
+            border-radius: 3px;
+            font-size: 0.85rem;
+        }
+        .match {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .mismatch {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .found-items {
+            margin-top: 5px;
+            padding: 5px;
+            background-color: #e2e3e5;
+            border-radius: 3px;
+            font-size: 0.85rem;
+        }
+        .flag-message {
+            margin-top: 5px;
+            padding: 8px;
+            background-color: #f8d7da;
+            color: #721c24;
+            border-radius: 4px;
+            border-left: 4px solid #dc3545;
+            font-size: 0.85rem;
+        }
+        .summary {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            font-weight: bold;
+            grid-column: span 2; /* Make summary span two columns */
+        }
+        .summary-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .summary-warning {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+        }
+        .summary-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .genre-container, .age-container, .optin-container {
+            margin-top: 10px;
+            pointer-events: auto; /* Re-enable pointer events for dropdowns */
+        }
+        .genre-dropdown, .age-dropdown, .optin-dropdown {
+            width: 100%;
+        }
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .button-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .small-text {
+            font-size: 0.8rem;
+            color: #6c757d;
+            pointer-events: auto; /* Re-enable pointer events for small text */
+        }
+        .tier-selection {
+            margin-top: 10px;
+            margin-bottom: 15px;
+            pointer-events: auto; /* Re-enable pointer events for tier selection */
+        }
+        .tier-checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .tier-checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px; /* Reduced padding for more compact look */
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            flex: 1;
+            min-width: 120px;
+            justify-content: center;
+        }
+        .tier-checkbox-item:hover {
+            background-color: #f0f0f0;
+            border-color: #d0d0d0;
+        }
+        .tier-checkbox-item.selected {
+            background-color: #e7f3ff;
+            border-color: #007bff;
+        }
+        .tier-checkbox-item input[type="checkbox"] {
+            margin: 0;
+            pointer-events: none; /* Prevent direct checkbox clicks */
+        }
+        .tier-checkbox-item label {
+            margin: 0;
+            font-weight: normal;
+            cursor: pointer;
+            pointer-events: none; /* Prevent label clicks from bubbling up */
+        }
+        .sql-toggle-header {
+            display: none;
+        }
+        .sql-toggle-button {
+            display: none;
+        }
+        .tier-selection-container {
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .tier-selection-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        /* Compact button styles */
+        .btn {
+            padding: 0.375rem 0.75rem; /* Reduced padding for more compact look */
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+        .btn-primary, .btn-secondary {
+            height: auto;
+            min-height: 2rem; /* Ensure consistent height */
+        }
+        
+        /* Media query for smaller screens */
+        @media (max-width: 768px) {
+            .validation-result {
+                grid-template-columns: 1fr;
+            }
+            .summary {
+                grid-column: span 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="left-panel">
+            <div class="section-title">Validation Options</div>
+            
+            <div class="validation-options">
+                <div class="checkbox-item" data-checkbox="genreSelected">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="genreSelected">
+                        <label class="form-check-label" for="genreSelected">
+                            Genre Selection
+                        </label>
+                    </div>
+                    <div class="genre-container">
+                        <select id="genres" class="form-select genre-dropdown">
+                            <option value="NONE" selected>N/A</option>
+                            <option value="ACTION">ACTION</option>
+                            <option value="ADVENTURE">ADVENTURE</option>
+                            <option value="ANIMATION">ANIMATION</option>
+                            <option value="CLASSIC_CONCERT">CLASSIC_CONCERT</option>
+                            <option value="COMEDY">COMEDY</option>
+                            <option value="DANCE">DANCE</option>
+                            <option value="DOCUMENTARY">DOCUMENTARY</option>
+                            <option value="DRAMA">DRAMA</option>
+                            <option value="FAMILY">FAMILY</option>
+                            <option value="FANTASY">FANTASY</option>
+                            <option value="HORROR">HORROR</option>
+                            <option value="MUSICAL">MUSICAL</option>
+                            <option value="OPERA">OPERA</option>
+                            <option value="ROCK_POP_CONCERT">ROCK_POP_CONCERT</option>
+                            <option value="ROMANCE">ROMANCE</option>
+                            <option value="ROMANTIC_COMEDY">ROMANTIC_COMEDY</option>
+                            <option value="SCIENCE_FICTION">SCIENCE_FICTION</option>
+                            <option value="SPECIAL_EVENTS">SPECIAL_EVENTS</option>
+                            <option value="SUSPENSE">SUSPENSE</option>
+                            <option value="THEATRE">THEATRE</option>
+                            <option value="WESTERN">WESTERN</option>
+                            <option value="ANIME">ANIME</option>
+                            <option value="ARTISAN">ARTISAN</option>
+                            <option value="THRILLS_AND_CHILLS">THRILLS_AND_CHILLS</option>
+                        </select>
+                    </div>
+                    <div class="small-text">Checks if selected genre column exists in query (e.g., al.[ACTION])</div>
+                </div>
+                
+                <div class="checkbox-item" data-checkbox="memberStatus">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="memberStatus">
+                        <label class="form-check-label" for="memberStatus">
+                            Member Status
+                        </label>
+                    </div>
+<!--                    <div class="small-text">Checks if MemberStatus is "Member" or "Non-Member"</div>-->
+                </div>
+                
+                <div class="checkbox-item" data-checkbox="optInSelector">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="optInSelector">
+                        <label class="form-check-label" for="optInSelector">
+                            Opt-in Selector
+                        </label>
+                    </div>
+                    <div class="optin-container">
+                        <select id="emailOptIn" class="form-select optin-dropdown">
+                            <option value="" selected>NA</option>
+                            <option value="AMCStubsSpecialOfferOptInIndicator">AMCStubsSpecialOfferOptInIndicator</option>
+                            <option value="AMCMyMoviesQueueOptIn">AMCMyMoviesQueueOptIn</option>
+                            <option value="AMCStubsAccountInformationEmailOptin">AMCStubsAccountInformationEmailOptin</option>
+                            <option value="AMCStubsMemberRewardsEmailOptin">AMCStubsMemberRewardsEmailOptin</option>
+                            <option value="AMCStubsMemberRewardsSummaryEmailOptIn">AMCStubsMemberRewardsSummaryEmailOptIn</option>
+                        </select>
+                    </div>
+<!--                    <div class="small-text">Checks if selected opt-in condition is present in query</div>-->
+                </div>
+                
+                <div class="checkbox-item" data-checkbox="ageSelection">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="ageSelection">
+                        <label class="form-check-label" for="ageSelection">
+                            Age Selection
+                        </label>
+                    </div>
+                    <div class="age-container">
+                        <select id="age" class="form-select age-dropdown">
+                            <option value="NA" selected>N/A</option>
+                            <option value="13">13</option>
+                            <option value="18">18</option>
+                            <option value="21">21</option>
+                        </select>
+                    </div>
+<!--                    <div class="small-text">Checks if DateOfBirth meets age criteria (13, 18, or 21)</div>-->
+                </div>
+                
+                <div class="checkbox-item" data-checkbox="activeStatus">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="activeStatus">
+                        <label class="form-check-label" for="activeStatus">
+                            Active Status
+                        </label>
+                    </div>
+<!--                    <div class="small-text">Checks if subscriber is active</div>-->
+                </div>
+                
+                <div class="checkbox-item" data-checkbox="complaint">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="complaint">
+                        <label class="form-check-label" for="complaint">
+                            Complaint
+                        </label>
+                    </div>
+<!--                    <div class="small-text">Checks if subscriber exists in _Complaint</div>-->
+                </div>
+                
+                <div class="checkbox-item" data-checkbox="masterSuppression">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="masterSuppression">
+                        <label class="form-check-label" for="masterSuppression">
+                            AMC Master Suppression
+                        </label>
+                    </div>
+<!--                    <div class="small-text">Checks if subscriber exists in AMC_MasterSuppression</div>-->
+                </div>
+                
+                <div class="checkbox-item" data-checkbox="associateSuppression">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="associateSuppression">
+                        <label class="form-check-label" for="associateSuppression">
+                            Associate Suppression
+                        </label>
+                    </div>
+<!--                    <div class="small-text">Checks if amcStubsCardNumber meets criteria</div>-->
+                </div>
+                
+                <div class="checkbox-item" data-checkbox="freshAddress">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="freshAddress">
+                        <label class="form-check-label" for="freshAddress">
+                            Fresh Address
+                        </label>
+                    </div>
+<!--                    <div class="small-text">Checks if subscriber exists in FreshAddress_Exclusions_MRM</div>-->
+                </div>
+                
+                <div class="checkbox-item" data-checkbox="engagement">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="engagement">
+                        <label class="form-check-label" for="engagement">
+                            Engagement: CLICK_ENGAGEMENT_LAST_6_MONTHS or LastOpen_6Months
+                        </label>
+                    </div>
+<!--                    <div class="small-text">Checks if subscriber exists in CLICK_ENGAGEMENT_LAST_6_MONTHS or LastOpen_6Months</div>-->
+                </div>
+            </div>
+        </div>
+        
+        <div class="right-panel">
+            <div class="sql-header">
+                <div class="section-title">SQL Query</div>
+                <button class="sql-toggle sql-toggle-header" id="sqlToggleHeader" title="Toggle SQL Query">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </button>
+            </div>
+            <div class="sql-container" id="sqlContainer">
+                <textarea class="form-control sql-input" id="sqlQuery" placeholder="Enter your SQL query here..."></textarea>
+            </div>
+            
+            <!-- Tier Selection moved here -->
+            <div class="tier-selection-container" id="tierSelectionContainer">
+                <div class="tier-selection-title">Tier Selection</div>
+                
+                <div class="tier-selection">
+                    <div class="tier-checkbox-group">
+                        <div class="tier-checkbox-item" data-tier="mac">
+                            <input type="checkbox" id="mac" name="tier" value="A-List_Classic" data-tier-name="A-List Classic">
+                            <label for="mac">A-List Classic</label>
+                        </div>
+                        <div class="tier-checkbox-item" data-tier="mea">
+                            <input type="checkbox" id="mea" name="tier" value="A-List" data-tier-name="A-List">
+                            <label for="mea">A-List</label>
+                        </div>
+                        <div class="tier-checkbox-item" data-tier="mei">
+                            <input type="checkbox" id="mei" name="tier" value="Insider" data-tier-name="Insider">
+                            <label for="mei">Insider</label>
+                        </div>
+                        <div class="tier-checkbox-item" data-tier="mep">
+                            <input type="checkbox" id="mep" name="tier" value="Premiere" data-tier-name="Premiere">
+                            <label for="mep">Premiere</label>
+                        </div>
+                        <div class="tier-checkbox-item" data-tier="mpg">
+                            <input type="checkbox" id="mpg" name="tier" value="PremiereGo" data-tier-name="PremiereGo">
+                            <label for="mpg">PremiereGo</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="small-text">Checks if selected tier matches the query</div>
+            </div>
+            
+            <div class="button-container">
+                <button class="btn btn-primary" id="validateBtn">Validate Query</button>
+                <button class="btn btn-secondary" id="clearBtn">Clear</button>
+                <button class="sql-toggle sql-toggle-button" id="sqlToggleButton" title="Toggle SQL Query">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="section-title mt-4">Validation Results</div>
+            <div id="validationResults" class="validation-result">
+                <div class="info result-item">
+                    Please select validation options and click "Validate Query" to see results.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.14.0-beta3/dist/js/bootstrap-select.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
