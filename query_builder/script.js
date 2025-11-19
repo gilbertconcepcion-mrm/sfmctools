@@ -375,7 +375,7 @@ function generateQuery(config, tierName) {
     // Only add tier condition if a tier is specified
     const qt = tierName ? `AND s.LoyaltyAccountPortfolioID IN (SELECT LoyaltyAccountPortfolioID FROM [Master_LoyaltyPortfolioID] WHERE Tier = '${tierName}' AND ActiveStatus='True')` : ``;
     // Only add genre WHERE clause if the campaign type is 'genre' AND a genre is selected
-    const qg2 = ccampaign === 'genre' && config.genre && config.genre !== "NONE" ? `AND (al.[${config.genre}] = 'True')` : ``;
+    const qg2 = ccampaign === 'genre' && config.genre && config.genre !== "NONE" ? `AND (al.${config.genre} = 'True')` : ``;
 //    let qdob = ``;
 //    if (config.member.age && config.member.age !== "NA" && !isNaN(config.member.age)) {
 //        qdob = `AND (ISNULL(s.[DateOfBirth], '') <> '' AND s.DateOfBirth <= DATEADD(year, -${parseInt(config.member.age)}, GETDATE()))`;
