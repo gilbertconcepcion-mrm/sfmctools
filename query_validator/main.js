@@ -220,7 +220,6 @@
             const genreSelectedChecked = document.getElementById('genreSelected').checked;
             const selectedGenre = document.getElementById('genres').value;
             const hasGenreJoin = sqlQuery.includes('INNER JOIN [AMC_Genre_targeting]');
-            const hasGenreAction = sqlQuery.includes('al.[ACTION] = \'True\'');
             
             // Check if the selected genre column exists in the query
             let hasGenreColumn = false;
@@ -308,7 +307,7 @@
                         document.querySelector('[data-checkbox="genreSelected"]').classList.add('highlight-error');
                     }
                 }
-            } else if (hasGenreJoin || hasGenreAction) {
+            } else if (hasGenreJoin) {
                 // Flag if checkbox is unchecked but condition exists in query
                 flagCount++;
                 let foundGenresText = foundGenreColumns.length > 0 ? 
