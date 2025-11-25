@@ -223,7 +223,7 @@ function generateQuerySendlist(config, tierName) {
     // Opt-in filter
     let qo = ``;
     if (config.optIn && config.optIn !== "NA" && config.optIn !== "Not Selected" && config.optIn !== "None Selected" && config.optIn.trim() !== "") {
-        qo = `AND s.[${config.optIn}] = 'Y'`;
+        qo = `AND s.${config.optIn} = 'Y'`;
     }
     
     // Tier filter - modified to support multiple tiers
@@ -370,7 +370,7 @@ function generateQuery(config, tierName) {
     let qo = ``;
     // Modified condition to exclude "Not Selected", "NA", and empty string
     if (config.optIn && config.optIn !== "NA" && config.optIn !== "Not Selected" && config.optIn !== "None Selected" && config.optIn.trim() !== "") {
-        qo = `AND s.[${config.optIn}] = 'Y'`;
+        qo = `AND s.${config.optIn} = 'Y'`;
     }
     // Only add tier condition if a tier is specified
     const qt = tierName ? `AND s.LoyaltyAccountPortfolioID IN (SELECT LoyaltyAccountPortfolioID FROM [Master_LoyaltyPortfolioID] WHERE Tier = '${tierName}' AND ActiveStatus='True')` : ``;
@@ -464,7 +464,7 @@ function generateQueryTransactional(config, tierName) {
     // Opt-in condition
     let qo = ``;
     if (config.optIn && config.optIn !== "NA" && config.optIn !== "Not Selected" && config.optIn !== "None Selected" && config.optIn.trim() !== "") {
-        qo = `AND s.[${config.optIn}] = 'Y'`;
+        qo = `AND s.${config.optIn} = 'Y'`;
     }
     
     // Tier condition
