@@ -43,11 +43,11 @@ const customConfig = {
   key39: "AND s.[AMCStubsMemberRewardsEmailOptin]",
   key40: "AND s.[AMCStubsMemberRewardsSummaryEmailOptIn]",
 
-  key36b: "AND s.AMCStubsSpecialOfferOptInIndicator",
-  key37b: "AND s.AMCMyMoviesQueueOptIn",
-  key38b: "AND s.AMCStubsAccountInformationEmailOptin",
-  key39b: "AND s.AMCStubsMemberRewardsEmailOptin",
-  key40b: "AND s.AMCStubsMemberRewardsSummaryEmailOptIn",
+  key36b: "s.AMCStubsSpecialOfferOptInIndicator",
+  key37b: "s.AMCMyMoviesQueueOptIn",
+  key38b: "s.AMCStubsAccountInformationEmailOptin",
+  key39b: "s.AMCStubsMemberRewardsEmailOptin",
+  key40b: "s.AMCStubsMemberRewardsSummaryEmailOptIn",
     
   key41: "FreshAddress_Exclusions_MRM",
   key42: "CLICK_ENGAGEMENT_LAST_6_MONTHS",
