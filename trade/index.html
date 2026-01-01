@@ -122,30 +122,6 @@
             margin-top: 5px;
         }
         
-        .calculate-btn {
-            width: 100%;
-            padding: 15px;
-            background: linear-gradient(to right, #3b82f6, #60a5fa);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-top: 10px;
-        }
-        
-        .calculate-btn:hover {
-            background: linear-gradient(to right, #2563eb, #3b82f6);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4);
-        }
-        
-        .calculate-btn:active {
-            transform: translateY(0);
-        }
-        
         .result-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -276,7 +252,15 @@
                 <h2 style="color: #60a5fa; margin-bottom: 20px;">Input Parameters</h2>
                 
                 <div class="input-group">
-                    <label for="fund">Starting Fund ($)</label>
+                    <label for="account-type">Account Type</label>
+                    <select id="account-type">
+                        <option value="standard">Standard Account ($10/pip per lot)</option>
+                        <option value="cent">Cent Account ($0.10/pip per lot)</option>
+                    </select>
+                </div>
+                
+                <div class="input-group">
+                    <label for="fund" id="fund-label">Starting Fund ($)</label>
                     <input type="number" id="fund" min="1000" max="1000000" step="1000" value="100000">
                     <div class="slider-container">
                         <input type="range" id="fund-slider" min="1000" max="1000000" step="1000" value="100000">
@@ -309,8 +293,6 @@
                         <option value="indices">Indices/Commodities (Max 3 lots per position)</option>
                     </select>
                 </div>
-                
-                <button class="calculate-btn" id="calculate">Calculate Trading Parameters</button>
             </div>
             
             <div class="results-section">
@@ -365,9 +347,11 @@
 
     <script>
         // Get DOM elements
+        const accountTypeSelect = document.getElementById('account-type');
         const fundInput = document.getElementById('fund');
         const fundSlider = document.getElementById('fund-slider');
         const fundDisplay = document.getElementById('fund-display');
+        const fundLabel = document.getElementById('fund-label');
         
         const riskInput = document.getElementById('risk');
         const riskSlider = document.getElementById('risk-slider');
@@ -378,7 +362,6 @@
         const stoplossDisplay = document.getElementById('stoploss-display');
         
         const instrumentSelect = document.getElementById('instrument');
-        const calculateBtn = document.getElementById('calculate');
         
         const dailyLimitEl = document.getElementById('daily-limit');
         const totalLimitEl = document.getElementById('total-limit');
@@ -393,8 +376,8 @@
         // Format currency
         function formatCurrency(amount) {
             return '$' + amount.toLocaleString('en-US', {
-                minimumFractionDigits: 0,
-                maximumFractionDigits: 0
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
             });
         }
 
@@ -415,8 +398,15 @@
         }
 
         function updateDisplay(value, displayElement, isCurrency, suffix) {
+            const accountType = accountTypeSelect.value;
+            const isCent = accountType === 'cent';
+            
             if (isCurrency) {
-                displayElement.textContent = formatCurrency(parseFloat(value));
+                if (isCent) {
+                    displayElement.textContent = parseFloat(value).toLocaleString('en-US') + ' cents';
+                } else {
+                    displayElement.textContent = formatCurrency(parseFloat(value));
+                }
             } else if (suffix === '%') {
                 displayElement.textContent = parseFloat(value).toFixed(1) + suffix;
             } else if (suffix === ' pips') {
@@ -424,6 +414,17 @@
             } else {
                 displayElement.textContent = value;
             }
+        }
+
+        // Update fund label based on account type
+        function updateFundLabel() {
+            const accountType = accountTypeSelect.value;
+            if (accountType === 'cent') {
+                fundLabel.textContent = 'Starting Fund (cents)';
+            } else {
+                fundLabel.textContent = 'Starting Fund ($)';
+            }
+            updateDisplay(fundInput.value, fundDisplay, true);
         }
 
         // Initialize sync
@@ -437,26 +438,32 @@
             const riskPercent = parseFloat(riskInput.value) / 100;
             const stopLossPips = parseFloat(stoplossInput.value);
             const instrument = instrumentSelect.value;
+            const accountType = accountTypeSelect.value;
             
-            // Calculate limits
-            const dailyLimit = fund * 0.05; // 5%
-            const totalLimit = fund * 0.10; // 10%
+            // For cent accounts, convert cents to real USD for calculations and display
+            const isCent = accountType === 'cent';
+            const realFund = isCent ? fund / 100 : fund;
             
-            // Calculate risk amount per trade
-            const riskAmount = fund * riskPercent;
+            // Calculate limits in real money
+            const dailyLimit = realFund * 0.05; // 5%
+            const totalLimit = realFund * 0.10; // 10%
+            
+            // Calculate risk amount per trade in real money
+            const riskAmount = realFund * riskPercent;
             
             // Calculate how many losing trades to hit daily limit
             const tradesToDailyLimit = dailyLimit / riskAmount;
             
-            // Calculate lot size
-            // For forex majors: 1 standard lot = $10 per pip
-            // This is the standard calculation for USD-based pairs
-            const pipValue = 10; // $10 per pip per standard lot for major pairs
+            // Calculate lot size based on account type
+            // Standard: 1 lot = $10 per pip
+            // Cent: 1 lot = $0.10 per pip (100x smaller)
+            const pipValue = isCent ? 0.10 : 10;
             let lotSize = riskAmount / (stopLossPips * pipValue);
             
             // Apply instrument-specific max lot size PER POSITION
             const maxLot = instrument === 'forex' ? 5 : 3;
-            maxLotDisplay.textContent = `${maxLot} lots per position`;
+            const lotType = isCent ? 'cent lots' : 'lots';
+            maxLotDisplay.textContent = `${maxLot} ${lotType} per position`;
             
             // Check if lot size exceeds maximum
             let lotStatus = '';
@@ -464,40 +471,40 @@
             let adviceDetail = '';
             
             if (lotSize > maxLot) {
-                const maxRiskPercent = (maxLot * stopLossPips * pipValue / fund * 100);
-                lotStatus = `⚠️ Exceeds ${maxLot} lots limit!`;
+                const maxRiskPercent = (maxLot * stopLossPips * pipValue / realFund * 100);
+                lotStatus = `⚠️ Exceeds ${maxLot} ${lotType} limit!`;
                 advice = 'Risk Too High';
                 adviceDetail = `Reduce risk to ${maxRiskPercent.toFixed(2)}% or increase stop-loss to ${Math.ceil(riskAmount / (maxLot * pipValue))} pips`;
                 adviceEl.className = 'result-value warning-text';
                 lotSize = maxLot;
             } else if (lotSize > maxLot * 0.8) {
-                lotStatus = '⚠️ Near maximum limit';
+                lotStatus = `⚠️ Near maximum limit`;
                 advice = 'Caution Zone';
                 adviceDetail = `You're using ${(lotSize/maxLot*100).toFixed(0)}% of max lot size - consider reducing risk`;
                 adviceEl.className = 'result-value warning-text';
             } else if (tradesToDailyLimit < 3) {
-                lotStatus = '✓ Within lot limits';
+                lotStatus = `✓ Within lot limits`;
                 advice = 'Very High Risk';
                 adviceDetail = `Only ${tradesToDailyLimit.toFixed(1)} losing trades would hit your daily limit!`;
                 adviceEl.className = 'result-value warning-text';
             } else if (tradesToDailyLimit < 5) {
-                lotStatus = '✓ Within lot limits';
+                lotStatus = `✓ Within lot limits`;
                 advice = 'High Risk';
                 adviceDetail = `${tradesToDailyLimit.toFixed(1)} losing trades would hit your daily limit`;
                 adviceEl.className = 'result-value warning-text';
             } else {
-                lotStatus = '✓ Within limits';
+                lotStatus = `✓ Within limits`;
                 advice = 'Safe Zone';
                 adviceDetail = `${tradesToDailyLimit.toFixed(1)} losing trades to daily limit - good risk management`;
                 adviceEl.className = 'result-value safe-text';
             }
             
-            // Update results
+            // Update results - always show real USD values
             dailyLimitEl.textContent = formatCurrency(dailyLimit);
             totalLimitEl.textContent = formatCurrency(totalLimit);
             riskAmountEl.textContent = formatCurrency(riskAmount);
             riskTradesEl.textContent = `${tradesToDailyLimit.toFixed(1)} trades to daily limit`;
-            lotSizeEl.textContent = lotSize.toFixed(2);
+            lotSizeEl.textContent = lotSize.toFixed(2) + (isCent ? ' cent' : '');
             lotStatusEl.textContent = lotStatus;
             adviceEl.textContent = advice;
             adviceDetailEl.textContent = adviceDetail;
@@ -517,19 +524,21 @@
         }
 
         // Event listeners
-        calculateBtn.addEventListener('click', calculateParameters);
+        accountTypeSelect.addEventListener('change', function() {
+            updateFundLabel();
+            calculateParameters();
+        });
         instrumentSelect.addEventListener('change', calculateParameters);
-
-        // Initialize calculation
-        calculateParameters();
-
-        // Auto-calculate when any input changes
         fundInput.addEventListener('input', calculateParameters);
         riskInput.addEventListener('input', calculateParameters);
         stoplossInput.addEventListener('input', calculateParameters);
         fundSlider.addEventListener('input', calculateParameters);
         riskSlider.addEventListener('input', calculateParameters);
         stoplossSlider.addEventListener('input', calculateParameters);
+
+        // Initialize
+        updateFundLabel();
+        calculateParameters();
     </script>
 </body>
 </html>
