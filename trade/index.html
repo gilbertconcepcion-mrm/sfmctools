@@ -81,6 +81,26 @@
         .highlight-high {
             background-color: #e8f5e9 !important; /* Light green for higher capital */
         }
+        .risk-meter {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+        .risk-high {
+            background-color: #ffcdd2;
+            color: #c62828;
+        }
+        .risk-medium {
+            background-color: #fff9c4;
+            color: #f57f17;
+        }
+        .risk-low {
+            background-color: #c8e6c9;
+            color: #2e7d32;
+        }
         .note {
             background-color: #e3f2fd;
             border-left: 5px solid #2196f3;
@@ -134,7 +154,10 @@
                     <td>20 pips</td>
                     <td>$0.10 (1%)</td>
                     <td>$0.20 (2%)</td>
-                    <td><em>Demo practice only. Spread kills profits. Not viable for real trading.</em></td>
+                    <td>
+                        <div class="risk-meter risk-high">Blows in 5 losses</div>
+                        <em>Demo practice only. Spread kills profits. Not viable for real trading.</em>
+                    </td>
                 </tr>
                 <tr class="highlight-low">
                     <td><strong>$25</strong></td>
@@ -145,7 +168,10 @@
                     <td>50 pips</td>
                     <td>$0.10 (0.4%)</td>
                     <td>$0.20 (0.8%)</td>
-                    <td><em>Barely viable. Need 50+ pip moves. Extreme patience required.</em></td>
+                    <td>
+                        <div class="risk-meter risk-high">Blows in 10 losses</div>
+                        <em>Barely viable. Need 50+ pip moves. Extreme patience required.</em>
+                    </td>
                 </tr>
                 <tr class="highlight-low">
                     <td><strong>$50</strong></td>
@@ -156,7 +182,10 @@
                     <td>50 pips</td>
                     <td>$0.10-$0.20</td>
                     <td>$0.20-$0.40</td>
-                    <td><em>Minimum for occasional gold trades. Still very challenging.</em></td>
+                    <td>
+                        <div class="risk-meter risk-high">Blows in 10-15 losses</div>
+                        <em>Minimum for occasional gold trades. Still very challenging.</em>
+                    </td>
                 </tr>
                 <tr>
                     <td><strong>$100</strong></td>
@@ -167,7 +196,10 @@
                     <td>50 pips</td>
                     <td>$0.20 (0.2%)</td>
                     <td>$0.40 (0.4%)</td>
-                    <td><em>Starting point for serious learning. Can withstand some losses.</em></td>
+                    <td>
+                        <div class="risk-meter risk-medium">Blows in 15-20 losses</div>
+                        <em>Starting point for serious learning. Can withstand some losses.</em>
+                    </td>
                 </tr>
                 <tr>
                     <td><strong>$250</strong></td>
@@ -178,7 +210,10 @@
                     <td>50 pips</td>
                     <td>$0.50 (0.2%)</td>
                     <td>$1.00 (0.4%)</td>
-                    <td><em>Becomes practical. Profits start to mean something.</em></td>
+                    <td>
+                        <div class="risk-meter risk-medium">Blows in 25-30 losses</div>
+                        <em>Becomes practical. Profits start to mean something.</em>
+                    </td>
                 </tr>
                 <tr class="highlight-medium">
                     <td><strong>$500</strong></td>
@@ -189,7 +224,10 @@
                     <td>50 pips</td>
                     <td>$1.00 (0.2%)</td>
                     <td>$2.00 (0.4%)</td>
-                    <td><em>Sweet spot for serious practice. Real strategy testing possible.</em></td>
+                    <td>
+                        <div class="risk-meter risk-low">Blows in 30-35 losses</div>
+                        <em>Sweet spot for serious practice. Real strategy testing possible.</em>
+                    </td>
                 </tr>
                 <tr class="highlight-medium">
                     <td><strong>$750</strong></td>
@@ -200,7 +238,10 @@
                     <td>50 pips</td>
                     <td>$1.50 (0.2%)</td>
                     <td>$3.00 (0.4%)</td>
-                    <td><em>Comfortable for consistent trading. Can scale position slightly.</em></td>
+                    <td>
+                        <div class="risk-meter risk-low">Blows in 35-40 losses</div>
+                        <em>Comfortable for consistent trading. Can scale position slightly.</em>
+                    </td>
                 </tr>
                 <tr class="highlight-high">
                     <td><strong>$1,000</strong></td>
@@ -211,7 +252,10 @@
                     <td>50 pips</td>
                     <td>$2.00 (0.2%)</td>
                     <td>$4.00 (0.4%)</td>
-                    <td><em>Professional practice level. Real income potential begins.</em></td>
+                    <td>
+                        <div class="risk-meter risk-low">Blows in 40-45 losses</div>
+                        <em>Professional practice level. Real income potential begins.</em>
+                    </td>
                 </tr>
                 <tr class="highlight-high">
                     <td><strong>$1,500</strong></td>
@@ -222,7 +266,10 @@
                     <td>50 pips</td>
                     <td>$3.00 (0.2%)</td>
                     <td>$6.00 (0.4%)</td>
-                    <td><em>Can trade multiple instruments. Proper portfolio possible.</em></td>
+                    <td>
+                        <div class="risk-meter risk-low">Blows in 45-50 losses</div>
+                        <em>Can trade multiple instruments. Proper portfolio possible.</em>
+                    </td>
                 </tr>
                 <tr class="highlight-high">
                     <td><strong>$2,000</strong></td>
@@ -233,13 +280,16 @@
                     <td>50 pips</td>
                     <td>$4.00 (0.2%)</td>
                     <td>$8.00 (0.4%)</td>
-                    <td><em>Semi-pro level. Scalable strategies. Real supplemental income.</em></td>
+                    <td>
+                        <div class="risk-meter risk-low">Blows in 50+ losses</div>
+                        <em>Semi-pro level. Scalable strategies. Real supplemental income.</em>
+                    </td>
                 </tr>
             </tbody>
         </table>
 
         <div class="note">
-            <p><strong>Important Notes:</strong> This table is a guideline for educational purposes. Forex and CFD trading carry a high level of risk. Actual pip value can vary slightly based on the current price of Gold (XAUUSD) and your broker's specifications. Always test strategies on a demo account first and ensure you fully understand the risks before trading with real money.</p>
+            <p><strong>Important Notes:</strong> This table is a guideline for educational purposes. The "blows in X losses" calculation assumes consecutive losses with 2% risk per trade on the remaining capital. Forex and CFD trading carry a high level of risk. Actual pip value can vary slightly based on the current price of Gold (XAUUSD) and your broker's specifications. Always test strategies on a demo account first and ensure you fully understand the risks before trading with real money.</p>
         </div>
     </div>
 </body>
