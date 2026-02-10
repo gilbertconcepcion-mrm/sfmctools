@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gilbert Concepcion - Professional CV</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Simple, Word-friendly styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.3;
+            color: #333;
+            background-color: white;
+            font-size: 11pt;
+            padding: 0.5in;
+            max-width: 8.5in;
+            margin: 0 auto;
+        }
+        
+        /* Header */
+        .header {
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .header h1 {
+            font-size: 22pt;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        
+        .title-badge {
+            background-color: #3498db;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 3px;
+            display: inline-block;
+            font-size: 10pt;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .contact-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 10px;
+        }
+        
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 10pt;
+        }
+        
+        /* Two-column layout */
+        .main-container {
+            display: flex;
+            gap: 25px;
+            margin-top: 20px;
+        }
+        
+        .left-column {
+            width: 35%;
+        }
+        
+        .right-column {
+            width: 65%;
+        }
+        
+        /* Sections */
+        .section {
+            margin-bottom: 20px;
+            page-break-inside: avoid;
+        }
+        
+        .section-title {
+            color: #2c3e50;
+            border-bottom: 1px solid #3498db;
+            padding-bottom: 5px;
+            margin-bottom: 10px;
+            font-size: 13pt;
+            font-weight: bold;
+        }
+        
+        /* Education */
+        .education-item h4 {
+            color: #2c3e50;
+            margin-bottom: 3px;
+            font-size: 11pt;
+        }
+        
+        .education-item p {
+            color: #666;
+            margin-bottom: 2px;
+            font-size: 10pt;
+        }
+        
+        .year {
+            color: #3498db;
+            font-weight: bold;
+            font-size: 10pt;
+        }
+        
+        /* Skills */
+        .skill-category {
+            margin-bottom: 12px;
+        }
+        
+        .skill-category h4 {
+            color: #2c3e50;
+            margin-bottom: 5px;
+            font-size: 11pt;
+        }
+        
+        .skill-list {
+            list-style-type: none;
+            margin-bottom: 5px;
+        }
+        
+        .skill-list li {
+            padding: 2px 0;
+            font-size: 10pt;
+        }
+        
+        /* Jobs */
+        .job {
+            margin-bottom: 18px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+            page-break-inside: avoid;
+        }
+        
+        .job:last-child {
+            border-bottom: none;
+        }
+        
+        .job-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+        
+        .job-title {
+            font-size: 11pt;
+            color: #2c3e50;
+            font-weight: bold;
+        }
+        
+        .company {
+            color: #3498db;
+            font-weight: bold;
+            margin-bottom: 3px;
+            font-size: 10pt;
+        }
+        
+        .job-period {
+            background-color: #f5f5f5;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: bold;
+            color: #2c3e50;
+            white-space: nowrap;
+            font-size: 9pt;
+        }
+        
+        .responsibilities {
+            list-style-type: none;
+        }
+        
+        .responsibilities li {
+            padding: 3px 0;
+            padding-left: 15px;
+            position: relative;
+            font-size: 10pt;
+            line-height: 1.2;
+        }
+        
+        .responsibilities li:before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: #3498db;
+            font-weight: bold;
+        }
+        
+        /* Tools Section */
+        .tools-section {
+            margin-top: 20px;
+        }
+        
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-top: 10px;
+        }
+        
+        .tool-item {
+            background-color: #f9f9f9;
+            padding: 8px;
+            border-left: 3px solid #3498db;
+            font-size: 10pt;
+        }
+        
+        .tool-item strong {
+            color: #2c3e50;
+        }
+        
+        /* SFMC Skills */
+        .sfmc-skills {
+            background-color: #f0f8ff;
+            padding: 12px;
+            margin-top: 15px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .sfmc-skills h4 {
+            color: #2c3e50;
+            margin-bottom: 8px;
+            font-size: 11pt;
+        }
+        
+        .sfmc-skills ul {
+            list-style-type: none;
+            columns: 2;
+        }
+        
+        .sfmc-skills li {
+            padding: 3px 0;
+            font-size: 10pt;
+            position: relative;
+            padding-left: 15px;
+        }
+        
+        .sfmc-skills li:before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: #3498db;
+            font-weight: bold;
+        }
+        
+        /* Footer */
+        .footer {
+            border-top: 1px solid #ddd;
+            padding-top: 10px;
+            margin-top: 20px;
+            text-align: center;
+            font-size: 9pt;
+            color: #666;
+        }
+        
+        /* Print optimization */
+        @media print {
+            body {
+                padding: 0.4in;
+                font-size: 10pt;
+            }
+            
+            .section {
+                margin-bottom: 15px;
+            }
+            
+            .job {
+                margin-bottom: 15px;
+                padding-bottom: 10px;
+            }
+            
+            .responsibilities li {
+                padding: 2px 0 2px 15px;
+            }
+            
+            .sfmc-skills ul {
+                columns: 2;
+            }
+            
+            /* Avoid page breaks inside important sections */
+            .job, .section {
+                page-break-inside: avoid;
+            }
+            
+            .section-title {
+                page-break-after: avoid;
+            }
+        }
+        
+        /* Responsive */
+        @media (max-width: 900px) {
+            .main-container {
+                flex-direction: column;
+            }
+            
+            .left-column, .right-column {
+                width: 100%;
+            }
+            
+            .tools-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .sfmc-skills ul {
+                columns: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Section -->
+    <div class="header">
+        <h1>Gilbert Concepcion</h1>
+        <div class="title-badge">OLA Developer / Email Developer / SFMC Campaign Developer</div>
+        <p>Phase III Blk. 11 Lt. 68, Highview Hills Subd., Sampaloc Apalit Pampanga</p>
+        <div class="contact-info">
+            <div class="contact-item">
+                <i class="fas fa-mobile-alt"></i>
+                <span>+63 0906 482 4777</span>
+            </div>
+            <div class="contact-item">
+                <i class="fas fa-envelope"></i>
+                <span>gilbertconcepcion@gmail.com</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="main-container">
+        <!-- Left Column: Education and Skills -->
+        <div class="left-column">
+            <!-- Education -->
+            <div class="section">
+                <h2 class="section-title">Education</h2>
+                <div class="education-item">
+                    <h4>Central Luzon State University</h4>
+                    <p>Bachelor of Elementary Education</p>
+                    <p>Muñoz, Nueva Ecija</p>
+                    <p class="year">2005</p>
+                </div>
+            </div>
+            
+            <!-- Skills -->
+            <div class="section">
+                <h2 class="section-title">Technical Skills</h2>
+                
+                <div class="skill-category">
+                    <h4>Marketing Cloud</h4>
+                    <ul class="skill-list">
+                        <li>Salesforce Marketing Cloud</li>
+                        <li>Email Studio Development</li>
+                        <li>Content Builder</li>
+                        <li>Journey Builder</li>
+                        <li>AMPscript & SSJS</li>
+                    </ul>
+                </div>
+                
+                <div class="skill-category">
+                    <h4>Development</h4>
+                    <ul class="skill-list">
+                        <li>HTML5 + CSS + JavaScript</li>
+                        <li>Responsive Email Development</li>
+                        <li>ActionScript 3.0</li>
+                        <li>Object-Oriented Programming</li>
+                        <li>Email Template Development</li>
+                    </ul>
+                </div>
+                
+                <div class="skill-category">
+                    <h4>Animation & Design</h4>
+                    <ul class="skill-list">
+                        <li>Flash/Moho Animation</li>
+                        <li>Rich Media Ads Development</li>
+                        <li>Game Development</li>
+                        <li>Graphic Design</li>
+                    </ul>
+                </div>
+                
+                <div class="skill-category">
+                    <h4>Professional Skills</h4>
+                    <ul class="skill-list">
+                        <li>Client Communication</li>
+                        <li>Project Coordination</li>
+                        <li>Team Collaboration</li>
+                        <li>Quality Assurance</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Right Column: Employment History -->
+        <div class="right-column">
+            <!-- Employment History -->
+            <div class="section">
+                <h2 class="section-title">Employment History</h2>
+                
+                <!-- Current Job -->
+                <div class="job">
+                    <div class="job-header">
+                        <div>
+                            <div class="job-title">OLA Developer / Email Developer / SFMC Campaign Developer</div>
+                            <div class="company">Hedy Philippines</div>
+                        </div>
+                        <div class="job-period">2021 – Present</div>
+                    </div>
+                    <ul class="responsibilities">
+                        <li>Develop and implement complex OLA (Online Advertising) campaigns across multiple platforms</li>
+                        <li>Create responsive email templates and campaigns using Salesforce Marketing Cloud</li>
+                        <li>Code email templates based on client directions and industry standards</li>
+                        <li>Implement rigorous pretesting of email builds before QA submission</li>
+                        <li>Develop and optimize SFMC journeys and automation workflows</li>
+                        <li>Rectify sendings and cross-platform issues before QA approval</li>
+                        <li>Facilitate QA approval process ensuring final files meet quality standards</li>
+                        <li>Offer post-deployment support to resolve bugs promptly</li>
+                    </ul>
+                </div>
+                
+                <!-- Previous Job 1 -->
+                <div class="job">
+                    <div class="job-header">
+                        <div>
+                            <div class="job-title">Rich Media Ads Developer / Email Developer</div>
+                            <div class="company">Incubeta US</div>
+                        </div>
+                        <div class="job-period">2014 – 2021</div>
+                    </div>
+                    <ul class="responsibilities">
+                        <li>Proficient in creating rich media ads using AS 3.0 and HTML5</li>
+                        <li>Certified Google DoubleClick Studio rich media ads developer</li>
+                        <li>Adept at building HTML5 desktop and mobile responsive ads</li>
+                        <li>Specialized in converting images into sprite sheets per Google standards</li>
+                        <li>Developed email marketing campaigns and responsive templates</li>
+                        <li>Ensures cross-browser compatibility and thorough tracking implementation</li>
+                    </ul>
+                </div>
+                
+                <!-- Previous Job 2 -->
+                <div class="job">
+                    <div class="job-header">
+                        <div>
+                            <div class="job-title">Flash Developer / Illustrator / Animator</div>
+                            <div class="company">Cartoon Doll Emporium</div>
+                        </div>
+                        <div class="job-period">2013 – 2014</div>
+                    </div>
+                    <ul class="responsibilities">
+                        <li>Conceptualized and developed engaging flash games</li>
+                        <li>Expertise in coding games using ActionScript 3.0 with OOP principles</li>
+                        <li>Designed game elements and animations for immersive gaming experiences</li>
+                        <li>Collaborated with diverse teams of developers and designers</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- SFMC Skills -->
+            <div class="section">
+                <h2 class="section-title">Salesforce Marketing Cloud Expertise</h2>
+                <div class="sfmc-skills">
+                    <h4>Core SFMC Skills</h4>
+                    <ul>
+                        <li>Email Studio Development</li>
+                        <li>Content Builder Management</li>
+                        <li>Journey Builder Automation</li>
+                        <li>AMPscript Development</li>
+                        <li>Data Extensions & Lists</li>
+                        <li>Automation Studio</li>
+                        <li>Reporting & Analytics</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Tools Section -->
+            <div class="section tools-section">
+                <h2 class="section-title">Technical Tools & Platforms</h2>
+                <div class="tools-grid">
+                    <div class="tool-item">
+                        <strong>Marketing Platforms</strong>
+                        <p>Salesforce Marketing Cloud, Google DoubleClick Studio</p>
+                    </div>
+                    <div class="tool-item">
+                        <strong>Adobe Creative Suite</strong>
+                        <p>Photoshop, Illustrator, Premiere, XD</p>
+                    </div>
+                    <div class="tool-item">
+                        <strong>Design Tools</strong>
+                        <p>Figma, Sketch, Adobe XD, Photoshop, Illustrator</p>
+                    </div>
+                    <div class="tool-item">
+                        <strong>Ad Platforms</strong>
+                        <p>DoubleClick Studio, Sizmek, Celtra</p>
+                    </div>
+                    <div class="tool-item">
+                        <strong>Animation Tools</strong>
+                        <p>Flash, Anime Studio (Moho), GreenSock</p>
+                    </div>
+                    <div class="tool-item">
+                        <strong>Development</strong>
+                        <p>HTML5, CSS3, JavaScript, ActionScript</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <div class="footer">
+        <p>© 2023 Gilbert Concepcion | OLA Developer / Email Developer / SFMC Campaign Developer</p>
+        <p>Mobile: +63 0906 482 4777 | Email: gilbertconcepcion@gmail.com</p>
+    </div>
+
+    <script>
+        // Print optimization
+        document.addEventListener('DOMContentLoaded', function() {
+            // Clean up for print/Word export
+            const style = document.createElement('style');
+            style.textContent = `
+                @media print {
+                    .no-print { display: none !important; }
+                    body { 
+                        -webkit-print-color-adjust: exact !important; 
+                        print-color-adjust: exact !important; 
+                        color-adjust: exact !important;
+                    }
+                    a { color: #000 !important; text-decoration: none !important; }
+                    .tool-item, .sfmc-skills { 
+                        -webkit-print-color-adjust: exact !important;
+                        print-color-adjust: exact !important;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+        });
+    </script>
+</body>
+</html>
