@@ -6,7 +6,88 @@
     <title>Gilbert Concepcion - Professional CV</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Simple, Word-friendly styles */
+        /* PDF Export Optimized Styles */
+        @media print {
+            @page {
+                size: A4;
+                margin: 0.5in;
+            }
+            
+            body {
+                font-size: 11pt;
+                line-height: 1.3;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            
+            .container {
+                max-width: 100% !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            
+            header, footer, .sidebar, .main-section {
+                box-shadow: none !important;
+                margin-bottom: 15px !important;
+                page-break-inside: avoid;
+            }
+            
+            .main-content {
+                gap: 20px !important;
+                margin-bottom: 20px !important;
+            }
+            
+            .job {
+                margin-bottom: 20px !important;
+                padding-bottom: 15px !important;
+                page-break-inside: avoid;
+            }
+            
+            .job:last-child {
+                margin-bottom: 0 !important;
+            }
+            
+            .responsibilities li {
+                padding: 4px 0 4px 20px !important;
+                font-size: 10pt;
+            }
+            
+            .tools-grid {
+                gap: 10px !important;
+            }
+            
+            .tool-item {
+                padding: 8px 10px !important;
+                font-size: 10pt;
+            }
+            
+            footer {
+                margin-top: 20px !important;
+                padding: 10px 0 !important;
+            }
+            
+            /* Prevent page breaks inside critical sections */
+            h2.section-title, h3 {
+                page-break-after: avoid;
+            }
+            
+            .job-header {
+                page-break-inside: avoid;
+            }
+        }
+
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+            --gray-color: #7f8c8d;
+            --light-gray: #f5f5f5;
+            --border-radius: 6px;
+            --box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
         * {
             margin: 0;
             padding: 0;
@@ -15,138 +96,140 @@
         
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.3;
+            line-height: 1.4;
             color: #333;
-            background-color: white;
+            background-color: #f9f9f9;
             font-size: 12pt;
-            padding: 0.4in;
-            max-width: 8.5in;
+        }
+        
+        .container {
+            max-width: 1000px;
             margin: 0 auto;
+            padding: 0 15px;
         }
         
-        /* Header */
-        .header {
-            border-bottom: 3px solid #2c3e50;
-            padding-bottom: 20px;
-            margin-bottom: 25px;
-        }
-        
-        .header h1 {
-            font-size: 26pt;
-            color: #2c3e50;
-            margin-bottom: 8px;
-            font-weight: bold;
-        }
-        
-        .title-badge {
-            background-color: #3498db;
+        /* Compact Header Styles */
+        header {
+            background-color: var(--primary-color);
             color: white;
-            padding: 6px 12px;
+            padding: 25px 0 20px 0;
+            margin-bottom: 20px;
+            box-shadow: var(--box-shadow);
+        }
+        
+        .header-content {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .profile-info h1 {
+            font-size: 2.2rem;
+            margin-bottom: 3px;
+            color: white;
+        }
+        
+        .profile-info h2 {
+            font-size: 1.2rem;
+            font-weight: 400;
+            color: var(--light-color);
+            margin-bottom: 10px;
+        }
+        
+        .profile-title {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 4px 10px;
             border-radius: 4px;
             display: inline-block;
-            font-size: 13pt;
-            font-weight: bold;
-            margin-bottom: 15px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 10px;
         }
         
-        .address {
-            font-size: 12pt;
-            margin-bottom: 15px;
-            color: #555;
+        .profile-info p {
+            font-size: 0.9rem;
         }
         
         .contact-info {
             display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            margin-top: 10px;
+            flex-direction: column;
+            gap: 8px;
+            font-size: 0.9rem;
         }
         
         .contact-item {
             display: flex;
             align-items: center;
             gap: 8px;
-            font-size: 12pt;
         }
         
         .contact-item i {
-            color: #3498db;
-            font-size: 14pt;
+            color: var(--secondary-color);
+            width: 16px;
+            font-size: 0.9rem;
         }
         
-        /* Two-column layout */
-        .main-container {
-            display: flex;
-            gap: 30px;
-            margin-top: 20px;
+        /* Compact Main Content Layout */
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 25px;
+            margin-bottom: 30px;
         }
         
-        .left-column {
-            width: 35%;
+        /* Compact Sidebar */
+        .sidebar {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--box-shadow);
+            height: fit-content;
         }
         
-        .right-column {
-            width: 65%;
-        }
-        
-        /* Sections */
-        .section {
-            margin-bottom: 25px;
-            page-break-inside: avoid;
-        }
-        
-        .section-title {
-            color: #2c3e50;
-            border-bottom: 2px solid #3498db;
+        .sidebar h3 {
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--secondary-color);
             padding-bottom: 8px;
             margin-bottom: 15px;
-            font-size: 16pt;
-            font-weight: bold;
-            text-transform: uppercase;
+            font-size: 1.2rem;
         }
         
-        .section-title i {
-            margin-right: 10px;
-            color: #3498db;
+        /* Education Section */
+        .education-item {
+            margin-bottom: 20px;
         }
         
-        /* Education */
         .education-item h4 {
-            color: #2c3e50;
-            margin-bottom: 5px;
-            font-size: 13pt;
-            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 4px;
+            font-size: 1rem;
         }
         
         .education-item p {
-            color: #666;
-            margin-bottom: 3px;
-            font-size: 12pt;
+            color: var(--gray-color);
+            margin-bottom: 4px;
+            font-size: 0.9rem;
         }
         
         .year {
-            color: #3498db;
-            font-weight: bold;
-            font-size: 12pt;
-            margin-top: 5px;
-            display: inline-block;
-            background-color: #f5f9fd;
-            padding: 3px 10px;
-            border-radius: 3px;
+            color: var(--secondary-color);
+            font-weight: 600;
+            font-size: 0.9rem;
         }
         
-        /* Skills */
-        .skill-category {
-            margin-bottom: 18px;
+        /* Compact Skills Section */
+        .skills-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
         }
         
         .skill-category h4 {
-            color: #2c3e50;
-            margin-bottom: 8px;
-            font-size: 13pt;
-            font-weight: bold;
-            border-left: 4px solid #3498db;
-            padding-left: 10px;
+            color: var(--primary-color);
+            margin-bottom: 6px;
+            font-size: 1rem;
         }
         
         .skill-list {
@@ -155,24 +238,45 @@
         }
         
         .skill-list li {
-            padding: 6px 0;
-            font-size: 12pt;
-            border-bottom: 1px dashed #eee;
+            padding: 4px 0;
+            font-size: 0.9rem;
         }
         
-        .skill-list li:last-child {
-            border-bottom: none;
-        }
-        
-        /* Jobs */
-        .job {
+        /* Compact Main Sections */
+        .main-section {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--box-shadow);
             margin-bottom: 25px;
-            padding-bottom: 20px;
-            border-bottom: 2px solid #f0f0f0;
-            page-break-inside: avoid;
+        }
+        
+        .section-title {
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--secondary-color);
+            padding-bottom: 8px;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .section-title i {
+            color: var(--secondary-color);
+            font-size: 1.1rem;
+        }
+        
+        /* Compact Employment History */
+        .job {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
         }
         
         .job:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
             border-bottom: none;
         }
         
@@ -180,212 +284,131 @@
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+            gap: 8px;
         }
         
         .job-title {
-            font-size: 14pt;
-            color: #2c3e50;
-            font-weight: bold;
-            margin-bottom: 5px;
+            font-size: 1.1rem;
+            color: var(--primary-color);
         }
         
         .company {
-            color: #3498db;
-            font-weight: bold;
-            margin-bottom: 5px;
-            font-size: 13pt;
+            color: var(--secondary-color);
+            font-weight: 600;
+            margin-bottom: 3px;
+            font-size: 0.95rem;
         }
         
         .job-period {
-            background-color: #2c3e50;
-            color: white;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-weight: bold;
+            background-color: var(--light-gray);
+            padding: 3px 10px;
+            border-radius: 15px;
+            font-weight: 600;
+            color: var(--primary-color);
             white-space: nowrap;
-            font-size: 11pt;
+            font-size: 0.85rem;
         }
         
         .responsibilities {
             list-style-type: none;
-            margin-top: 10px;
         }
         
         .responsibilities li {
-            padding: 8px 0;
-            padding-left: 25px;
+            padding: 5px 0;
+            padding-left: 20px;
             position: relative;
-            font-size: 12pt;
-            line-height: 1.4;
+            font-size: 0.9rem;
         }
         
         .responsibilities li:before {
             content: "▸";
             position: absolute;
             left: 0;
-            color: #3498db;
+            color: var(--secondary-color);
             font-weight: bold;
-            font-size: 14pt;
         }
         
-        /* Tools Section */
-        .tools-section {
+        /* Compact Tools Section */
+        .additional-skills {
             margin-top: 25px;
         }
         
         .tools-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-top: 15px;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 12px;
+            margin-top: 12px;
         }
         
         .tool-item {
-            background-color: #f9f9f9;
-            padding: 15px;
-            border: 1px solid #e0e0e0;
-            border-left: 4px solid #3498db;
-            font-size: 12pt;
-            border-radius: 5px;
+            background-color: var(--light-gray);
+            padding: 10px 12px;
+            border-radius: var(--border-radius);
+            border-left: 3px solid var(--secondary-color);
+            font-size: 0.9rem;
         }
         
-        .tool-item strong {
-            color: #2c3e50;
-            font-size: 13pt;
-            display: block;
-            margin-bottom: 5px;
-        }
-        
-        /* SFMC Skills */
+        /* SFMC Specific Skills */
         .sfmc-skills {
+            margin-top: 15px;
+            padding: 15px;
             background-color: #f0f8ff;
-            padding: 20px;
-            margin-top: 20px;
-            border-radius: 8px;
-            border-left: 6px solid #3498db;
+            border-radius: var(--border-radius);
+            border-left: 4px solid var(--secondary-color);
         }
         
         .sfmc-skills h4 {
-            color: #2c3e50;
-            margin-bottom: 12px;
-            font-size: 14pt;
-            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 8px;
+            font-size: 1rem;
         }
         
         .sfmc-skills ul {
             list-style-type: none;
             columns: 2;
-            column-gap: 40px;
         }
         
         .sfmc-skills li {
-            padding: 8px 0;
-            font-size: 12pt;
+            padding: 4px 0;
+            font-size: 0.9rem;
             position: relative;
-            padding-left: 20px;
-            break-inside: avoid;
+            padding-left: 15px;
         }
         
         .sfmc-skills li:before {
             content: "•";
             position: absolute;
             left: 0;
-            color: #3498db;
+            color: var(--secondary-color);
             font-weight: bold;
-            font-size: 16pt;
         }
         
-        /* Footer */
-        .footer {
-            border-top: 2px solid #2c3e50;
-            padding-top: 15px;
-            margin-top: 30px;
+        /* Compact Footer */
+        footer {
+            background-color: var(--primary-color);
+            color: white;
             text-align: center;
-            font-size: 11pt;
-            color: #666;
-            background-color: #f9f9f9;
-            padding: 15px;
-            border-radius: 5px;
+            padding: 15px 0;
+            margin-top: 30px;
+            font-size: 0.85rem;
         }
         
-        /* Print optimization */
-        @media print {
-            body {
-                padding: 0.5in;
-                font-size: 11pt;
-                line-height: 1.4;
-            }
-            
-            .header h1 {
-                font-size: 24pt;
-            }
-            
-            .title-badge {
-                font-size: 12pt;
-            }
-            
-            .section-title {
-                font-size: 14pt;
-            }
-            
-            .job-title {
-                font-size: 13pt;
-            }
-            
-            .responsibilities li {
-                font-size: 11pt;
-                padding: 6px 0 6px 20px;
-            }
-            
-            .sfmc-skills ul {
-                columns: 2;
-                column-gap: 30px;
-            }
-            
-            .sfmc-skills li {
-                font-size: 11pt;
-                padding: 6px 0 6px 18px;
-            }
-            
-            .tools-grid {
-                gap: 10px;
-            }
-            
-            .tool-item {
-                padding: 12px;
-                font-size: 11pt;
-            }
-            
-            /* Avoid page breaks inside important sections */
-            .job, .section {
-                page-break-inside: avoid;
-            }
-            
-            .section-title {
-                page-break-after: avoid;
-            }
-            
-            /* Ensure colors print correctly */
-            * {
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-                color-adjust: exact !important;
-            }
-        }
-        
-        /* Responsive */
+        /* Responsive Design */
         @media (max-width: 900px) {
-            .main-container {
-                flex-direction: column;
+            .main-content {
+                grid-template-columns: 1fr;
             }
             
-            .left-column, .right-column {
-                width: 100%;
+            .header-content {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
             }
             
             .tools-grid {
-                grid-template-columns: 1fr;
+                grid-template-columns: repeat(2, 1fr);
             }
             
             .sfmc-skills ul {
@@ -393,248 +416,271 @@
             }
         }
         
-        /* Spacing utilities */
-        .mb-10 { margin-bottom: 10px; }
-        .mb-15 { margin-bottom: 15px; }
-        .mb-20 { margin-bottom: 20px; }
-        .mb-25 { margin-bottom: 25px; }
-        .mt-10 { margin-top: 10px; }
-        .mt-15 { margin-top: 15px; }
-        .mt-20 { margin-top: 20px; }
-        .mt-25 { margin-top: 25px; }
-        
-        /* Highlight important text */
-        .highlight {
-            background-color: #fff8e1;
-            padding: 2px 5px;
-            border-radius: 3px;
-            font-weight: bold;
+        @media (max-width: 600px) {
+            .profile-info h1 {
+                font-size: 1.8rem;
+            }
+            
+            .tools-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .job-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .section-title {
+                font-size: 1.2rem;
+            }
         }
     </style>
 </head>
 <body>
     <!-- Header Section -->
-    <div class="header">
-        <h1>Gilbert Concepcion</h1>
-        <div class="title-badge">OLA Developer / Email Developer / SFMC Campaign Developer</div>
-        <div class="address mb-15">
-            Phase III Blk. 11 Lt. 68, Highview Hills Subd., Sampaloc Apalit Pampanga
-        </div>
-        <div class="contact-info">
-            <div class="contact-item">
-                <i class="fas fa-mobile-alt"></i>
-                <span>+63 0906 482 4777</span>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="profile-info">
+                    <h1>Gilbert Concepcion</h1>
+                    <div class="profile-title">OLA Developer / Email Developer / SFMC Campaign Developer</div>
+                    <h2></h2>
+                    <p>Phase III Blk. 11 Lt. 68, Highview Hills Subd., Sampaloc Apalit Pampanga</p>
+                </div>
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <i class="fas fa-mobile-alt"></i>
+                        <span>+63 0906 482 4777</span>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-envelope"></i>
+                        <span>gilbertconcepcion@gmail.com</span>
+                    </div>
+                </div>
             </div>
-            <div class="contact-item">
-                <i class="fas fa-envelope"></i>
-                <span>gilbertconcepcion@gmail.com</span>
-            </div>
         </div>
-    </div>
+    </header>
     
     <!-- Main Content -->
-    <div class="main-container">
-        <!-- Left Column: Education and Skills -->
-        <div class="left-column">
-            <!-- Education -->
-            <div class="section">
-                <h2 class="section-title"><i class="fas fa-graduation-cap"></i> Education</h2>
-                <div class="education-item">
-                    <h4>Central Luzon State University</h4>
-                    <p class="mb-10">Bachelor of Elementary Education</p>
-                    <p class="mb-15">Muñoz, Nueva Ecija</p>
-                    <span class="year">2005</span>
-                </div>
-            </div>
-            
-            <!-- Skills -->
-            <div class="section">
-                <h2 class="section-title"><i class="fas fa-tools"></i> Technical Skills</h2>
+    <div class="container">
+        <div class="main-content">
+            <!-- Sidebar with Education and Skills -->
+            <aside class="sidebar">
+                <section class="education-section">
+                    <h3><i class="fas fa-graduation-cap"></i> Education</h3>
+                    <div class="education-item">
+                        <h4>Central Luzon State University</h4>
+                        <p>Bachelor of Elementary Education</p>
+                        <p>Muñoz, Nueva Ecija</p>
+                        <p class="year">2005</p>
+                    </div>
+                </section>
                 
-                <div class="skill-category">
-                    <h4>Marketing Cloud</h4>
-                    <ul class="skill-list">
-                        <li>Salesforce Marketing Cloud</li>
-                        <li>Email Studio Development</li>
-                        <li>Content Builder</li>
-                        <li>Journey Builder</li>
-                        <li>AMPscript & SSJS</li>
-                    </ul>
-                </div>
-                
-                <div class="skill-category">
-                    <h4>Development</h4>
-                    <ul class="skill-list">
-                        <li>HTML5 + CSS + JavaScript</li>
-                        <li>Responsive Email Development</li>
-                        <li>ActionScript 3.0</li>
-                        <li>Object-Oriented Programming</li>
-                        <li>Email Template Development</li>
-                    </ul>
-                </div>
-                
-                <div class="skill-category">
-                    <h4>Animation & Design</h4>
-                    <ul class="skill-list">
-                        <li>Flash/Moho Animation</li>
-                        <li>Rich Media Ads Development</li>
-                        <li>Game Development</li>
-                        <li>Graphic Design</li>
-                    </ul>
-                </div>
-                
-                <div class="skill-category">
-                    <h4>Professional Skills</h4>
-                    <ul class="skill-list">
-                        <li>Client Communication</li>
-                        <li>Project Coordination</li>
-                        <li>Team Collaboration</li>
-                        <li>Quality Assurance</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Right Column: Employment History -->
-        <div class="right-column">
-            <!-- Employment History -->
-            <div class="section">
-                <h2 class="section-title"><i class="fas fa-briefcase"></i> Employment History</h2>
-                
-                <!-- Current Job -->
-                <div class="job">
-                    <div class="job-header">
-                        <div>
-                            <div class="job-title">OLA Developer / Email Developer / SFMC Campaign Developer</div>
-                            <div class="company">Hedy Philippines</div>
+                <section class="skills-section" style="margin-top: 20px;">
+                    <h3><i class="fas fa-tools"></i> Technical Skills</h3>
+                    <div class="skills-grid">
+                        <div class="skill-category">
+                            <h4>Marketing Cloud</h4>
+                            <ul class="skill-list">
+                                <li>Salesforce Marketing Cloud</li>
+                                <li>Email Studio Development</li>
+                                <li>Content Builder</li>
+                                <li>Journey Builder</li>
+                                <li>AMPscript & SSJS</li>
+                            </ul>
                         </div>
-                        <div class="job-period">2021 – Present</div>
-                    </div>
-                    <ul class="responsibilities">
-                        <li>Develop and implement complex <span class="highlight">OLA (Online Advertising)</span> campaigns across multiple platforms</li>
-                        <li>Create responsive email templates and campaigns using <span class="highlight">Salesforce Marketing Cloud</span></li>
-                        <li>Code email templates based on client directions and industry standards</li>
-                        <li>Implement rigorous pretesting of email builds before QA submission</li>
-                        <li>Develop and optimize <span class="highlight">SFMC journeys</span> and automation workflows</li>
-                        <li>Rectify sendings and cross-platform issues before QA approval</li>
-                        <li>Facilitate QA approval process ensuring final files meet quality standards</li>
-                        <li>Offer post-deployment support to resolve bugs promptly</li>
-                    </ul>
-                </div>
-                
-                <!-- Previous Job 1 -->
-                <div class="job">
-                    <div class="job-header">
-                        <div>
-                            <div class="job-title">Rich Media Ads Developer / Email Developer</div>
-                            <div class="company">Incubeta US</div>
+                        <div class="skill-category">
+                            <h4>Development</h4>
+                            <ul class="skill-list">
+                                <li>HTML5 + CSS + JavaScript</li>
+                                <li>Responsive Email Development</li>
+                                <li>ActionScript 3.0</li>
+                                <li>Object-Oriented Programming</li>
+                                <li>Email Template Development</li>
+                            </ul>
                         </div>
-                        <div class="job-period">2014 – 2021</div>
-                    </div>
-                    <ul class="responsibilities">
-                        <li>Proficient in creating rich media ads using AS 3.0 and HTML5</li>
-                        <li>Certified <span class="highlight">Google DoubleClick Studio</span> rich media ads developer</li>
-                        <li>Adept at building HTML5 desktop and mobile responsive ads</li>
-                        <li>Specialized in converting images into sprite sheets per Google standards</li>
-                        <li>Developed email marketing campaigns and responsive templates</li>
-                        <li>Ensures cross-browser compatibility and thorough tracking implementation</li>
-                    </ul>
-                </div>
-                
-                <!-- Previous Job 2 -->
-                <div class="job">
-                    <div class="job-header">
-                        <div>
-                            <div class="job-title">Flash Developer / Illustrator / Animator</div>
-                            <div class="company">Cartoon Doll Emporium</div>
+                        <div class="skill-category">
+                            <h4>Animation & Design</h4>
+                            <ul class="skill-list">
+                                <li>Flash/Moho Animation</li>
+                                <li>Rich Media Ads Development</li>
+                                <li>Game Development</li>
+                                <li>Graphic Design</li>
+                            </ul>
                         </div>
-                        <div class="job-period">2013 – 2014</div>
+                        <div class="skill-category">
+                            <h4>Professional Skills</h4>
+                            <ul class="skill-list">
+                                <li>Client Communication</li>
+                                <li>Project Coordination</li>
+                                <li>Team Collaboration</li>
+                                <li>Quality Assurance</li>
+                            </ul>
+                        </div>
                     </div>
-                    <ul class="responsibilities">
-                        <li>Conceptualized and developed engaging flash games</li>
-                        <li>Expertise in coding games using ActionScript 3.0 with OOP principles</li>
-                        <li>Designed game elements and animations for immersive gaming experiences</li>
-                        <li>Collaborated with diverse teams of developers and designers</li>
-                    </ul>
-                </div>
-            </div>
+                </section>
+            </aside>
             
-            <!-- SFMC Skills -->
-            <div class="section">
-                <h2 class="section-title"><i class="fas fa-cloud"></i> Salesforce Marketing Cloud Expertise</h2>
-                <div class="sfmc-skills">
-                    <h4>Core SFMC Skills</h4>
-                    <ul>
-                        <li>Email Studio Development</li>
-                        <li>Content Builder Management</li>
-                        <li>Journey Builder Automation</li>
-                        <li>AMPscript Development</li>
-                        <li>Data Extensions & Lists</li>
-                        <li>Automation Studio</li>
-                        <li>Reporting & Analytics</li>
-                    </ul>
-                </div>
-            </div>
-            
-            <!-- Tools Section -->
-            <div class="section tools-section">
-                <h2 class="section-title"><i class="fas fa-laptop-code"></i> Technical Tools & Platforms</h2>
-                <div class="tools-grid">
-                    <div class="tool-item">
-                        <strong>Marketing Platforms</strong>
-                        <p>Salesforce Marketing Cloud, Google DoubleClick Studio</p>
+            <!-- Main Sections with Employment History -->
+            <main>
+                <section class="main-section">
+                    <h2 class="section-title"><i class="fas fa-briefcase"></i> Employment History</h2>
+                    
+                    <!-- Current Job -->
+                    <div class="job">
+                        <div class="job-header">
+                            <div>
+                                <h3 class="job-title">OLA Developer / Email Developer / SFMC Campaign Developer</h3>
+                                <p class="company">Hedy Philippines</p>
+                            </div>
+                            <div class="job-period">2021 – Present</div>
+                        </div>
+                        <ul class="responsibilities">
+                            <li>Develop and implement complex OLA (Online Advertising) campaigns across multiple platforms</li>
+                            <li>Create responsive email templates and campaigns using Salesforce Marketing Cloud</li>
+                            <li>Code email templates based on client directions and industry standards</li>
+                            <li>Implement rigorous pretesting of email builds before QA submission</li>
+                            <li>Develop and optimize SFMC journeys and automation workflows</li>
+                            <li>Rectify sendings and cross-platform issues before QA approval</li>
+                            <li>Facilitate QA approval process ensuring final files meet quality standards</li>
+                            <li>Offer post-deployment support to resolve bugs promptly</li>
+                        </ul>
                     </div>
-                    <div class="tool-item">
-                        <strong>Adobe Creative Suite</strong>
-                        <p>Photoshop, Illustrator, Premiere, XD</p>
+                    
+                    <!-- Previous Job 1 -->
+                    <div class="job">
+                        <div class="job-header">
+                            <div>
+                                <h3 class="job-title">Rich Media Ads Developer / Email Developer</h3>
+                                <p class="company">Incubeta US</p>
+                            </div>
+                            <div class="job-period">2014 – 2021</div>
+                        </div>
+                        <ul class="responsibilities">
+                            <li>Proficient in creating rich media ads using AS 3.0 and HTML5</li>
+                            <li>Certified Google DoubleClick Studio rich media ads developer</li>
+                            <li>Adept at building HTML5 desktop and mobile responsive ads</li>
+                            <li>Specialized in converting images into sprite sheets per Google standards</li>
+                            <li>Developed email marketing campaigns and responsive templates</li>
+                            <li>Ensures cross-browser compatibility and thorough tracking implementation</li>
+                        </ul>
                     </div>
-                    <div class="tool-item">
-                        <strong>Design Tools</strong>
-                        <p>Figma, Sketch, Adobe XD, Photoshop, Illustrator</p>
+                    
+                    <!-- Previous Job 2 -->
+                    <div class="job">
+                        <div class="job-header">
+                            <div>
+                                <h3 class="job-title">Flash Developer / Illustrator / Animator</h3>
+                                <p class="company">Cartoon Doll Emporium</p>
+                            </div>
+                            <div class="job-period">2013 – 2014</div>
+                        </div>
+                        <ul class="responsibilities">
+                            <li>Conceptualized and developed engaging flash games</li>
+                            <li>Expertise in coding games using ActionScript 3.0 with OOP principles</li>
+                            <li>Designed game elements and animations for immersive gaming experiences</li>
+                            <li>Collaborated with diverse teams of developers and designers</li>
+                        </ul>
                     </div>
-                    <div class="tool-item">
-                        <strong>Ad Platforms</strong>
-                        <p>DoubleClick Studio, Sizmek, Celtra</p>
+                    
+                    <!-- Previous Job 3 -->
+                    <div class="job">
+                        <div class="job-header">
+                            <div>
+                                <h3 class="job-title">Freelance Flash Developer</h3>
+                                <p class="company">Systaserv E-Learning Games</p>
+                            </div>
+                            <div class="job-period">2013 (April – July)</div>
+                        </div>
+                        <ul class="responsibilities">
+                            <li>Transformed client directives into interactive educational games</li>
+                            <li>Meticulously followed storyboards for children's gaming experiences</li>
+                            <li>Optimized game elements and graphics for performance</li>
+                            <li>Participated in testing, debugging, and revision processes</li>
+                        </ul>
                     </div>
-                    <div class="tool-item">
-                        <strong>Animation Tools</strong>
-                        <p>Flash, Anime Studio (Moho), GreenSock</p>
+                </section>
+                
+                <!-- SFMC Skills Section -->
+                <section class="main-section additional-skills">
+                    <h2 class="section-title"><i class="fas fa-cloud"></i> Salesforce Marketing Cloud Expertise</h2>
+                    <div class="sfmc-skills">
+                        <h4>Core SFMC Skills</h4>
+                        <ul>
+                            <li>Email Studio Development</li>
+                            <li>Content Builder Management</li>
+                            <li>Journey Builder Automation</li>
+                            <li>AMPscript Development</li>
+                            <li>CloudPages Development</li>
+                            <li>Data Extensions & Lists</li>
+                            <li>Automation Studio</li>
+<!--                            <li>Mobile Studio</li>-->
+<!--                            <li>Personalization & Dynamic Content</li>-->
+                            <li>Reporting & Analytics</li>
+                        </ul>
                     </div>
-                    <div class="tool-item">
-                        <strong>Development</strong>
-                        <p>HTML5, CSS3, JavaScript, ActionScript</p>
+                </section>
+                
+                <!-- Technical Tools Section -->
+                <section class="main-section additional-skills">
+                    <h2 class="section-title"><i class="fas fa-laptop-code"></i> Technical Tools & Platforms</h2>
+                    <div class="tools-grid">
+                        <div class="tool-item">
+                            <strong>Marketing Platforms</strong>
+                            <p>Salesforce Marketing Cloud, Google DoubleClick Studio</p>
+                        </div>
+                        <div class="tool-item">
+                            <strong>Adobe Creative Suite</strong>
+                            <p>Photoshop, Illustrator, Premiere, XD</p>
+                        </div>
+                        <div class="tool-item">
+                            <strong>Design Tools</strong>
+                            <p>Figma, Sketch, Adobe XD, Photoshop, Illustrator</p>
+                        </div>
+                        <div class="tool-item">
+                            <strong>Ad Platforms</strong>
+                            <p>DoubleClick Studio, Sizmek, Celtra</p>
+                        </div>
+                        <div class="tool-item">
+                            <strong>Animation Tools</strong>
+                            <p>Flash, Anime Studio (Moho), GreenSock</p>
+                        </div>
+                        <div class="tool-item">
+                            <strong>Development</strong>
+                            <p>HTML5, CSS3, JavaScript, ActionScript</p>
+                        </div>
                     </div>
-                </div>
-            </div>
+                </section>
+            </main>
         </div>
     </div>
     
     <!-- Footer -->
-    <div class="footer">
-        <p>© 2023 Gilbert Concepcion | OLA Developer / Email Developer / SFMC Campaign Developer</p>
-        <p>Mobile: +63 0906 482 4777 | Email: gilbertconcepcion@gmail.com</p>
-    </div>
+    <footer>
+        <div class="container">
+            <p>© 2023 Gilbert Concepcion | OLA Developer / Email Developer / SFMC Developer</p>
+            <p>Mobile: +63 0906 482 4777 | Email: gilbertconcepcion@gmail.com</p>
+        </div>
+    </footer>
 
     <script>
-        // Print optimization
+        // Print/PDF export optimization
         document.addEventListener('DOMContentLoaded', function() {
-            // Add print styles
+            // Set print media query for better PDF export
             const style = document.createElement('style');
             style.textContent = `
                 @media print {
-                    body { 
-                        -webkit-print-color-adjust: exact !important; 
-                        print-color-adjust: exact !important; 
-                        color-adjust: exact !important;
+                    body * {
+                        visibility: hidden;
                     }
-                    .highlight, .title-badge, .job-period, .year {
-                        -webkit-print-color-adjust: exact !important;
-                        print-color-adjust: exact !important;
+                    .container, .container * {
+                        visibility: visible;
                     }
-                    .sfmc-skills, .tool-item {
-                        background-color: #f0f8ff !important;
-                        -webkit-print-color-adjust: exact !important;
-                        print-color-adjust: exact !important;
+                    .container {
+                        position: absolute;
+                        left: 0;
+                        top: 0;
+                        width: 100%;
                     }
                 }
             `;
