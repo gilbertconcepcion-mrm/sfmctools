@@ -1093,12 +1093,12 @@
                     </div>
                 </div>
 
-                <!-- ===== FORM WITH ASP ACTION ===== -->
+                <!-- ===== FORM WITH ASP ACTION (CONSISTENT NAMES) ===== -->
                 <form class="contact-form" id="contactForm" action="sendmail.asp" method="POST">
                     <h4>Send a Message</h4>
                     <div class="form-group">
-                        <label for="name">Full Name</label>
-                        <input type="text" id="name" name="fullname" placeholder="Juan Dela Cruz" required />
+                        <label for="fullname">Full Name</label>
+                        <input type="text" id="fullname" name="name" placeholder="Juan Dela Cruz" required />
                     </div>
                     <div class="form-group">
                         <label for="email">Email Address</label>
@@ -1229,7 +1229,7 @@
         // ===== CONTACT FORM VALIDATION (SUBMITS TO ASP) =====
         const contactForm = document.getElementById('contactForm');
         contactForm.addEventListener('submit', function(e) {
-            const name = document.getElementById('name').value.trim();
+            const name = document.getElementById('fullname').value.trim();
             const email = document.getElementById('email').value.trim();
             const message = document.getElementById('message').value.trim();
 
@@ -1256,9 +1256,10 @@
          SAMPLE ASP HANDLER (sendmail.asp)
          ========================================
          <%
-             Dim fullname, email, subject, message, toEmail, fromEmail, mailSubject, mailBody
+             Dim name, email, subject, message, toEmail, fromEmail, mailSubject, mailBody
 
-             fullname = Request.Form("fullname")
+             ' Now the name field is consistently "name" on both sides
+             name = Request.Form("name")
              email = Request.Form("email")
              subject = Request.Form("subject")
              message = Request.Form("message")
@@ -1266,7 +1267,7 @@
              toEmail = "info@floridablancacdc.com"
              fromEmail = email
              mailSubject = "New Contact Message: " & subject
-             mailBody = "Name: " & fullname & vbCrLf & _
+             mailBody = "Name: " & name & vbCrLf & _
                         "Email: " & email & vbCrLf & _
                         "Subject: " & subject & vbCrLf & _
                         "Message: " & vbCrLf & message
