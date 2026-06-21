@@ -577,6 +577,7 @@
             font-size: 0.95rem;
         }
 
+        /* --- FORM WITH ASP ACTION --- */
         .contact-form {
             background: var(--white);
             padding: 40px 36px;
@@ -1092,23 +1093,24 @@
                     </div>
                 </div>
 
-                <form class="contact-form" id="contactForm">
+                <!-- ===== FORM WITH ASP ACTION ===== -->
+                <form class="contact-form" id="contactForm" action="sendmail.asp" method="POST">
                     <h4>Send a Message</h4>
                     <div class="form-group">
                         <label for="name">Full Name</label>
-                        <input type="text" id="name" placeholder="Juan Dela Cruz" required />
+                        <input type="text" id="name" name="fullname" placeholder="Juan Dela Cruz" required />
                     </div>
                     <div class="form-group">
                         <label for="email">Email Address</label>
-                        <input type="email" id="email" placeholder="juan@example.com" required />
+                        <input type="email" id="email" name="email" placeholder="juan@example.com" required />
                     </div>
                     <div class="form-group">
                         <label for="subject">Subject</label>
-                        <input type="text" id="subject" placeholder="Project inquiry" />
+                        <input type="text" id="subject" name="subject" placeholder="Project inquiry" />
                     </div>
                     <div class="form-group">
                         <label for="message">Message</label>
-                        <textarea id="message" placeholder="Tell us about your project..." required></textarea>
+                        <textarea id="message" name="message" placeholder="Tell us about your project..." required></textarea>
                     </div>
                     <button type="submit" class="btn btn-dark">
                         <i class="fas fa-paper-plane"></i> Send Message
@@ -1224,31 +1226,62 @@
             }
         });
 
-        // ===== CONTACT FORM =====
+        // ===== CONTACT FORM VALIDATION (SUBMITS TO ASP) =====
         const contactForm = document.getElementById('contactForm');
-        contactForm.addEventListener('submit', (e) => {
-            e.preventDefault();
+        contactForm.addEventListener('submit', function(e) {
             const name = document.getElementById('name').value.trim();
             const email = document.getElementById('email').value.trim();
             const message = document.getElementById('message').value.trim();
 
+            // Client-side validation – if fails, prevent submission
             if (!name || !email || !message) {
+                e.preventDefault();
                 alert('Please fill in all required fields.');
                 return;
             }
 
             const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailPattern.test(email)) {
+                e.preventDefault();
                 alert('Please enter a valid email address.');
                 return;
             }
 
-            alert(
-                `✅ Thank you, ${name}!\n\nYour message has been sent successfully.\nWe'll get back to you within 24 hours.`
-            );
-            contactForm.reset();
+            // If validation passes, the form submits normally to sendmail.asp
+            // No preventDefault() here – it will POST to the ASP handler.
         });
     </script>
 
+    <!-- ========================================
+         SAMPLE ASP HANDLER (sendmail.asp)
+         ========================================
+         <%
+             Dim fullname, email, subject, message, toEmail, fromEmail, mailSubject, mailBody
+
+             fullname = Request.Form("fullname")
+             email = Request.Form("email")
+             subject = Request.Form("subject")
+             message = Request.Form("message")
+
+             toEmail = "info@floridablancacdc.com"
+             fromEmail = email
+             mailSubject = "New Contact Message: " & subject
+             mailBody = "Name: " & fullname & vbCrLf & _
+                        "Email: " & email & vbCrLf & _
+                        "Subject: " & subject & vbCrLf & _
+                        "Message: " & vbCrLf & message
+
+             ' Use CDO or other mail component
+             Set mail = Server.CreateObject("CDO.Message")
+             mail.From = fromEmail
+             mail.To = toEmail
+             mail.Subject = mailSubject
+             mail.TextBody = mailBody
+             mail.Send
+             Set mail = Nothing
+
+             Response.Redirect "thankyou.html"
+         %>
+    ======================================== -->
 </body>
 </html>
