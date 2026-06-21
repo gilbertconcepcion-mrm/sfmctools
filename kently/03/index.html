@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FCDC | Floridablanca Construction</title>
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <!-- Google Font: Poppins -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    /* ===== RESET & VARIABLES ===== */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary: #E63946;
+      /* bold red – accent */
+      --primary-dark: #BA1826;
+      --yellow: #FFC300;
+      /* main yellow */
+      --yellow-dark: #E6A800;
+      --yellow-light: #FFE066;
+      --yellow-bg: #FFF8E1;
+      /* soft yellow background */
+      --white: #FFFFFF;
+      --light-gray: #F8F9FA;
+      --gray: #6C757D;
+      --dark: #212529;
+      --shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+      --shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.12);
+      --radius: 16px;
+      --transition: 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: var(--white);
+      color: var(--dark);
+      line-height: 1.7;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+    ul {
+      list-style: none;
+    }
+    img {
+      max-width: 100%;
+      display: block;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* ===== BUTTONS ===== */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 40px;
+      border-radius: 60px;
+      font-weight: 600;
+      font-size: 1rem;
+      border: none;
+      cursor: pointer;
+      transition: var(--transition);
+      background: var(--yellow);
+      color: var(--dark);
+      box-shadow: 0 8px 24px rgba(255, 195, 0, 0.4);
+    }
+    .btn:hover {
+      background: var(--yellow-dark);
+      transform: translateY(-4px);
+      box-shadow: 0 16px 32px rgba(255, 195, 0, 0.5);
+    }
+    .btn-outline {
+      background: transparent;
+      color: var(--white);
+      border: 2px solid var(--white);
+      box-shadow: none;
+    }
+    .btn-outline:hover {
+      background: var(--white);
+      color: var(--yellow-dark);
+      box-shadow: 0 8px 24px rgba(255, 255, 255, 0.25);
+    }
+    .btn-secondary {
+      background: var(--yellow);
+      color: var(--dark);
+      box-shadow: 0 8px 24px rgba(255, 195, 0, 0.3);
+    }
+    .btn-secondary:hover {
+      background: var(--yellow-dark);
+      box-shadow: 0 16px 32px rgba(255, 195, 0, 0.4);
+    }
+    .btn-red {
+      background: var(--primary);
+      color: var(--white);
+      box-shadow: 0 8px 24px rgba(230, 57, 70, 0.3);
+    }
+    .btn-red:hover {
+      background: var(--primary-dark);
+      box-shadow: 0 16px 32px rgba(230, 57, 70, 0.4);
+    }
+
+    /* ===== HEADER ===== */
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 1000;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 2px solid var(--yellow);
+      transition: var(--transition);
+    }
+    .header.scrolled {
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.08);
+    }
+
+    .header .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 80px;
+    }
+
+    .logo {
+      font-weight: 800;
+      font-size: 1.6rem;
+      color: var(--primary);
+      letter-spacing: -0.5px;
+    }
+    .logo span {
+      color: var(--yellow-dark);
+    }
+    .logo .sub {
+      display: block;
+      font-size: 0.55rem;
+      font-weight: 500;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--gray);
+      margin-top: -4px;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .nav-links a {
+      color: var(--dark);
+      font-weight: 500;
+      font-size: 0.9rem;
+      padding: 8px 20px;
+      border-radius: 50px;
+      transition: var(--transition);
+    }
+    .nav-links a:hover,
+    .nav-links a.active {
+      background: var(--yellow);
+      color: var(--dark);
+    }
+
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      background: transparent;
+      border: none;
+      padding: 6px;
+    }
+    .hamburger span {
+      width: 28px;
+      height: 3px;
+      background: var(--dark);
+      border-radius: 4px;
+      transition: var(--transition);
+    }
+    .hamburger.active span:nth-child(1) {
+      transform: rotate(45deg) translate(6px, 6px);
+    }
+    .hamburger.active span:nth-child(2) {
+      opacity: 0;
+    }
+    .hamburger.active span:nth-child(3) {
+      transform: rotate(-45deg) translate(6px, -6px);
+    }
+
+    /* ===== HERO ===== */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      text-align: center;
+      background: linear-gradient(135deg, var(--yellow) 0%, var(--yellow-dark) 100%);
+      padding: 120px 0 80px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 10% 90%, rgba(230, 57, 70, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 90% 10%, rgba(255, 255, 255, 0.15) 0%, transparent 50%);
+      pointer-events: none;
+    }
+    .hero .container {
+      position: relative;
+      z-index: 2;
+    }
+    .hero-badge {
+      display: inline-block;
+      background: rgba(0, 0, 0, 0.08);
+      backdrop-filter: blur(4px);
+      padding: 8px 24px;
+      border-radius: 60px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--dark);
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      margin-bottom: 20px;
+    }
+    .hero h1 {
+      font-size: clamp(2.8rem, 7vw, 4.8rem);
+      font-weight: 800;
+      color: var(--dark);
+      line-height: 1.1;
+      letter-spacing: -2px;
+    }
+    .hero h1 .highlight {
+      color: var(--white);
+      background: var(--primary);
+      padding: 0 12px;
+      display: inline-block;
+      border-radius: 12px;
+    }
+    .hero p {
+      color: rgba(0, 0, 0, 0.7);
+      font-size: 1.15rem;
+      max-width: 600px;
+      margin: 20px auto 40px;
+      line-height: 1.8;
+    }
+    .hero-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 16px;
+    }
+    .hero-stats {
+      display: flex;
+      justify-content: center;
+      gap: 60px;
+      margin-top: 60px;
+      padding-top: 40px;
+      border-top: 1px solid rgba(0, 0, 0, 0.1);
+    }
+    .hero-stats .stat h3 {
+      color: var(--dark);
+      font-size: 2.4rem;
+      font-weight: 800;
+    }
+    .hero-stats .stat p {
+      color: rgba(0, 0, 0, 0.6);
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin: 0;
+    }
+
+    /* ===== SECTIONS COMMON ===== */
+    section {
+      padding: 80px 0;
+    }
+    .section-header {
+      text-align: center;
+      max-width: 700px;
+      margin: 0 auto 60px;
+    }
+    .section-header .tag {
+      display: inline-block;
+      background: rgba(255, 195, 0, 0.15);
+      color: var(--yellow-dark);
+      font-weight: 600;
+      font-size: 0.75rem;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 6px 20px;
+      border-radius: 60px;
+      margin-bottom: 12px;
+    }
+    .section-header h2 {
+      font-size: clamp(2rem, 4vw, 2.8rem);
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      color: var(--dark);
+    }
+    .section-header h2 span {
+      color: var(--yellow-dark);
+    }
+    .section-header p {
+      color: var(--gray);
+      font-size: 1.05rem;
+      margin-top: 12px;
+    }
+
+    /* ===== VISION & MISSION ===== */
+    #vision-mission {
+      background: var(--white);
+    }
+    .vm-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+    }
+    .vm-card {
+      background: var(--white);
+      padding: 48px 40px;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border-top: 6px solid var(--yellow);
+      transition: var(--transition);
+      position: relative;
+    }
+    .vm-card:hover {
+      transform: translateY(-8px);
+      box-shadow: var(--shadow-hover);
+    }
+    .vm-card.mission {
+      border-top-color: var(--primary);
+    }
+    .vm-card .icon {
+      font-size: 2.8rem;
+      color: var(--yellow-dark);
+      margin-bottom: 16px;
+    }
+    .vm-card.mission .icon {
+      color: var(--primary);
+    }
+    .vm-card h3 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+    .vm-card p {
+      color: var(--gray);
+      line-height: 1.8;
+    }
+    .vm-card ul {
+      margin-top: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .vm-card ul li {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 500;
+    }
+    .vm-card ul li i {
+      color: var(--yellow-dark);
+      font-size: 1.1rem;
+    }
+    .vm-card.mission ul li i {
+      color: var(--primary);
+    }
+
+    /* ===== SERVICES ===== */
+    #services {
+      background: var(--yellow-bg);
+    }
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 30px;
+    }
+    .service-card {
+      background: var(--white);
+      padding: 40px 30px;
+      border-radius: var(--radius);
+      text-align: center;
+      transition: var(--transition);
+      box-shadow: var(--shadow);
+      border: 2px solid transparent;
+    }
+    .service-card:hover {
+      transform: translateY(-6px);
+      box-shadow: var(--shadow-hover);
+      border-color: var(--yellow);
+    }
+    .service-card .icon {
+      width: 80px;
+      height: 80px;
+      background: var(--yellow);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      font-size: 2.2rem;
+      color: var(--dark);
+      transition: var(--transition);
+    }
+    .service-card:hover .icon {
+      background: var(--yellow-dark);
+      color: var(--white);
+    }
+    .service-card h4 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+    .service-card p {
+      color: var(--gray);
+      font-size: 0.95rem;
+      line-height: 1.7;
+    }
+
+    /* ===== EQUIPMENTS ===== */
+    #equipments {
+      background: var(--white);
+    }
+    .equipments-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 30px;
+    }
+    .equipment-card {
+      background: var(--yellow-bg);
+      padding: 32px 20px;
+      border-radius: var(--radius);
+      text-align: center;
+      box-shadow: var(--shadow);
+      transition: var(--transition);
+      border-bottom: 4px solid var(--yellow);
+    }
+    .equipment-card:hover {
+      transform: translateY(-6px);
+      box-shadow: var(--shadow-hover);
+      border-bottom-color: var(--primary);
+    }
+    .equipment-card .icon {
+      font-size: 3.2rem;
+      color: var(--yellow-dark);
+      margin-bottom: 12px;
+      display: inline-block;
+    }
+    .equipment-card:hover .icon {
+      color: var(--primary);
+    }
+    .equipment-card h4 {
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+    .equipment-card p {
+      color: var(--gray);
+      font-size: 0.85rem;
+      margin-bottom: 8px;
+    }
+    .equipment-card .qty {
+      display: inline-block;
+      background: var(--yellow);
+      color: var(--dark);
+      padding: 2px 16px;
+      border-radius: 60px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    /* ===== CONTACT ===== */
+    #contact {
+      background: var(--yellow-bg);
+    }
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+    }
+    .contact-info h3 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+    .contact-info p {
+      color: var(--gray);
+      line-height: 1.8;
+      margin-bottom: 32px;
+    }
+    .contact-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .contact-item .icon {
+      width: 52px;
+      height: 52px;
+      background: var(--yellow);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--dark);
+      font-size: 1.2rem;
+      flex-shrink: 0;
+    }
+    .contact-item .text h4 {
+      font-weight: 600;
+      font-size: 1rem;
+    }
+    .contact-item .text p {
+      color: var(--gray);
+      margin: 0;
+      font-size: 0.95rem;
+    }
+
+    .contact-form {
+      background: var(--white);
+      padding: 40px 36px;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: 2px solid var(--yellow);
+    }
+    .contact-form h4 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+    }
+    .contact-form .form-group {
+      margin-bottom: 18px;
+    }
+    .contact-form label {
+      display: block;
+      font-weight: 500;
+      font-size: 0.85rem;
+      margin-bottom: 4px;
+    }
+    .contact-form input,
+    .contact-form textarea {
+      width: 100%;
+      padding: 14px 18px;
+      border: 2px solid #E9ECEF;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 0.95rem;
+      transition: var(--transition);
+      background: var(--white);
+    }
+    .contact-form input:focus,
+    .contact-form textarea:focus {
+      outline: none;
+      border-color: var(--yellow);
+      box-shadow: 0 0 0 4px rgba(255, 195, 0, 0.15);
+    }
+    .contact-form textarea {
+      resize: vertical;
+      min-height: 120px;
+    }
+    .contact-form .btn {
+      width: 100%;
+      justify-content: center;
+    }
+
+    /* ===== FOOTER ===== */
+    .footer {
+      background: var(--dark);
+      color: rgba(255, 255, 255, 0.6);
+      padding: 48px 0 24px;
+      border-top: 4px solid var(--yellow);
+    }
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 40px;
+      padding-bottom: 32px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      margin-bottom: 24px;
+    }
+    .footer-brand .logo {
+      color: var(--white);
+      font-size: 1.4rem;
+      margin-bottom: 12px;
+    }
+    .footer-brand .logo span {
+      color: var(--yellow);
+    }
+    .footer-brand p {
+      font-size: 0.9rem;
+      max-width: 320px;
+      line-height: 1.8;
+    }
+    .footer h4 {
+      color: var(--white);
+      font-weight: 600;
+      margin-bottom: 16px;
+      font-size: 1rem;
+    }
+    .footer ul li {
+      margin-bottom: 8px;
+    }
+    .footer ul li a {
+      transition: var(--transition);
+      font-size: 0.9rem;
+    }
+    .footer ul li a:hover {
+      color: var(--yellow);
+    }
+    .footer-social {
+      display: flex;
+      gap: 12px;
+      margin-top: 16px;
+    }
+    .footer-social a {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.04);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+      color: rgba(255, 255, 255, 0.4);
+      font-size: 1rem;
+    }
+    .footer-social a:hover {
+      background: var(--yellow);
+      color: var(--dark);
+      transform: translateY(-3px);
+    }
+    .footer-bottom {
+      text-align: center;
+      font-size: 0.85rem;
+      opacity: 0.6;
+    }
+    .footer-bottom span {
+      color: var(--yellow);
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 1024px) {
+      .hero-stats {
+        gap: 30px;
+      }
+      .footer-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+      .contact-grid {
+        grid-template-columns: 1fr;
+        gap: 40px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .hamburger {
+        display: flex;
+      }
+      .nav-links {
+        position: fixed;
+        top: 80px;
+        left: 0;
+        width: 100%;
+        background: var(--white);
+        flex-direction: column;
+        padding: 24px 32px 40px;
+        gap: 4px;
+        transform: translateY(-120%);
+        transition: var(--transition);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+        border-bottom: 2px solid var(--yellow);
+      }
+      .nav-links.open {
+        transform: translateY(0);
+      }
+      .nav-links a {
+        padding: 12px 20px;
+        width: 100%;
+        text-align: center;
+        border-radius: 8px;
+      }
+
+      .vm-grid {
+        grid-template-columns: 1fr;
+      }
+      .hero-stats {
+        flex-wrap: wrap;
+        gap: 24px;
+      }
+      .hero-stats .stat h3 {
+        font-size: 1.8rem;
+      }
+      .services-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+      .equipments-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+      .footer-grid {
+        grid-template-columns: 1fr;
+        gap: 28px;
+      }
+      section {
+        padding: 60px 0;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .services-grid {
+        grid-template-columns: 1fr;
+      }
+      .equipments-grid {
+        grid-template-columns: 1fr;
+      }
+      .hero h1 {
+        font-size: 2.4rem;
+      }
+      .hero-buttons .btn {
+        width: 100%;
+        justify-content: center;
+      }
+      .container {
+        padding: 0 16px;
+      }
+      .contact-form {
+        padding: 24px 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===== HEADER ===== -->
+  <header class="header" id="header">
+    <div class="container">
+      <a href="#" class="logo">
+        FCDC<span>.</span>
+        <span class="sub">Floridablanca Construction &amp; Development Corp.</span>
+      </a>
+
+      <nav class="nav-links" id="navLinks">
+        <a href="#home" class="active">Home</a>
+        <a href="#vision-mission">About</a>
+        <a href="#services">Services</a>
+        <a href="#equipments">Equipments</a>
+        <a href="#contact">Contact</a>
+      </nav>
+
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ===== HERO ===== -->
+  <section class="hero" id="home">
+    <div class="container">
+      <span class="hero-badge"><i class="fas fa-hard-hat"></i> Building Excellence Since 2010</span>
+      <h1>
+        Building <br />
+        <span class="highlight">Tomorrow’s</span> Landmarks
+      </h1>
+      <p>
+        Floridablanca Construction &amp; Development Corp. delivers
+        world‑class infrastructure with integrity, innovation, and
+        unwavering quality.
+      </p>
+      <div class="hero-buttons">
+        <a href="#contact" class="btn">
+          <i class="fas fa-paper-plane"></i> Get a Quote
+        </a>
+        <a href="#services" class="btn btn-outline">
+          <i class="fas fa-arrow-right"></i> Our Services
+        </a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat">
+          <h3>15+</h3>
+          <p>Years of Excellence</p>
+        </div>
+        <div class="stat">
+          <h3>120+</h3>
+          <p>Projects Completed</p>
+        </div>
+        <div class="stat">
+          <h3>98%</h3>
+          <p>Client Satisfaction</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== VISION & MISSION ===== -->
+  <section id="vision-mission">
+    <div class="container">
+      <div class="section-header">
+        <span class="tag"><i class="fas fa-flag"></i> Our Core</span>
+        <h2>Vision &amp; <span>Mission</span></h2>
+        <p>Guided by purpose, driven by excellence — we build with a clear vision and a steadfast mission.</p>
+      </div>
+      <div class="vm-grid">
+        <div class="vm-card vision">
+          <div class="icon"><i class="fas fa-eye"></i></div>
+          <h3>Our Vision</h3>
+          <p>
+            To be the Philippines' most trusted construction partner,
+            transforming skylines and communities through sustainable,
+            innovative, and world‑class engineering.
+          </p>
+          <ul>
+            <li><i class="fas fa-check-circle"></i> Innovation in every project</li>
+            <li><i class="fas fa-check-circle"></i> Sustainable building practices</li>
+            <li><i class="fas fa-check-circle"></i> Uncompromising quality</li>
+          </ul>
+        </div>
+        <div class="vm-card mission">
+          <div class="icon"><i class="fas fa-bullseye"></i></div>
+          <h3>Our Mission</h3>
+          <p>
+            To deliver exceptional construction solutions that exceed
+            expectations, foster long‑term partnerships, and uplift the
+            communities we serve — safely, ethically, and on time.
+          </p>
+          <ul>
+            <li><i class="fas fa-check-circle"></i> Client‑centric approach</li>
+            <li><i class="fas fa-check-circle"></i> Safety first, always</li>
+            <li><i class="fas fa-check-circle"></i> Continuous improvement</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== SERVICES ===== -->
+  <section id="services">
+    <div class="container">
+      <div class="section-header">
+        <span class="tag"><i class="fas fa-tools"></i> What We Do</span>
+        <h2>Our <span>Services</span></h2>
+        <p>From foundations to finishing touches — we offer a full spectrum of construction services.</p>
+      </div>
+      <div class="services-grid">
+        <div class="service-card">
+          <div class="icon"><i class="fas fa-city"></i></div>
+          <h4>General Construction</h4>
+          <p>Residential, commercial, and industrial building projects executed with precision and care.</p>
+        </div>
+        <div class="service-card">
+          <div class="icon"><i class="fas fa-road"></i></div>
+          <h4>Infrastructure &amp; Civil</h4>
+          <p>Roads, bridges, drainage systems, and large‑scale civil engineering projects.</p>
+        </div>
+        <div class="service-card">
+          <div class="icon"><i class="fas fa-pencil-ruler"></i></div>
+          <h4>Design &amp; Planning</h4>
+          <p>Architectural design, structural engineering, and project planning tailored to your needs.</p>
+        </div>
+        <div class="service-card">
+          <div class="icon"><i class="fas fa-hard-hat"></i></div>
+          <h4>Project Management</h4>
+          <p>End‑to‑end project oversight, ensuring timelines, budgets, and quality standards are met.</p>
+        </div>
+        <div class="service-card">
+          <div class="icon"><i class="fas fa-home"></i></div>
+          <h4>Renovation &amp; Retrofit</h4>
+          <p>Modernizing existing structures with sustainable materials and contemporary designs.</p>
+        </div>
+        <div class="service-card">
+          <div class="icon"><i class="fas fa-handshake"></i></div>
+          <h4>Consultancy &amp; Advisory</h4>
+          <p>Expert guidance on construction feasibility, cost estimation, and regulatory compliance.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== EQUIPMENTS ===== -->
+  <section id="equipments">
+    <div class="container">
+      <div class="section-header">
+        <span class="tag"><i class="fas fa-cogs"></i> Our Fleet</span>
+        <h2>Our <span>Equipments</span></h2>
+        <p>State‑of‑the‑art machinery and tools that power our projects with efficiency and reliability.</p>
+      </div>
+      <div class="equipments-grid">
+        <div class="equipment-card">
+          <span class="icon"><i class="fas fa-tractor"></i></span>
+          <h4>Excavators</h4>
+          <p>Heavy‑duty digging &amp; earthmoving</p>
+          <span class="qty">8 Units</span>
+        </div>
+        <div class="equipment-card">
+          <span class="icon"><i class="fas fa-truck"></i></span>
+          <h4>Dump Trucks</h4>
+          <p>Material hauling &amp; logistics</p>
+          <span class="qty">12 Units</span>
+        </div>
+        <div class="equipment-card">
+          <span class="icon"><i class="fas fa-arrow-up"></i></span>
+          <h4>Cranes</h4>
+          <p>Lifting &amp; heavy placement</p>
+          <span class="qty">6 Units</span>
+        </div>
+        <div class="equipment-card">
+          <span class="icon"><i class="fas fa-tachometer-alt"></i></span>
+          <h4>Concrete Pumpers</h4>
+          <p>High‑volume concrete pouring</p>
+          <span class="qty">4 Units</span>
+        </div>
+        <div class="equipment-card">
+          <span class="icon"><i class="fas fa-compress"></i></span>
+          <h4>Compactors &amp; Rollers</h4>
+          <p>Soil &amp; asphalt compaction</p>
+          <span class="qty">7 Units</span>
+        </div>
+        <div class="equipment-card">
+          <span class="icon"><i class="fas fa-bolt"></i></span>
+          <h4>Generators &amp; Tools</h4>
+          <p>Reliable power for every site</p>
+          <span class="qty">20+ Units</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== CONTACT ===== -->
+  <section id="contact">
+    <div class="container">
+      <div class="section-header">
+        <span class="tag"><i class="fas fa-envelope"></i> Get in Touch</span>
+        <h2>Contact <span>Us</span></h2>
+        <p>Have a project in mind? Let's talk — we're ready to bring your vision to life.</p>
+      </div>
+      <div class="contact-grid">
+        <div class="contact-info">
+          <h3>Let's Build Together</h3>
+          <p>
+            Reach out to our team for inquiries, project consultations, or
+            partnership opportunities. We respond within 24 hours.
+          </p>
+          <div class="contact-item">
+            <div class="icon"><i class="fas fa-map-marker-alt"></i></div>
+            <div class="text">
+              <h4>Our Office</h4>
+              <p>Floridablanca, Pampanga, Philippines</p>
+            </div>
+          </div>
+          <div class="contact-item">
+            <div class="icon"><i class="fas fa-phone-alt"></i></div>
+            <div class="text">
+              <h4>Call Us</h4>
+              <p>+63 (45) 123‑4567</p>
+            </div>
+          </div>
+          <div class="contact-item">
+            <div class="icon"><i class="fas fa-envelope"></i></div>
+            <div class="text">
+              <h4>Email</h4>
+              <p>info@floridablancacdc.com</p>
+            </div>
+          </div>
+          <div class="contact-item">
+            <div class="icon"><i class="fas fa-clock"></i></div>
+            <div class="text">
+              <h4>Working Hours</h4>
+              <p>Mon – Fri: 8:00 AM – 5:00 PM</p>
+            </div>
+          </div>
+        </div>
+
+        <form class="contact-form" id="contactForm">
+          <h4>Send a Message</h4>
+          <div class="form-group">
+            <label for="name">Full Name</label>
+            <input type="text" id="name" placeholder="Juan Dela Cruz" required />
+          </div>
+          <div class="form-group">
+            <label for="email">Email Address</label>
+            <input type="email" id="email" placeholder="juan@example.com" required />
+          </div>
+          <div class="form-group">
+            <label for="subject">Subject</label>
+            <input type="text" id="subject" placeholder="Project inquiry" />
+          </div>
+          <div class="form-group">
+            <label for="message">Message</label>
+            <textarea id="message" placeholder="Tell us about your project..." required></textarea>
+          </div>
+          <button type="submit" class="btn">
+            <i class="fas fa-paper-plane"></i> Send Message
+          </button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="#" class="logo">
+            FCDC<span>.</span>
+            <span class="sub" style="color:rgba(255,255,255,0.4);">Floridablanca Construction &amp; Development Corp.</span>
+          </a>
+          <p>
+            Building a better future with integrity, quality, and
+            innovation. Your trusted partner in construction and
+            development.
+          </p>
+          <div class="footer-social">
+            <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+            <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+            <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+          </div>
+        </div>
+        <div>
+          <h4>Quick Links</h4>
+          <ul>
+            <li><a href="#home">Home</a></li>
+            <li><a href="#vision-mission">Vision &amp; Mission</a></li>
+            <li><a href="#services">Services</a></li>
+            <li><a href="#equipments">Equipments</a></li>
+            <li><a href="#contact">Contact</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Services</h4>
+          <ul>
+            <li><a href="#services">General Construction</a></li>
+            <li><a href="#services">Infrastructure</a></li>
+            <li><a href="#services">Design &amp; Planning</a></li>
+            <li><a href="#services">Project Management</a></li>
+            <li><a href="#services">Renovation</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Contact Info</h4>
+          <ul>
+            <li><i class="fas fa-map-pin" style="color:var(--yellow);width:20px;"></i> Floridablanca, Pampanga</li>
+            <li><i class="fas fa-phone" style="color:var(--yellow);width:20px;"></i> +63 (45) 123‑4567</li>
+            <li><i class="fas fa-envelope" style="color:var(--yellow);width:20px;"></i> info@floridablancacdc.com</li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        &copy; 2026 <span>Floridablanca Construction &amp; Development Corp.</span> All rights reserved.
+      </div>
+    </div>
+  </footer>
+
+  <!-- ===== JAVASCRIPT ===== -->
+  <script>
+    // ===== HAMBURGER MENU =====
+    const hamburger = document.getElementById('hamburger');
+    const navLinks = document.getElementById('navLinks');
+
+    hamburger.addEventListener('click', () => {
+      hamburger.classList.toggle('active');
+      navLinks.classList.toggle('open');
+    });
+
+    document.querySelectorAll('.nav-links a').forEach(link => {
+      link.addEventListener('click', () => {
+        hamburger.classList.remove('active');
+        navLinks.classList.remove('open');
+      });
+    });
+
+    // ===== ACTIVE NAV LINK =====
+    const sections = document.querySelectorAll('section[id]');
+    const navItems = document.querySelectorAll('.nav-links a');
+
+    function updateActiveLink() {
+      let current = '';
+      sections.forEach(section => {
+        const sectionTop = section.offsetTop - 120;
+        if (window.scrollY >= sectionTop) {
+          current = section.getAttribute('id');
+        }
+      });
+      navItems.forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href') === '#' + current) {
+          link.classList.add('active');
+        }
+      });
+    }
+
+    window.addEventListener('scroll', updateActiveLink);
+
+    // ===== HEADER SHADOW =====
+    const header = document.getElementById('header');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 40) {
+        header.classList.add('scrolled');
+      } else {
+        header.classList.remove('scrolled');
+      }
+    });
+
+    // ===== CONTACT FORM =====
+    const contactForm = document.getElementById('contactForm');
+    contactForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = document.getElementById('name').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const message = document.getElementById('message').value.trim();
+
+      if (!name || !email || !message) {
+        alert('Please fill in all required fields.');
+        return;
+      }
+
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailPattern.test(email)) {
+        alert('Please enter a valid email address.');
+        return;
+      }
+
+      alert(
+        `✅ Thank you, ${name}!\n\nYour message has been sent successfully.\nWe'll get back to you within 24 hours.`
+      );
+      contactForm.reset();
+    });
+  </script>
+
+</body>
+</html>
