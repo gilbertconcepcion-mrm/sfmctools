@@ -825,6 +825,17 @@
                         </div>
                     </div>
 
+                    <!-- Prospect Loyalty (PROSPECT only) -->
+                    <div id="prospectLoyaltyRow" class="filter-row">
+                        <div class="filter-top-line">
+                            <input style="display:none;" type="checkbox" id="chkProspectLoyalty" checked disabled />
+                            <span>Exclusion(adjust as BU’s loyalty values)</span>
+                            <span class="filter-input-group">
+                                <input type="text" id="prospectLoyaltyTiers" value="'BLACK GOLD','GOLD','ROSE','BLACK','SILVER'" style="width: 380px;" disabled />
+                            </span>
+                        </div>
+                    </div>
+
                     <!-- Sampler (SAMPLER only) -->
                     <div id="samplerRow" class="filter-row hidden">
                         <div class="filter-top-line">
@@ -1168,7 +1179,7 @@ AND db.FIRST_PURCHASE_DATE IS NULL
 {{PROSPECT_SNIPPET}}
  
 /* Loyalty – adjust as BU’s loyalty values */ 
-AND db.LOYALTY_TIER_CURRENT NOT IN ('BLACK GOLD','GOLD','ROSE') 
+{{PROSPECT_LOYALTY_SNIPPET}}
  
 {{WHATSAPP}}
 
@@ -1428,6 +1439,10 @@ AND EXISTS(
         const prospectAbsoluteGroup = document.getElementById('prospectAbsoluteGroup');
         const prospectTypeRadios = document.querySelectorAll('input[name="prospectType"]');
 
+        // Prospect Loyalty controls
+        const chkProspectLoyalty = document.getElementById('chkProspectLoyalty');
+        const prospectLoyaltyTiers = document.getElementById('prospectLoyaltyTiers');
+
         // Sampler controls
         const chkSampler = document.getElementById('chkSampler');
         const samplerMonths = document.getElementById('samplerMonths');
@@ -1486,6 +1501,7 @@ AND EXISTS(
 
         // Rows
         const prospectRow = document.getElementById('prospectRow');
+        const prospectLoyaltyRow = document.getElementById('prospectLoyaltyRow');
         const samplerRow = document.getElementById('samplerRow');
         const lpWithEANRow = document.getElementById('lpWithEANRow');
         const lpWithoutEANRow = document.getElementById('lpWithoutEANRow');
@@ -1535,19 +1551,18 @@ AND EXISTS(
                 edmSuppression: chkEDMSuppression.checked,
                 smsSuppression: chkSMSSuppression.checked,
                 prospect: chkProspect.checked,
+                prospectLoyalty: true, // Always true - fixed filter
                 whatsapp: chkWhatsapp.checked,
                 engagements: chkEngagements.checked,
-                aiAudience: false, // Always false - removed the checkbox
+                aiAudience: false,
                 vouchers: chkVouchers.checked,
                 sampler: chkSampler.checked,
                 lpWithEAN: chkLPWithEAN.checked,
                 lpWithoutEAN: chkLPWithoutEAN.checked,
                 everpurchase: chkEverpurchase.checked,
                 loyalty: chkLoyalty.checked,
-                // Sampler toggles
                 samplerCounterId: chkSamplerCounterId.checked,
                 samplerEan: chkSamplerEan.checked,
-                // Customer-wide toggles
                 customerCounterId: chkCustomerCounterId.checked,
                 customerEan: chkCustomerEan.checked
             };
@@ -1707,6 +1722,7 @@ WHERE (s.EMAIL != '' AND s.EMAIL IS NOT NULL)
                 
                 // Hide all special rows
                 prospectRow.classList.add('hidden');
+                prospectLoyaltyRow.classList.add('hidden');
                 samplerRow.classList.add('hidden');
                 lpWithEANRow.classList.add('hidden');
                 lpWithoutEANRow.classList.add('hidden');
@@ -1751,6 +1767,7 @@ WHERE (s.EMAIL != '' AND s.EMAIL IS NOT NULL)
 
                 // Hide all special rows
                 prospectRow.classList.add('hidden');
+                prospectLoyaltyRow.classList.add('hidden');
                 samplerRow.classList.add('hidden');
                 lpWithEANRow.classList.add('hidden');
                 lpWithoutEANRow.classList.add('hidden');
@@ -1806,6 +1823,15 @@ AND db.CREATION_DATE BETWEEN CAST('${start}' AS DATE) AND CAST('${end}' AS DATE)
 /* P${prospectVal}M prospects – adjust as per requirement */ 
 AND db.CREATION_DATE >= DATEADD(month, -${prospectVal}, GETDATE())`;
                 }
+            }
+
+            let prospectLoyaltySnippet = '';
+            if (type === 'prospect' && states.prospectLoyalty) {
+                let tiers = prospectLoyaltyTiers.value.trim();
+                if (!tiers) tiers = "'BLACK GOLD','GOLD','ROSE'";
+                prospectLoyaltySnippet =
+                    `
+AND db.Loyalty_Tier_Current NOT IN (${tiers}) /* Prospect loyalty filter */`;
             }
 
             let samplerSnippet = '';
@@ -1993,6 +2019,7 @@ AND db.Loyalty_Tier_Current IN (${tiers})`;
                 .replace(/\{\{PREVIOUS_ENTRY_JOIN\}\}/g, prevEntrySnippet)
                 .replace(/\{\{OPT_IN_CLAUSE\}\}/g, optInClause)
                 .replace(/\{\{PROSPECT_SNIPPET\}\}/g, prospectSnippet)
+                .replace(/\{\{PROSPECT_LOYALTY_SNIPPET\}\}/g, prospectLoyaltySnippet)
                 .replace(/\{\{WHATSAPP\}\}/g, states.whatsapp ? snippets.whatsapp : '')
                 .replace(/\{\{ENGAGEMENTS\}\}/g, engagementsSnippet)
                 .replace(/\{\{AI_AUDIENCE\}\}/g, '') // Removed AI Audience snippet
@@ -2037,10 +2064,13 @@ AND db.Loyalty_Tier_Current IN (${tiers})`;
             // Show/hide conditional controls
             if (type === 'prospect') {
                 prospectRow.classList.remove('hidden');
+                prospectLoyaltyRow.classList.remove('hidden'); // Always visible
                 toggleProspectType();
             } else {
                 prospectRow.classList.add('hidden');
+                prospectLoyaltyRow.classList.add('hidden');
                 chkProspect.checked = false;
+                // Don't uncheck prospectLoyalty as it's always true
             }
 
             if (type === 'sampler') {
@@ -2115,6 +2145,7 @@ AND db.Loyalty_Tier_Current IN (${tiers})`;
                 .replace(/\{\{PREVIOUS_ENTRY_JOIN\}\}/g, prevEntrySnippet)
                 .replace(/\{\{OPT_IN_CLAUSE\}\}/g, optInClause)
                 .replace(/\{\{PROSPECT_SNIPPET\}\}/g, '')
+                .replace(/\{\{PROSPECT_LOYALTY_SNIPPET\}\}/g, '')
                 .replace(/\{\{WHATSAPP\}\}/g, '')
                 .replace(/\{\{ENGAGEMENTS\}\}/g, engagementsSnippet)
                 .replace(/\{\{AI_AUDIENCE\}\}/g, snippets.aiAudience)
@@ -2165,6 +2196,10 @@ AND db.Loyalty_Tier_Current IN (${tiers})`;
                         // These will be enabled separately
                         return;
                     }
+                }
+                // Skip Prospect Loyalty controls - they should always be disabled
+                if (['chkProspectLoyalty', 'prospectLoyaltyTiers'].includes(control.id)) {
+                    return;
                 }
                 control.disabled = disabled;
             });
@@ -2345,6 +2380,13 @@ AND db.Loyalty_Tier_Current IN (${tiers})`;
 
         // Loyalty text input
         loyaltyTiersInput.addEventListener('input', function() {
+            if (currentActiveType !== 'seed' && currentActiveType !== 'ai') {
+                showQuery(currentActiveType);
+            }
+        });
+
+        // Prospect Loyalty text input
+        prospectLoyaltyTiers.addEventListener('input', function() {
             if (currentActiveType !== 'seed' && currentActiveType !== 'ai') {
                 showQuery(currentActiveType);
             }
