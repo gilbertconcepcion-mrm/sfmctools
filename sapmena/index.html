@@ -1672,7 +1672,7 @@ AND EXISTS(
                 const localeData = localeMap[brandData.locale];
                 const localeLabel = localeData ? localeData.label : 'SG';
                 const seedLabel = brandData.seedDB;
-                
+
                 const seedQuery = `SELECT 
   COALESCE(e.Subscriber_Key, s.Subscriber_Key) AS Subscriber_Key
 , COALESCE(e.first_name, s.first_name) AS first_name
@@ -1688,7 +1688,9 @@ LEFT JOIN [${localeLabel}_CAMPAIGN_NAME_03242026_ENTRY] e
     ON e.EMAIL = s.EMAIL 
 
 WHERE (s.EMAIL != '' AND s.EMAIL IS NOT NULL)
- AND (s.MOBILE != '' AND s.MOBILE IS NOT NULL)                   
+ /*AND (s.MOBILE != '' AND s.MOBILE IS NOT NULL)/*                   
+
+ /*if MY_GAB use s.Mobile_Formatted/*
 
 `;
 
