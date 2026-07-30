@@ -1005,81 +1005,99 @@
 
         // ---------- Brand list with all new entries ----------
         const brandList = [
-            // Malaysia (MY)
-            { label: 'Aesop Malaysia', locale: 'MY', spaceDB: 'Aesop_DB' },
-            { label: 'Armani Malaysia', locale: 'MY', spaceDB: 'GAB_Maindb_SCV_V3_0' },
-            { label: 'CeraVe Malaysia', locale: 'MY', spaceDB: 'CeraVe_DB' },
-            { label: 'CPD Malaysia', locale: 'MY', spaceDB: 'CPD_DB' },
-            { label: 'HelenaRubinstein Malaysia', locale: 'MY', spaceDB: 'HelenaRubinstein_DB' },
-            { label: 'Kérastase Malaysia', locale: 'MY', spaceDB: 'Kerastase_DB' },
-            { label: "Kiehl's Malaysia", locale: 'MY', spaceDB: 'Kiehls_Maindb_SCV_V3_0' },
-            { label: 'La Roche-Posay Malaysia', locale: 'MY', spaceDB: 'LaRochePosay_DB' },
-            { label: 'LSS Malaysia', locale: 'MY', spaceDB: 'LSS_DB' },
-            { label: 'Shu Uemura Malaysia', locale: 'MY', spaceDB: 'ShuUemura_DB' },
-            { label: 'Yves Saint Laurent Malaysia', locale: 'MY', spaceDB: 'YSL_Maindb_SCV_V3_0' },
-            { label: "L'Oreal Malaysia", locale: 'MY', spaceDB: 'LOreal_DB' },
+    // Aesop
+    { label: 'Aesop Malaysia', locale: 'MY', spaceDB: 'Aesop_DB', seedDB: 'Aesop_SEEDLIST' },
+    { label: 'Aesop Singapore', locale: 'SG', spaceDB: 'Aesop_DB', seedDB: 'Aesop_SEEDLIST' },
+    { label: 'Aesop Thailand', locale: 'TH', spaceDB: 'Aesop_DB', seedDB: 'Aesop_SEEDLIST' },
 
-            // GCC (AE)
-            { label: 'CeraVe GCC', locale: 'AE', spaceDB: 'CeraVe_DB' },
-            { label: 'La Roche-Posay GCC', locale: 'AE', spaceDB: 'LaRochePosay_DB' },
-            { label: 'Skinceuticals GCC', locale: 'AE', spaceDB: 'Skinceuticals_DB' },
-            { label: 'Vichy GCC', locale: 'AE', spaceDB: 'Vichy_DB' },
+    // Armani
+    { label: 'Armani Malaysia', locale: 'MY', spaceDB: 'GAB_Maindb_SCV_V3_0', seedDB: 'Armani_SEEDLIST' },
+    { label: 'Armani Singapore', locale: 'SG', spaceDB: 'GAB_Maindb_SCV_V3_0', seedDB: 'Armani_SEEDLIST' },
+    { label: 'Armani Thailand', locale: 'TH', spaceDB: 'GAB_Maindb_SCV_V3_0', seedDB: 'Armani_SEEDLIST' },
 
-            // India (IN)
-            { label: 'Cerave India', locale: 'IN', spaceDB: 'Cerave_DB' },
-            { label: 'Kerastase India', locale: 'IN', spaceDB: 'Kerastase_DB' },
-            { label: 'Lancome India', locale: 'IN', spaceDB: 'Lancome_Maindb_SCV_V3_0' },
-            { label: 'LSS India', locale: 'IN', spaceDB: 'LSS_DB' },
+    // CeraVe / Cerave
+    { label: 'CeraVe Malaysia', locale: 'MY', spaceDB: 'CeraVe_DB', seedDB: 'CeraVe_SEEDLIST' },
+    { label: 'CeraVe GCC', locale: 'AE', spaceDB: 'CeraVe_DB', seedDB: 'CeraVe_SEEDLIST' },
+    { label: 'Cerave India', locale: 'IN', spaceDB: 'Cerave_DB', seedDB: 'Cerave_SEEDLIST' },
+    { label: 'CeraVe Indonesia', locale: 'ID', spaceDB: 'CeraVe_DB', seedDB: 'CeraVe_SEEDLIST' },
+    { label: 'Cerave Singapore', locale: 'SG', spaceDB: 'Cerave_DB', seedDB: 'Cerave_SEEDLIST' },
+    { label: 'CeraVe Thailand', locale: 'TH', spaceDB: 'CeraVe_DB', seedDB: 'CeraVe_SEEDLIST' },
 
-            // Indonesia (ID)
-            { label: 'CeraVe Indonesia', locale: 'ID', spaceDB: 'CeraVe_DB' },
-            { label: 'Garnier Indonesia', locale: 'ID', spaceDB: 'Garnier_DB' },
-            { label: 'Kérastase Indonesia', locale: 'ID', spaceDB: 'Kerastase_DB' },
-            { label: "Kiehl's Indonesia", locale: 'ID', spaceDB: 'Kiehls_Maindb_SCV_V3_0' },
-            { label: "L'Oréal Paris Indonesia", locale: 'ID', spaceDB: 'LOrealParis_DB' },
-            { label: "L'Oréal Professional Indonesia", locale: 'ID', spaceDB: 'LOrealProfessional_DB' },
-            { label: 'La Roche Posay Indonesia', locale: 'ID', spaceDB: 'LaRochePosay_DB' },
-            { label: 'Lancôme Indonesia', locale: 'ID', spaceDB: 'Lancome_Maindb_SCV_V3_0' },
-            { label: 'LSS Indonesia', locale: 'ID', spaceDB: 'LSS_DB' },
-            { label: 'Yves Saint Laurent Indonesia', locale: 'ID', spaceDB: 'YSL_Maindb_SCV_V3_0' },
+    // CPD
+    { label: 'CPD Malaysia', locale: 'MY', spaceDB: 'CPD_DB', seedDB: 'CPD_SEEDLIST' },
+    { label: 'CPD Thailand', locale: 'TH', spaceDB: 'CPD_DB', seedDB: 'CPD_SEEDLIST' },
+    { label: 'CPD VN', locale: 'VN', spaceDB: 'CPD_DB', seedDB: 'CPD_SEEDLIST' },
 
-            // Philippines (PH)
-            { label: 'Kerastase Philippines', locale: 'PH', spaceDB: 'Kerastase_DB' },
-            { label: "Kiehl's Philippines", locale: 'PH', spaceDB: 'Kiehls_Maindb_SCV_V3_0' },
-            { label: 'Lancôme Philippines', locale: 'PH', spaceDB: 'Lancome_Maindb_SCV_V3_0' },
-            { label: "L'Oréal Philippines CPD", locale: 'PH', spaceDB: 'LOrealCPD_DB' },
-            { label: "L'Oréal Professional Philippines", locale: 'PH', spaceDB: 'LOrealProfessional_DB' },
+    // Garnier
+    { label: 'Garnier Indonesia', locale: 'ID', spaceDB: 'Garnier_DB', seedDB: 'Garnier_SEEDLIST' },
 
-            // Singapore (SG)
-            { label: 'Aesop Singapore', locale: 'SG', spaceDB: 'Aesop_DB' },
-            { label: 'Armani Singapore', locale: 'SG', spaceDB: 'GAB_Maindb_SCV_V3_0' },
-            { label: 'Cerave Singapore', locale: 'SG', spaceDB: 'Cerave_DB' },
-            { label: 'HelenaRubinstein Singapore', locale: 'SG', spaceDB: 'HelenaRubinstein_DB' },
-            { label: "Kiehl's Singapore", locale: 'SG', spaceDB: 'Kiehls_Maindb_SCV_V3_0' },
-            { label: 'La Roche-Posay Singapore', locale: 'SG', spaceDB: 'LaRochePosay_DB' },
-            { label: 'LSS Singapore', locale: 'SG', spaceDB: 'LSS_DB' },
-            { label: 'Lancôme Singapore', locale: 'SG', spaceDB: 'Lancome_Maindb_SCV_V3_0' },
-            { label: 'SkinCeuticals Singapore', locale: 'SG', spaceDB: 'SkinCeuticals_DB' },
-            { label: 'Vichy Singapore', locale: 'SG', spaceDB: 'Vichy_DB' },
-            { label: 'Yves Saint Laurent Singapore', locale: 'SG', spaceDB: 'YSL_Maindb_SCV_V3_0' },
+    // Helena Rubinstein
+    { label: 'HelenaRubinstein Malaysia', locale: 'MY', spaceDB: 'HelenaRubinstein_DB', seedDB: 'HelenaRubinstein_SEEDLIST' },
+    { label: 'HelenaRubinstein Singapore', locale: 'SG', spaceDB: 'HelenaRubinstein_DB', seedDB: 'HelenaRubinstein_SEEDLIST' },
 
-            // Thailand (TH)
-            { label: 'Aesop Thailand', locale: 'TH', spaceDB: 'Aesop_DB' },
-            { label: 'Armani Thailand', locale: 'TH', spaceDB: 'GAB_Maindb_SCV_V3_0' },
-            { label: 'CeraVe Thailand', locale: 'TH', spaceDB: 'CeraVe_DB' },
-            { label: 'CPD Thailand', locale: 'TH', spaceDB: 'CPD_DB' },
-            { label: "Kiehl's Thailand", locale: 'TH', spaceDB: 'Kiehls_Maindb_SCV_V3_0' },
-            { label: 'Lancôme Thailand', locale: 'TH', spaceDB: 'Lancome_Maindb_SCV_V3_0' },
-            { label: 'Shu Uemura Thailand', locale: 'TH', spaceDB: 'ShuUemura_DB' },
-            { label: 'Vichy Thailand', locale: 'TH', spaceDB: 'Vichy_DB' },
-            { label: 'Yves Saint Laurent Thailand', locale: 'TH', spaceDB: 'YSL_Maindb_SCV_V3_0' },
+    // Kérastase / Kerastase
+    { label: 'Kérastase Malaysia', locale: 'MY', spaceDB: 'Kerastase_DB', seedDB: 'Kerastase_SEEDLIST' },
+    { label: 'Kerastase India', locale: 'IN', spaceDB: 'Kerastase_DB', seedDB: 'Kerastase_SEEDLIST' },
+    { label: 'Kérastase Indonesia', locale: 'ID', spaceDB: 'Kerastase_DB', seedDB: 'Kerastase_SEEDLIST' },
+    { label: 'Kerastase Philippines', locale: 'PH', spaceDB: 'Kerastase_DB', seedDB: 'Kerastase_SEEDLIST' },
 
-            // Vietnam (VN)
-            { label: 'CPD VN', locale: 'VN', spaceDB: 'CPD_DB' },
-            { label: "Kiehl's Vietnam", locale: 'VN', spaceDB: 'Kiehls_Maindb_SCV_V3_0' },
-            { label: 'Lancôme Vietnam', locale: 'VN', spaceDB: 'Lancome_Maindb_SCV_V3_0' },
-            { label: 'LDB Vietnam', locale: 'VN', spaceDB: 'LDB_DB' }
-        ];
+    // Kiehl's
+    { label: "Kiehl's Malaysia", locale: 'MY', spaceDB: 'Kiehls_Maindb_SCV_V3_0', seedDB: "Kiehls_SEEDLIST" },
+    { label: "Kiehl's Indonesia", locale: 'ID', spaceDB: 'Kiehls_Maindb_SCV_V3_0', seedDB: "Kiehls_SEEDLIST" },
+    { label: "Kiehl's Philippines", locale: 'PH', spaceDB: 'Kiehls_Maindb_SCV_V3_0', seedDB: "Kiehls_SEEDLIST" },
+    { label: "Kiehl's Singapore", locale: 'SG', spaceDB: 'Kiehls_Maindb_SCV_V3_0', seedDB: "Kiehls_SEEDLIST" },
+    { label: "Kiehl's Thailand", locale: 'TH', spaceDB: 'Kiehls_Maindb_SCV_V3_0', seedDB: "Kiehls_SEEDLIST" },
+    { label: "Kiehl's Vietnam", locale: 'VN', spaceDB: 'Kiehls_Maindb_SCV_V3_0', seedDB: "Kiehls_SEEDLIST" },
+
+    // La Roche-Posay
+    { label: 'La Roche-Posay Malaysia', locale: 'MY', spaceDB: 'LaRochePosay_DB', seedDB: 'LaRochePosay_SEEDLIST' },
+    { label: 'La Roche-Posay GCC', locale: 'AE', spaceDB: 'LaRochePosay_DB', seedDB: 'LaRochePosay_SEEDLIST' },
+    { label: 'La Roche Posay Indonesia', locale: 'ID', spaceDB: 'LaRochePosay_DB', seedDB: 'LaRochePosay_SEEDLIST' },
+    { label: 'La Roche-Posay Singapore', locale: 'SG', spaceDB: 'LaRochePosay_DB', seedDB: 'LaRochePosay_SEEDLIST' },
+
+    // Lancôme
+    { label: 'Lancome India', locale: 'IN', spaceDB: 'Lancome_Maindb_SCV_V3_0', seedDB: 'Lancome_SEEDLIST' },
+    { label: 'Lancôme Indonesia', locale: 'ID', spaceDB: 'Lancome_Maindb_SCV_V3_0', seedDB: 'Lancome_SEEDLIST' },
+    { label: 'Lancôme Philippines', locale: 'PH', spaceDB: 'Lancome_Maindb_SCV_V3_0', seedDB: 'Lancome_SEEDLIST' },
+    { label: 'Lancôme Singapore', locale: 'SG', spaceDB: 'Lancome_Maindb_SCV_V3_0', seedDB: 'Lancome_SEEDLIST' },
+    { label: 'Lancôme Thailand', locale: 'TH', spaceDB: 'Lancome_Maindb_SCV_V3_0', seedDB: 'Lancome_SEEDLIST' },
+    { label: 'Lancôme Vietnam', locale: 'VN', spaceDB: 'Lancome_Maindb_SCV_V3_0', seedDB: 'Lancome_SEEDLIST' },
+
+    // LDB
+    { label: 'LDB Vietnam', locale: 'VN', spaceDB: 'LDB_DB', seedDB: 'LDB_SEEDLIST' },
+
+    // L'Oréal / L'Oreal
+    { label: "L'Oreal Malaysia", locale: 'MY', spaceDB: 'LOreal_DB', seedDB: "LOreal_SEEDLIST" },
+    { label: "L'Oréal Paris Indonesia", locale: 'ID', spaceDB: 'LOrealParis_DB', seedDB: "LOrealParis_SEEDLIST" },
+    { label: "L'Oréal Professional Indonesia", locale: 'ID', spaceDB: 'LOrealProfessional_DB', seedDB: "LOrealProfessional_SEEDLIST" },
+    { label: "L'Oréal Philippines CPD", locale: 'PH', spaceDB: 'LOrealCPD_DB', seedDB: "LOrealCPD_SEEDLIST" },
+    { label: "L'Oréal Professional Philippines", locale: 'PH', spaceDB: 'LOrealProfessional_DB', seedDB: "LOrealProfessional_SEEDLIST" },
+
+    // LSS
+    { label: 'LSS Malaysia', locale: 'MY', spaceDB: 'LSS_DB', seedDB: 'LSS_SEEDLIST' },
+    { label: 'LSS India', locale: 'IN', spaceDB: 'LSS_DB', seedDB: 'LSS_SEEDLIST' },
+    { label: 'LSS Indonesia', locale: 'ID', spaceDB: 'LSS_DB', seedDB: 'LSS_SEEDLIST' },
+    { label: 'LSS Singapore', locale: 'SG', spaceDB: 'LSS_DB', seedDB: 'LSS_SEEDLIST' },
+
+    // Shu Uemura
+    { label: 'Shu Uemura Malaysia', locale: 'MY', spaceDB: 'ShuUemura_DB', seedDB: 'ShuUemura_SEEDLIST' },
+    { label: 'Shu Uemura Thailand', locale: 'TH', spaceDB: 'ShuUemura_DB', seedDB: 'ShuUemura_SEEDLIST' },
+
+    // SkinCeuticals / Skinceuticals
+    { label: 'Skinceuticals GCC', locale: 'AE', spaceDB: 'Skinceuticals_DB', seedDB: 'Skinceuticals_SEEDLIST' },
+    { label: 'SkinCeuticals Singapore', locale: 'SG', spaceDB: 'SkinCeuticals_DB', seedDB: 'SkinCeuticals_SEEDLIST' },
+
+    // Vichy
+    { label: 'Vichy GCC', locale: 'AE', spaceDB: 'Vichy_DB', seedDB: 'Vichy_SEEDLIST' },
+    { label: 'Vichy Singapore', locale: 'SG', spaceDB: 'Vichy_DB', seedDB: 'Vichy_SEEDLIST' },
+    { label: 'Vichy Thailand', locale: 'TH', spaceDB: 'Vichy_DB', seedDB: 'Vichy_SEEDLIST' },
+
+    // Yves Saint Laurent
+    { label: 'Yves Saint Laurent Malaysia', locale: 'MY', spaceDB: 'YSL_Maindb_SCV_V3_0', seedDB: 'YSL_SEEDLIST' },
+    { label: 'Yves Saint Laurent Indonesia', locale: 'ID', spaceDB: 'YSL_Maindb_SCV_V3_0', seedDB: 'YSL_SEEDLIST' },
+    { label: 'Yves Saint Laurent Singapore', locale: 'SG', spaceDB: 'YSL_Maindb_SCV_V3_0', seedDB: 'YSL_SEEDLIST' },
+    { label: 'Yves Saint Laurent Thailand', locale: 'TH', spaceDB: 'YSL_Maindb_SCV_V3_0', seedDB: 'YSL_SEEDLIST' },
+];
 
         // ---------- Customer type mapping ----------
         const customerTypeMap = {
