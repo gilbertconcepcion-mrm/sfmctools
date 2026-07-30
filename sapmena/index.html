@@ -1666,6 +1666,7 @@ AND EXISTS(
                 const brandData = getCurrentBrandData();
                 const localeData = localeMap[brandData.locale];
                 const localeLabel = localeData ? localeData.label : 'SG';
+                const seedLabel = brandData.seedDB;
                 
                 const seedQuery = `SELECT 
   COALESCE(e.Subscriber_Key, s.Subscriber_Key) AS Subscriber_Key
@@ -1677,8 +1678,8 @@ AND EXISTS(
 , 'SEED' AS Record_Type 
 , '${localeLabel}' AS Locale
 
-FROM [${localeLabel}_YSL_SEED] s 
-LEFT JOIN [${localeLabel}_YSL_AD_MYSLFEDTIntenseLaunch_EDM1_20260727_NPD_ENTRY] e 
+FROM [${seedLabel}] s 
+LEFT JOIN [${localeLabel}_CAMPAIGN_NAME_03242026_ENTRY] e 
     ON e.EMAIL = s.EMAIL 
 
 WHERE s.EMAIL != '' AND s.EMAIL IS NOT NULL`;
