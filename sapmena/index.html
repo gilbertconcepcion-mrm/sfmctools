@@ -1687,7 +1687,10 @@ FROM [${seedLabel}] s
 LEFT JOIN [${localeLabel}_CAMPAIGN_NAME_03242026_ENTRY] e 
     ON e.EMAIL = s.EMAIL 
 
-WHERE s.EMAIL != '' AND s.EMAIL IS NOT NULL`;
+WHERE (s.EMAIL != '' AND s.EMAIL IS NOT NULL)
+ AND (s.MOBILE != '' AND s.MOBILE IS NOT NULL)                   
+
+`;
 
                 currentDisplayedQuery = seedQuery;
                 try {
