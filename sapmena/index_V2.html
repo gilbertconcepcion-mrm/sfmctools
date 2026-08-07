@@ -1,0 +1,3156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SpaceDB Query Builder</title>
+
+    <!-- Highlight.js: Atom One Dark theme -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css" />
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        html, body {
+            height: 100%;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            padding: 20px;
+        }
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1400px;
+            width: 100%;
+            height: 100%;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+            padding: 30px 25px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+            margin-bottom: 6px;
+        }
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        h1 {
+            font-size: 24px;
+            color: #1e293b;
+            margin-bottom: 0;
+        }
+        .snippets-btn {
+            padding: 8px 20px;
+            border: 2px solid #1e3a8a;
+            border-radius: 30px;
+            background: transparent;
+            color: #1e3a8a;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .snippets-btn:hover {
+            background: #1e3a8a;
+            color: #fff;
+            transform: translateY(-2px);
+        }
+        .subhead {
+            color: #64748b;
+            margin-bottom: 20px;
+            font-size: 15px;
+            flex-shrink: 0;
+        }
+
+        .control-bar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 20px 30px;
+            margin-bottom: 15px;
+            flex-shrink: 0;
+        }
+        .selector-group {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 12px 20px;
+        }
+        .selector-group label {
+            font-weight: 500;
+            color: #1e293b;
+            font-size: 15px;
+            margin-right: 4px;
+        }
+        .selector-group select {
+            padding: 8px 16px;
+            border-radius: 30px;
+            border: 1px solid #d1d9e3;
+            background: #f8fafc;
+            font-size: 14px;
+            font-weight: 500;
+            color: #1e293b;
+            cursor: pointer;
+            outline: none;
+            transition: border 0.2s;
+            min-width: 200px;
+        }
+        .selector-group select:hover {
+            border-color: #94a3b8;
+        }
+        .selector-group select:focus {
+            border-color: #1e3a8a;
+            box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.15);
+        }
+        .btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .btn {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            background: #e9edf2;
+            color: #1e293b;
+            transition: all 0.2s ease;
+        }
+        .btn:hover {
+            background: #d1d9e3;
+            transform: translateY(-2px);
+        }
+        .btn.active {
+            background: #1e3a8a;
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(30, 58, 138, 0.3);
+        }
+        .btn.active:hover {
+            background: #1e3a8a;
+        }
+        .btn.ai-btn.active {
+            background: #7c3aed;
+            box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+        }
+        .btn.ai-btn.active:hover {
+            background: #6d28d9;
+        }
+        .btn.seed-btn.active {
+            background: #059669;
+            box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
+        }
+        .btn.seed-btn.active:hover {
+            background: #047857;
+        }
+
+        /* ---------- Settings display ---------- */
+        .settings-display {
+            background: #f1f5f9;
+            border-radius: 12px;
+            padding: 12px 18px;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            font-size: 14px;
+            color: #1e293b;
+            flex-shrink: 0;
+        }
+        .settings-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .settings-item .label {
+            font-weight: 500;
+            color: #475569;
+            min-width: 110px;
+        }
+        .settings-item .value {
+            font-weight: 600;
+            color: #0f172a;
+            background: #fff;
+            padding: 2px 14px;
+            border-radius: 30px;
+            border: 1px solid #d1d9e3;
+        }
+
+        /* ---------- Side-by-side layout ---------- */
+        .main-layout {
+            display: flex;
+            gap: 20px;
+            flex: 1;
+            min-height: 0;
+            align-items: stretch;
+        }
+
+        /* --- LEFT PANEL --- */
+        .left-panel {
+            flex: 0 0 540px;
+            min-width: 420px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            height: 100%;
+        }
+
+        /* --- CHECKBOX COLUMN --- */
+        .checkbox-column {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 12px 16px;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            overflow-y: auto;
+            flex: 1;
+            min-height: 0;
+            overflow-x: hidden;
+        }
+        .checkbox-column label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #1e293b;
+            cursor: pointer;
+            user-select: none;
+            padding: 3px 0;
+            flex-wrap: wrap;
+        }
+        .checkbox-column label.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+        .checkbox-column label.disabled input {
+            cursor: not-allowed;
+        }
+        .checkbox-column input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: #1e3a8a;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        /* --- Flat input boxes --- */
+        .checkbox-column input[type="number"],
+        .checkbox-column input[type="date"],
+        .checkbox-column input[type="text"] {
+            padding: 2px 6px;
+            border-radius: 0px;
+            border: 1px solid #d1d9e3;
+            text-align: center;
+            font-size: 13px;
+            font-weight: 500;
+            background: #fff;
+            color: #1e293b;
+            outline: none;
+        }
+        .checkbox-column input[type="date"] {
+            width: 150px;
+            text-align: left;
+            padding: 2px 8px;
+            font-family: 'Segoe UI', monospace;
+            font-weight: 400;
+        }
+        .checkbox-column input[type="text"] {
+            text-align: left;
+            padding: 2px 8px;
+            font-family: 'Segoe UI', monospace;
+            font-weight: 400;
+        }
+        .checkbox-column input[type="number"]:focus,
+        .checkbox-column input[type="date"]:focus,
+        .checkbox-column input[type="text"]:focus {
+            border-color: #1e3a8a;
+            box-shadow: 0 0 0 2px rgba(30, 58, 138, 0.15);
+        }
+
+        /* --- Date components --- */
+        .date-components {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+        .date-components select {
+            padding: 2px 4px;
+            border: 1px solid #d1d9e3;
+            border-radius: 0px;
+            font-size: 13px;
+            font-weight: 500;
+            background: #fff;
+            color: #1e293b;
+            outline: none;
+            cursor: pointer;
+        }
+        .date-components select:focus {
+            border-color: #1e3a8a;
+            box-shadow: 0 0 0 2px rgba(30, 58, 138, 0.15);
+        }
+        .date-components select.year-select {
+            width: 70px;
+        }
+        .date-components select.month-select {
+            width: 60px;
+        }
+        .date-components select.day-select {
+            width: 55px;
+        }
+        .date-separator {
+            color: #94a3b8;
+            font-weight: normal;
+            padding: 0 2px;
+        }
+
+        /* --- Date range with aligned rows --- */
+        .date-range-container {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-left: 24px;
+            width: 100%;
+            max-width: 350px;
+        }
+        .date-range-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .date-range-row .date-range-label {
+            font-size: 13px;
+            color: #64748b;
+            font-weight: normal;
+            min-width: 35px;
+        }
+        .date-range-row .date-components {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* --- Previous Entry --- */
+        .prev-entry-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 2px;
+            width: 100%;
+            padding: 3px 0;
+        }
+        .prev-entry-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+        .prev-entry-row input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: #1e3a8a;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .prev-entry-row span {
+            font-size: 14px;
+            font-weight: 500;
+            color: #1e293b;
+        }
+        .prev-entry-input {
+            width: 100%;
+            max-width: 280px;
+            padding: 4px 8px;
+            border-radius: 0px;
+            border: 1px solid #d1d9e3;
+            font-size: 13px;
+            font-weight: 500;
+            background: #fff;
+            color: #1e293b;
+            outline: none;
+            margin-left: 24px;
+        }
+        .prev-entry-input:focus {
+            border-color: #1e3a8a;
+            box-shadow: 0 0 0 2px rgba(30, 58, 138, 0.15);
+        }
+
+        /* --- Record Type --- */
+        .record-type-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 3px 0;
+        }
+        .record-type-wrapper label {
+            font-weight: 500;
+            color: #1e293b;
+            font-size: 14px;
+            cursor: default;
+        }
+        .record-type-wrapper input[type="text"] {
+            padding: 4px 8px;
+            border: 1px solid #d1d9e3;
+            border-radius: 0px;
+            font-size: 13px;
+            font-weight: 500;
+            background: #fff;
+            color: #1e293b;
+            outline: none;
+            width: 150px;
+        }
+        .record-type-wrapper input[type="text"]:focus {
+            border-color: #1e3a8a;
+            box-shadow: 0 0 0 2px rgba(30, 58, 138, 0.15);
+        }
+
+        /* --- Voucher Input --- */
+        .voucher-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 3px 0;
+        }
+        .voucher-wrapper label {
+            font-weight: 500;
+            color: #1e293b;
+            font-size: 14px;
+            cursor: default;
+        }
+        .voucher-wrapper input[type="text"] {
+            padding: 4px 8px;
+            border: 1px solid #d1d9e3;
+            border-radius: 0px;
+            font-size: 13px;
+            font-weight: 500;
+            background: #fff;
+            color: #1e293b;
+            outline: none;
+            width: 150px;
+        }
+        .voucher-wrapper input[type="text"]:focus {
+            border-color: #1e3a8a;
+            box-shadow: 0 0 0 2px rgba(30, 58, 138, 0.15);
+        }
+
+        /* --- Filter Rows --- */
+        .filter-row {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 4px;
+            padding: 3px 0;
+            width: 100%;
+        }
+        .filter-top-line {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            cursor: pointer;
+        }
+        .filter-top-line input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: #1e3a8a;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .filter-label-text {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .filter-options {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-weight: normal;
+            white-space: nowrap;
+        }
+        .filter-options label {
+            display: inline-flex;
+            align-items: center;
+            gap: 2px;
+            font-weight: normal;
+            font-size: 13px;
+            cursor: pointer;
+            padding: 0;
+            white-space: nowrap;
+        }
+        .filter-options input[type="radio"] {
+            width: 13px;
+            height: 13px;
+            accent-color: #1e3a8a;
+            cursor: pointer;
+            margin: 0;
+        }
+        .filter-input-group {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            white-space: nowrap;
+        }
+        .filter-input-group input[type="number"] {
+            width: 50px;
+        }
+        .filter-absolute-inputs {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-left: 24px;
+            width: 100%;
+        }
+        .filter-absolute-inputs.hidden {
+            display: none;
+        }
+        .filter-input-group.hidden {
+            display: none;
+        }
+        .filter-extra-options {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-left: 0px;
+            font-weight: normal;
+            width: 100%;
+        }
+        .filter-extra-options label {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-weight: normal;
+            font-size: 13px;
+            cursor: pointer;
+            padding: 0;
+            white-space: nowrap;
+            min-width: 120px;
+        }
+        .filter-extra-options input[type="checkbox"] {
+            width: 14px;
+            height: 14px;
+            accent-color: #1e3a8a;
+            cursor: pointer;
+            margin: 0;
+        }
+        .filter-extra-options .filter-input-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        .filter-extra-options .filter-input-group input[type="text"] {
+            width: 100%;
+            min-width: 200px;
+            padding: 4px 8px;
+            border: 1px solid #d1d9e3;
+            border-radius: 0px;
+            font-size: 13px;
+            font-weight: 400;
+            background: #fff;
+            color: #1e293b;
+            outline: none;
+            text-align: left;
+        }
+        .filter-extra-options .filter-input-group input[type="text"]:focus {
+            border-color: #1e3a8a;
+            box-shadow: 0 0 0 2px rgba(30, 58, 138, 0.15);
+        }
+        .filter-extra-inputs {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            margin-left: 0px;
+            width: 100%;
+            max-width: 400px;
+        }
+        .filter-extra-inputs-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+        }
+        .filter-extra-inputs-row label {
+            font-weight: normal;
+            min-width: 70px;
+            padding: 0;
+            cursor: default;
+        }
+        .filter-extra-inputs-row input[type="text"] {
+            width: 100%;
+            padding: 4px 8px;
+            border: 1px solid #d1d9e3;
+            border-radius: 0px;
+            font-size: 13px;
+            font-weight: 400;
+            background: #fff;
+            color: #1e293b;
+            outline: none;
+        }
+        .filter-extra-inputs-row input[type="text"]:focus {
+            border-color: #1e3a8a;
+            box-shadow: 0 0 0 2px rgba(30, 58, 138, 0.15);
+        }
+        .filter-radio-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-left: 24px;
+        }
+        .filter-radio-group label {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-weight: normal;
+            font-size: 13px;
+            cursor: pointer;
+            padding: 0;
+            white-space: nowrap;
+        }
+        .filter-radio-group input[type="radio"] {
+            width: 13px;
+            height: 13px;
+            accent-color: #1e3a8a;
+            cursor: pointer;
+            margin: 0;
+        }
+        .filter-config-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            margin-left: 24px;
+            width: 100%;
+        }
+        .customer-select-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 4px 0;
+        }
+        .customer-select-row select {
+            padding: 4px 8px;
+            border: 1px solid #d1d9e3;
+            border-radius: 0px;
+            font-size: 13px;
+            background: #fff;
+            color: #1e293b;
+            outline: none;
+            min-width: 150px;
+        }
+        .customer-select-row select:focus {
+            border-color: #1e3a8a;
+            box-shadow: 0 0 0 2px rgba(30, 58, 138, 0.15);
+        }
+
+        /* ---------- Query column ---------- */
+        .query-column {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .query-wrapper {
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #282c34;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+        .query-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 18px;
+            background: #1e2229;
+            border-bottom: 1px solid #3e4452;
+            flex-shrink: 0;
+        }
+        .query-label {
+            color: #abb2bf;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .copy-btn {
+            background: transparent;
+            border: 1px solid #5c6370;
+            color: #abb2bf;
+            padding: 6px 16px;
+            border-radius: 30px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        .copy-btn:hover {
+            background: #3e4452;
+            border-color: #abb2bf;
+            color: #fff;
+        }
+        .copy-btn.copied {
+            background: #98c379;
+            border-color: #98c379;
+            color: #282c34;
+        }
+
+        .query-pre {
+            flex: 1;
+            overflow: auto;
+            margin: 0;
+            padding: 0;
+            background: #282c34;
+        }
+
+        #queryCode {
+            display: block;
+            padding: 24px 20px;
+            font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+            font-size: 14px;
+            line-height: 1.7;
+            white-space: pre-wrap;
+            word-break: break-word;
+            tab-size: 2;
+            background: #282c34 !important;
+            color: #abb2bf !important;
+        }
+
+        /* ---------- FORCED STYLES ---------- */
+        #queryCode,
+        #queryCode.hljs,
+        #queryCode * {
+            background: #282c34 !important;
+            color: #abb2bf !important;
+        }
+
+        #queryCode .hljs-keyword,
+        #queryCode .hljs-selector-tag,
+        #queryCode .hljs-literal,
+        #queryCode .hljs-title,
+        #queryCode .hljs-section,
+        #queryCode .hljs-doctag,
+        #queryCode .hljs-type,
+        #queryCode .hljs-name,
+        #queryCode .hljs-strong {
+            color: #c678dd !important;
+        }
+        #queryCode .hljs-string,
+        #queryCode .hljs-meta,
+        #queryCode .hljs-bullet,
+        #queryCode .hljs-symbol,
+        #queryCode .hljs-addition {
+            color: #98c379 !important;
+        }
+        #queryCode .hljs-comment,
+        #queryCode .hljs-quote {
+            color: #5c6370 !important;
+        }
+        #queryCode .hljs-number,
+        #queryCode .hljs-built_in,
+        #queryCode .hljs-attr {
+            color: #d19a66 !important;
+        }
+        #queryCode .hljs-variable,
+        #queryCode .hljs-template-variable,
+        #queryCode .hljs-tag,
+        #queryCode .hljs-deletion {
+            color: #e06c75 !important;
+        }
+        #queryCode .hljs-function,
+        #queryCode .hljs-class {
+            color: #61afef !important;
+        }
+
+        .footer {
+            margin-top: 16px;
+            color: #1e293b;
+            font-size: 13px;
+            text-align: left;
+            flex-shrink: 0;
+            padding: 8px 4px;
+            line-height: 1.6;
+        }
+        .footer .summary-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            align-items: baseline;
+        }
+        .footer .summary-item {
+            font-weight: 500;
+            color: #1e293b;
+        }
+        .footer .summary-item .label {
+            color: #64748b;
+            font-weight: 400;
+        }
+        .footer .summary-item .value {
+            color: #1e3a8a;
+            font-weight: 600;
+        }
+        .hidden {
+            display: none !important;
+        }
+
+        @media (max-width: 768px) {
+            .main-layout {
+                flex-direction: column;
+                flex: 1;
+                min-height: 0;
+            }
+            .left-panel {
+                flex: none;
+                width: 100%;
+                min-width: 0;
+                height: auto;
+                flex: 0 0 auto;
+                max-height: 50vh;
+            }
+            .checkbox-column {
+                max-height: 100%;
+                flex-direction: row;
+                flex-wrap: wrap;
+                gap: 4px 16px;
+                align-content: flex-start;
+                overflow-y: auto;
+                flex: 1;
+            }
+            .checkbox-column label {
+                flex: 0 0 auto;
+                width: auto;
+            }
+            .prev-entry-wrapper {
+                width: auto;
+                flex: 0 0 auto;
+            }
+            .prev-entry-input {
+                max-width: 180px;
+                margin-left: 24px;
+            }
+            .checkbox-column input[type="date"] {
+                width: 130px;
+            }
+            .checkbox-column input[type="text"] {
+                width: 140px;
+            }
+            .filter-row {
+                width: auto;
+                flex: 0 0 auto;
+            }
+            .date-range-container {
+                margin-left: 24px;
+                max-width: 100%;
+            }
+            .filter-extra-options {
+                margin-left: 0px;
+                flex-wrap: wrap;
+            }
+            .filter-extra-options .filter-input-group {
+                min-width: 150px;
+            }
+            .filter-extra-options .filter-input-group input[type="text"] {
+                min-width: 150px;
+            }
+            .filter-extra-inputs {
+                margin-left: 0px;
+                max-width: 100%;
+            }
+            .filter-config-group {
+                margin-left: 0px;
+            }
+            .filter-radio-group {
+                margin-left: 0px;
+            }
+            .settings-display {
+                flex-shrink: 0;
+            }
+            .query-column {
+                min-height: 300px;
+                flex: 1;
+                height: auto;
+            }
+            .query-wrapper {
+                height: 100%;
+            }
+            .customer-select-row {
+                flex-wrap: wrap;
+            }
+            .customer-select-row select {
+                min-width: 120px;
+            }
+            .date-components select.year-select {
+                width: 60px;
+            }
+            .date-components select.month-select {
+                width: 50px;
+            }
+            .date-components select.day-select {
+                width: 45px;
+            }
+            .date-range-row .date-range-label {
+                min-width: 30px;
+            }
+            .header-row {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+            .footer .summary-row {
+                flex-direction: column;
+                gap: 6px;
+            }
+        }
+        @media (max-width: 600px) {
+            .control-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .selector-group {
+                flex-wrap: wrap;
+            }
+            .btn-group {
+                flex-direction: column;
+            }
+            .btn {
+                text-align: center;
+            }
+            .query-header {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+            #queryCode {
+                font-size: 12px;
+                padding: 16px 14px;
+            }
+            .settings-item .label {
+                min-width: 80px;
+            }
+            .checkbox-column {
+                max-height: 45vh;
+            }
+            .checkbox-column input[type="date"] {
+                width: 120px;
+            }
+            .checkbox-column input[type="text"] {
+                width: 120px;
+            }
+            .date-range-container {
+                margin-left: 24px;
+                max-width: 100%;
+            }
+            .left-panel {
+                max-height: 50vh;
+            }
+            .filter-extra-inputs-row {
+                flex-wrap: wrap;
+            }
+            .filter-extra-inputs-row label {
+                min-width: 60px;
+            }
+            .filter-config-group {
+                flex-wrap: wrap;
+            }
+            .customer-select-row {
+                flex-wrap: wrap;
+            }
+            .customer-select-row select {
+                min-width: 100px;
+                width: 100%;
+            }
+            .date-components select.year-select {
+                width: 55px;
+            }
+            .date-components select.month-select {
+                width: 45px;
+            }
+            .date-components select.day-select {
+                width: 40px;
+            }
+            .date-range-row .date-range-label {
+                min-width: 25px;
+                font-size: 11px;
+            }
+            .filter-extra-options .filter-input-group {
+                min-width: 120px;
+            }
+            .filter-extra-options .filter-input-group input[type="text"] {
+                min-width: 120px;
+            }
+            .record-type-wrapper {
+                flex-wrap: wrap;
+            }
+            .voucher-wrapper {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header-row">
+            <div class="header-left">
+                <h1>Space DB Query Builder</h1>
+                <!-- <a href="snippets.html" class="snippets-btn">Snippets</a> -->
+            </div>
+        </div>
+        <div class="subhead">Choose a brand – sets DB, locale, and country code. Checkbox/Input for settings.</div>
+
+        <div class="control-bar">
+            <div class="selector-group">
+                <label for="brandSelect">Brand:</label>
+                <select id="brandSelect">
+                    <!-- populated by JS -->
+                </select>
+            </div>
+            <div class="btn-group">
+                <button class="btn active" data-query="prospect">PROSPECT</button>
+                <button class="btn" data-query="sampler">SAMPLER</button>
+                <button class="btn" data-query="customer">CUSTOMER</button>
+                <button class="btn ai-btn" data-query="ai">AI AUDIENCE</button>
+                <button class="btn seed-btn" data-query="seed">SEED</button>
+            </div>
+        </div>
+
+        <!-- Main side-by-side layout -->
+        <div class="main-layout">
+            <!-- LEFT PANEL -->
+            <div class="left-panel">
+                <!-- Checkbox column -->
+                <div class="checkbox-column" id="checkboxGroup">
+                    <!-- Record Type -->
+                    <div class="record-type-wrapper">
+                        <label for="recordTypeInput">Record Type:</label>
+                        <input type="text" id="recordTypeInput" value="SMS1" />
+                    </div>
+
+                    <!-- Previous Entry Join -->
+                    <div class="prev-entry-wrapper">
+                        <label class="prev-entry-row">
+                            <input type="checkbox" id="chkPreviousEntry" />
+                            <span>Previous Touchpoint DE</span>
+                        </label>
+                        <input type="text" id="previousEntryTable" value="previous_entry_DE" class="prev-entry-input hidden" />
+                    </div>
+
+                    <!-- Email Opt-in -->
+                    <div class="filter-row" id="emailOptinRow">
+                        <div class="filter-top-line">
+                            <input type="checkbox" id="chkEmailOptin" checked />
+                            <span>Email Opt-in</span>
+                        </div>
+                    </div>
+
+                    <!-- SMS Opt-in -->
+                    <div class="filter-row" id="smsOptinRow">
+                        <div class="filter-top-line">
+                            <input type="checkbox" id="chkSmsOptin" checked />
+                            <span>SMS Opt-in</span>
+                        </div>
+                    </div>
+
+                    <!-- EDM Suppression -->
+                    <div class="filter-row" id="edmSuppressionRow">
+                        <div class="filter-top-line">
+                            <input type="checkbox" id="chkEDMSuppression" checked />
+                            <span>EDM Suppression</span>
+                            <span class="filter-input-group">
+                                <input type="text" id="edmSuppressionTable" value="AutosuppresionDE" style="width: 180px;" />
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- SMS Suppression -->
+                    <div class="filter-row" id="smsSuppressionRow">
+                        <div class="filter-top-line">
+                            <input type="checkbox" id="chkSMSSuppression" checked />
+                            <span>SMS Suppression</span>
+                            <span class="filter-input-group">
+                                <input type="text" id="smsSuppressionTable" value="SMS_optout_de" style="width: 180px;" />
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- WhatsApp Unsubscribe -->
+                    <label><input type="checkbox" id="chkWhatsapp" /> WhatsApp Unsubscribe</label>
+
+                    <!-- Engagements -->
+                    <label>
+                        <input type="checkbox" id="chkEngagements" />
+                        <span class="engagements-label-text">
+                            <span>Engagements (P</span>
+                            <input type="number" id="engagementsMonths" value="6" min="1" max="99" step="1" style="width:50px;" />
+                            <span>M Open)</span>
+                        </span>
+                    </label>
+
+                    <!-- Vouchers -->
+                    <!-- <div class="voucher-wrapper">
+                        <label for="voucherInput">Voucher:</label>
+                        <input type="text" id="voucherInput" value="O350" />
+                    </div> -->
+                    <label><input type="checkbox" id="chkVouchers" /> Voucher<input type="text" id="voucherInput" value="O350" /></label>
+
+                    <!-- Prospect (PROSPECT only) - Now radio only -->
+                    <div id="prospectRow" class="filter-row hidden">
+                        <div class="filter-top-line">
+                            <span class="filter-label-text">
+                                <span>Prospect:</span>
+                                <span class="filter-options">
+                                    <label><input type="radio" name="prospectType" value="relative" checked /> Relative</label>
+                                    <label><input type="radio" name="prospectType" value="absolute" /> Absolute</label>
+                                </span>
+                            </span>
+                        </div>
+                        <div id="prospectRelativeGroup" class="filter-input-group hidden" style="margin-left:68px;">
+                            <input type="number" id="prospectMonths" value="6" min="1" max="99" step="1" />
+                            <span>months</span>
+                        </div>
+                        <div id="prospectAbsoluteGroup" class="filter-absolute-inputs hidden">
+                            <div class="date-range-container">
+                                <div class="date-range-row">
+                                    <span class="date-range-label">From:</span>
+                                    <div class="date-components" id="prospectStartDateComponents">
+                                        <select class="year-select" id="prospectStartYear"></select>
+                                        <span class="date-separator">-</span>
+                                        <select class="month-select" id="prospectStartMonth"></select>
+                                        <span class="date-separator">-</span>
+                                        <select class="day-select" id="prospectStartDay"></select>
+                                    </div>
+                                </div>
+                                <div class="date-range-row">
+                                    <span class="date-range-label">To:</span>
+                                    <div class="date-components" id="prospectEndDateComponents">
+                                        <select class="year-select" id="prospectEndYear"></select>
+                                        <span class="date-separator">-</span>
+                                        <select class="month-select" id="prospectEndMonth"></select>
+                                        <span class="date-separator">-</span>
+                                        <select class="day-select" id="prospectEndDay"></select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Prospect Loyalty (PROSPECT only) -->
+                    <div id="prospectLoyaltyRow" class="filter-row hidden">
+                        <div class="filter-top-line">
+                            <span>Exclusion (adjust as BU's loyalty values)</span>
+                            <span class="filter-input-group">
+                                <input type="text" id="prospectLoyaltyTiers" value="'BLACK GOLD','GOLD','ROSE','BLACK','SILVER'" style="width: 380px;" />
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Sampler (SAMPLER only) - Now radio only -->
+                    <div id="samplerRow" class="filter-row hidden">
+                        <div class="filter-top-line">
+                            <span class="filter-label-text">
+                                <span>Sampler:</span>
+                                <span class="filter-options">
+                                    <label><input type="radio" name="samplerType" value="relative" checked /> Relative</label>
+                                    <label><input type="radio" name="samplerType" value="absolute" /> Absolute</label>
+                                </span>
+                            </span>
+                        </div>
+                        <div id="samplerRelativeGroup" class="filter-input-group hidden" style="margin-left:24px;">
+                            <input type="number" id="samplerMonths" value="3" min="1" max="99" step="1" />
+                            <span>months</span>
+                        </div>
+                        <div id="samplerAbsoluteGroup" class="filter-absolute-inputs hidden">
+                            <div class="date-range-container">
+                                <div class="date-range-row">
+                                    <span class="date-range-label">From:</span>
+                                    <div class="date-components" id="samplerStartDateComponents">
+                                        <select class="year-select" id="samplerStartYear"></select>
+                                        <span class="date-separator">-</span>
+                                        <select class="month-select" id="samplerStartMonth"></select>
+                                        <span class="date-separator">-</span>
+                                        <select class="day-select" id="samplerStartDay"></select>
+                                    </div>
+                                </div>
+                                <div class="date-range-row">
+                                    <span class="date-range-label">To:</span>
+                                    <div class="date-components" id="samplerEndDateComponents">
+                                        <select class="year-select" id="samplerEndYear"></select>
+                                        <span class="date-separator">-</span>
+                                        <select class="month-select" id="samplerEndMonth"></select>
+                                        <span class="date-separator">-</span>
+                                        <select class="day-select" id="samplerEndDay"></select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Sampler-specific extra options - rearranged -->
+                        <div class="filter-extra-options" style="margin-top:4px;">
+                            <label><input type="checkbox" id="chkSamplerCounterId" checked /> COUNTER_ID filter</label>
+                            <div class="filter-input-group">
+                                <input type="text" id="samplerCounterIdList" value="'KX0','450KX0'" />
+                            </div>
+                        </div>
+                        <div class="filter-extra-options">
+                            <label><input type="checkbox" id="chkSamplerEan" checked /> EAN filter</label>
+                            <div class="filter-input-group">
+                                <input type="text" id="samplerEanList" value="'4936968883583', '3614274507713'" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Customer Section -->
+                    <div id="customerSection" class="hidden">
+                        <!-- Customer Dropdown Selector -->
+                        <div class="filter-row">
+                            <div class="customer-select-row">
+                                <span style="font-weight:500;">Customer Filter:</span>
+                                <select id="customerFilterSelect">
+                                    <option value="lp_with_ean">LP with EAN</option>
+                                    <option value="lp_without_ean">LP without EAN</option>
+                                    <option value="everpurchase">EP</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div style="color:#ffffff;">-------------------------------------------</div>
+                        <!-- LP with EAN -->
+                        <div id="lpWithEANRow" class="filter-row">
+                            <div class="filter-top-line">
+                                <span class="filter-label-text">
+                                    <span>LP with EAN:</span>
+                                    <span class="filter-options">
+                                        <label><input type="radio" name="lpWithEANType" value="relative" checked /> Relative</label>
+                                        <label><input type="radio" name="lpWithEANType" value="absolute" /> Absolute</label>
+                                    </span>
+                                </span>
+                            </div>
+                            <div id="lpWithEANRelativeGroup" class="filter-input-group hidden" style="margin-left:24px;">
+                                <input type="number" id="lpWithEANMonths" value="36" min="1" max="99" step="1" />
+                                <span>months</span>
+                            </div>
+                            <div id="lpWithEANAbsoluteGroup" class="filter-absolute-inputs hidden">
+                                <div class="date-range-container">
+                                    <div class="date-range-row">
+                                        <span class="date-range-label">From:</span>
+                                        <div class="date-components" id="lpWithEANStartDateComponents">
+                                            <select class="year-select" id="lpWithEANStartYear"></select>
+                                            <span class="date-separator">-</span>
+                                            <select class="month-select" id="lpWithEANStartMonth"></select>
+                                            <span class="date-separator">-</span>
+                                            <select class="day-select" id="lpWithEANStartDay"></select>
+                                        </div>
+                                    </div>
+                                    <div class="date-range-row">
+                                        <span class="date-range-label">To:</span>
+                                        <div class="date-components" id="lpWithEANEndDateComponents">
+                                            <select class="year-select" id="lpWithEANEndYear"></select>
+                                            <span class="date-separator">-</span>
+                                            <select class="month-select" id="lpWithEANEndMonth"></select>
+                                            <span class="date-separator">-</span>
+                                            <select class="day-select" id="lpWithEANEndDay"></select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- LP without EAN -->
+                        <div id="lpWithoutEANRow" class="filter-row hidden">
+                            <div class="filter-top-line">
+                                <span class="filter-label-text">
+                                    <span>LP without EAN:</span>
+                                    <span class="filter-options">
+                                        <label><input type="radio" name="lpWithoutEANType" value="relative" checked /> Relative</label>
+                                        <label><input type="radio" name="lpWithoutEANType" value="absolute" /> Absolute</label>
+                                    </span>
+                                </span>
+                            </div>
+                            <div id="lpWithoutEANRelativeGroup" class="filter-input-group hidden" style="margin-left:24px;">
+                                <input type="number" id="lpWithoutEANMonths" value="36" min="1" max="99" step="1" />
+                                <span>months</span>
+                            </div>
+                            <div id="lpWithoutEANAbsoluteGroup" class="filter-absolute-inputs hidden">
+                                <div class="date-range-container">
+                                    <div class="date-range-row">
+                                        <span class="date-range-label">From:</span>
+                                        <div class="date-components" id="lpWithoutEANStartDateComponents">
+                                            <select class="year-select" id="lpWithoutEANStartYear"></select>
+                                            <span class="date-separator">-</span>
+                                            <select class="month-select" id="lpWithoutEANStartMonth"></select>
+                                            <span class="date-separator">-</span>
+                                            <select class="day-select" id="lpWithoutEANStartDay"></select>
+                                        </div>
+                                    </div>
+                                    <div class="date-range-row">
+                                        <span class="date-range-label">To:</span>
+                                        <div class="date-components" id="lpWithoutEANEndDateComponents">
+                                            <select class="year-select" id="lpWithoutEANEndYear"></select>
+                                            <span class="date-separator">-</span>
+                                            <select class="month-select" id="lpWithoutEANEndMonth"></select>
+                                            <span class="date-separator">-</span>
+                                            <select class="day-select" id="lpWithoutEANEndDay"></select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- EP -->
+                        <div id="everpurchaseRow" class="filter-row hidden">
+                            <div class="filter-top-line">
+                                <span class="filter-label-text">
+                                    <span>EP:</span>
+                                    <span class="filter-options">
+                                        <label><input type="radio" name="everpurchaseType" value="relative" checked /> Relative</label>
+                                        <label><input type="radio" name="everpurchaseType" value="absolute" /> Absolute</label>
+                                    </span>
+                                </span>
+                            </div>
+                            <div id="everpurchaseRelativeGroup" class="filter-input-group hidden" style="margin-left:24px;">
+                                <input type="number" id="everpurchaseMonths" value="6" min="1" max="99" step="1" />
+                                <span>months</span>
+                            </div>
+                            <div id="everpurchaseAbsoluteGroup" class="filter-absolute-inputs hidden">
+                                <div class="date-range-container">
+                                    <div class="date-range-row">
+                                        <span class="date-range-label">From:</span>
+                                        <div class="date-components" id="everpurchaseStartDateComponents">
+                                            <select class="year-select" id="everpurchaseStartYear"></select>
+                                            <span class="date-separator">-</span>
+                                            <select class="month-select" id="everpurchaseStartMonth"></select>
+                                            <span class="date-separator">-</span>
+                                            <select class="day-select" id="everpurchaseStartDay"></select>
+                                        </div>
+                                    </div>
+                                    <div class="date-range-row">
+                                        <span class="date-range-label">To:</span>
+                                        <div class="date-components" id="everpurchaseEndDateComponents">
+                                            <select class="year-select" id="everpurchaseEndYear"></select>
+                                            <span class="date-separator">-</span>
+                                            <select class="month-select" id="everpurchaseEndMonth"></select>
+                                            <span class="date-separator">-</span>
+                                            <select class="day-select" id="everpurchaseEndDay"></select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Customer-wide COUNTER_ID and EAN filters - rearranged -->
+                        <div id="customerFilterRow" class="filter-row">
+                            <div class="filter-extra-options" style="margin-left:0;">
+                                <label><input type="checkbox" id="chkCustomerCounterId" checked /> COUNTER_ID filter</label>
+                                <div class="filter-input-group">
+                                    <input type="text" id="customerCounterIdList" value="'KX0','450KX0'" />
+                                </div>
+                            </div>
+                            <div class="filter-extra-options" style="margin-left:0;">
+                                <label><input type="checkbox" id="chkCustomerEan" checked /> EAN filter</label>
+                                <div class="filter-input-group">
+                                    <input type="text" id="customerEanList" value="'4936968883583', '3614274507713'" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Loyalty -->
+                        <div id="loyaltyRow" class="filter-row">
+                            <div class="filter-top-line">
+                                <input type="checkbox" id="chkLoyalty" />
+                                <span>Loyalty</span>
+                                <span class="filter-input-group">
+                                    <input type="text" id="loyaltyTiers" value="'RUBY','GOLD','SAPPHIRE','BLACK DIAMOND','RED','ROSE'" style="margin-left:51px; width:373px;" />
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Settings display -->
+                <div class="settings-display" id="settingsDisplay">
+                    <div class="settings-item"><span class="label">Brand:</span> <span class="value" id="settingBrand">-</span></div>
+                    <div class="settings-item"><span class="label">Locale:</span> <span class="value" id="settingLocale">-</span></div>
+                    <div class="settings-item"><span class="label">Space DB:</span> <span class="value" id="settingSpaceDB">-</span></div>
+                    <div class="settings-item"><span class="label">Country Code:</span> <span class="value" id="settingCountryCode">-</span></div>
+                </div>
+            </div>
+
+            <!-- Query column -->
+            <div class="query-column">
+                <div class="query-wrapper">
+                    <div class="query-header">
+                        <span class="query-label" id="queryLabel">PROSPECT Query</span>
+                        <button class="copy-btn" id="copyBtn">Copy</button>
+                    </div>
+                    <pre class="query-pre"><code id="queryCode" class="language-sql"></code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- <div class="footer" id="footerSummary">
+            <div class="summary-row">
+                <span class="summary-item"><span class="label">Query:</span> <span class="value" id="summaryQueryType">Prospect</span></span>
+                <span class="summary-item"><span class="label">Prospect:</span> <span class="value" id="summaryProspect">6M</span></span>
+                <span class="summary-item"><span class="label">Sampler:</span> <span class="value" id="summarySampler">3M</span></span>
+                <span class="summary-item"><span class="label">Last Purchase:</span> <span class="value" id="summaryLastPurchase">36M</span></span>
+                <span class="summary-item"><span class="label">EP:</span> <span class="value" id="summaryEP">6M</span></span>
+                <span class="summary-item"><span class="label">Record Type:</span> <span class="value" id="summaryRecordType">SMS1</span></span>
+                <span class="summary-item"><span class="label">Voucher:</span> <span class="value" id="summaryVoucher">O350</span></span>
+            </div>
+        </div> -->
+    </div>
+
+    <!-- Highlight.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js">
+    </script>
+    <script>
+        // ---------- Locale mapping ----------
+        const localeMap = {
+            'TH': { code: '66', label: 'TH' },
+            'MY': { code: '60', label: 'MY' },
+            'SG': { code: '65', label: 'SG' },
+            'PH': { code: '63', label: 'PH' },
+            'ID': { code: '62', label: 'ID' },
+            'VN': { code: '84', label: 'VN' },
+            'IN': { code: '91', label: 'IN' },
+            'AE': { code: '971', label: 'AE' }
+        };
+
+        // ---------- Brand list ----------
+        const brandList = [
+            // Armani
+            { label: 'Armani Malaysia', locale: 'MY', spaceDB: 'GAB_Maindb_SCV_V3_0', seedDB: 'MY_GAB_SEED' },
+            { label: 'Armani Singapore', locale: 'SG', spaceDB: 'GAB_Maindb_SCV_V3_0', seedDB: 'SG_GAB_SEED' },
+            { label: 'Armani Thailand', locale: 'TH', spaceDB: 'GAB_Maindb_SCV_V3_0', seedDB: 'TH_GAB_SEED' },
+
+            // Kiehl's
+            { label: "Kiehl's Malaysia", locale: 'MY', spaceDB: 'Kiehls_Maindb_SCV_V3_0', seedDB: "MY_KIE_SEED" },
+            { label: "Kiehl's Indonesia", locale: 'ID', spaceDB: 'KIE_Maindb_SCV_V3_0', seedDB: "ID_KIE_SEED" },
+            { label: "Kiehl's Philippines", locale: 'PH', spaceDB: 'KIE_Maindb_SCV_V3_0', seedDB: "PH_KIE_SEEDLIST" },
+            { label: "Kiehl's Singapore", locale: 'SG', spaceDB: 'KIE_Maindb_SCV_V3_0', seedDB: "SG_KIE_Activation_SEED" },
+            { label: "Kiehl's Thailand", locale: 'TH', spaceDB: 'KIE_Maindb_SCV_V3_0', seedDB: "TH_KIE_SEED" },
+            { label: "Kiehl's Vietnam", locale: 'VN', spaceDB: 'KIE_Maindb_SCV_V3_0', seedDB: "VN_KIE_SEEDLIST" },
+
+            // La Roche-Posay
+            { label: 'La Roche Posay Indonesia', locale: 'ID', spaceDB: 'LRP_Maindb_SCV_V3_0', seedDB: 'ID_LRP_SEED_WHATSAPP' },
+            { label: 'La Roche-Posay Malaysia', locale: 'MY', spaceDB: 'LRP_Maindb_SCV_V3_0', seedDB: 'MY_LRP_BETA_TEST_V2' },
+            { label: 'La Roche-Posay GCC', locale: 'AE', spaceDB: 'LRP_Maindb_SCV_V3_0', seedDB: 'GCC_LRP_SEED' },
+            { label: 'La Roche-Posay Singapore', locale: 'SG', spaceDB: 'LRP_Maindb_SCV_V3_0', seedDB: 'SG_LRP_BETA_TEST' },
+
+            // Lancôme
+            { label: 'Lancôme Indonesia', locale: 'ID', spaceDB: 'LAN_Maindb_SCV_V3_0', seedDB: 'ID_LAN_SEED' },
+            { label: 'Lancôme Philippines', locale: 'PH', spaceDB: 'LAN_Maindb_SCV_V3_0', seedDB: 'PH_LAN_ACTIVATION_SEEDLIST' },
+            { label: 'Lancôme Singapore', locale: 'SG', spaceDB: 'Lancome_Maindb_SCV_V3_0', seedDB: 'SG_LAN_Seedlist' },
+            { label: 'Lancôme Thailand', locale: 'TH', spaceDB: 'LAN_Maindb_SCV_V3_0', seedDB: 'TH_LAN_SEED' },
+            { label: 'Lancôme Vietnam', locale: 'VN', spaceDB: 'LAN_Maindb_SCV_V3_0', seedDB: 'VN_LAN_Activation_Seedlist' },
+            { label: "Lancôme Malaysia", locale: 'MY', spaceDB: 'Lancome_Maindb_SCV_V3_0', seedDB: "MY_LAN_Activation_Seedlist" },
+
+            // SkinCeuticals
+            { label: 'Skinceuticals GCC', locale: 'AE', spaceDB: 'SKC_Maindb_SCV_V3_0', seedDB: 'GC_SKC_SEED' },
+            { label: 'SkinCeuticals Singapore', locale: 'SG', spaceDB: 'SKC_Maindb_SCV_V3_0', seedDB: 'SG_SKC_SEED' },
+
+            // Vichy
+            { label: 'Vichy GCC', locale: 'AE', spaceDB: 'VCY_Maindb_SCV_V3_0', seedDB: 'GCC_VCY_SEED' },
+            { label: 'Vichy Thailand', locale: 'TH', spaceDB: 'VCY_Maindb_SCV_V3_0', seedDB: 'TH_VCY_SEED' },
+
+            // Yves Saint Laurent
+            { label: 'Yves Saint Laurent Indonesia', locale: 'ID', spaceDB: 'YSL_Maindb_SCV_V3_0', seedDB: 'ID_YSL_SEED_WHATSAPP' },
+            { label: 'Yves Saint Laurent Malaysia', locale: 'MY', spaceDB: 'YSL_Maindb_SCV_V3_0', seedDB: 'MY_YSL_Activation_Seedlist' },
+            { label: 'Yves Saint Laurent Singapore', locale: 'SG', spaceDB: 'YSL_Maindb_SCV_V3_0', seedDB: 'SG_YSL_SEED' },
+            { label: 'Yves Saint Laurent Thailand', locale: 'TH', spaceDB: 'YSL_Maindb_SCV_V3_0', seedDB: 'TH_YSL_SEED' },
+        ];
+
+        // ---------- Customer type mapping ----------
+        const customerTypeMap = {
+            prospect: 'Prospect',
+            sampler: 'Sampler',
+            customer: 'Customer'
+        };
+
+        // ---------- Query definitions ----------
+        const queries = {
+            prospect: `SELECT 
+
+z.brand_code, z.first_name, z.last_name, z.Email_Perm_Status, z.SMS_Perm_Status 
+, z.Acquisition_Source, z.Creation_date, z.creation_counter, z.creation_BA, z.Point_Balance 
+, z.Loyalty_Tier_Current, z.Active, z.Mars_ID, z.Email, z.customer_code, z.Subscriber_Key 
+, z.Locale, z.Customer_Type, z.Record_Type, z.Mobile 
+ 
+FROM ( 
+
+SELECT 
+
+db.brand_code, db.first_name, db.last_name, db.Email_Perm_Status, db.SMS_Perm_Status 
+, db.Acquisition_Source, db.Creation_date, db.creation_counter, db.creation_BA 
+, db.Point_Balance, db.Loyalty_Tier_Current, db.Active, db.Mars_ID, db.Email 
+, db.customer_code 
+, db.customer_code AS Subscriber_Key 
+ 
+, CASE 
+WHEN sdb.Mobile_Formatted IS NULL OR sdb.Mobile_Formatted = ''  
+THEN NULL 
+ 
+WHEN sdb.Mobile_Formatted LIKE sdb.CountryCode + '%'  
+THEN sdb.Mobile_Formatted 
+ 
+WHEN PATINDEX('%[^0]%', sdb.Mobile_Formatted) > 0  
+THEN CONCAT(sdb.CountryCode, SUBSTRING(sdb.Mobile_Formatted, PATINDEX('%[^0]%', sdb.Mobile_Formatted), LEN(sdb.Mobile_Formatted))) 
+ 
+ELSE NULL 
+END AS Mobile 
+ 
+, '{{LOCALE}}' AS locale /* Update according to BU country */ 
+, '{{CUSTOMER_TYPE}}' AS customer_type 
+, '{{RECORD_TYPE}}' AS record_type /* Usually the touchpoint, but depends on your preference */ 
+ 
+FROM {{SPACE_DB}} db 
+ 
+/* REQUIRED for mobile formatting */ 
+INNER JOIN (  
+	SELECT a.CUSTOMER_CODE, '{{COUNTRY_CODE}}' AS CountryCode, /* Update country code accordingly */ 
+	REPLACE(REPLACE(REPLACE(LTRIM(RTRIM(a.MOBILE)), '+', ''), ' ', ''), '-', '') AS Mobile_Formatted 
+ 
+	FROM {{SPACE_DB}} a 
+	) sdb  
+ON sdb.CUSTOMER_CODE = db.CUSTOMER_CODE 
+
+{{PREVIOUS_ENTRY_JOIN}}
+
+{{OPT_IN_CLAUSE}}
+
+AND db.active = 'True' /*  please include this condition to avoid duplicate records */ 
+AND db.FIRST_PURCHASE_DATE IS NULL 
+ 
+{{PROSPECT_SNIPPET}}
+ 
+/* Loyalty – adjust as BU's loyalty values */ 
+{{PROSPECT_LOYALTY_SNIPPET}}
+ 
+{{WHATSAPP}}
+
+{{ENGAGEMENTS}}
+
+{{AI_AUDIENCE}}
+
+{{VOUCHERS}}
+ 
+/* Update country code accordingly */ 
+
+) z WHERE z.Mobile LIKE '{{COUNTRY_CODE}}%'`,
+
+            sampler: `SELECT 
+
+z.brand_code, z.first_name, z.last_name, z.Email_Perm_Status, z.SMS_Perm_Status 
+, z.Acquisition_Source, z.Creation_date, z.creation_counter, z.creation_BA, z.Point_Balance 
+, z.Loyalty_Tier_Current, z.Active, z.Mars_ID, z.Email, z.customer_code, z.Subscriber_Key 
+, z.Locale, z.Customer_Type, z.Record_Type, z.Mobile 
+ 
+FROM ( 
+
+SELECT 
+
+db.brand_code, db.first_name, db.last_name, db.Email_Perm_Status, db.SMS_Perm_Status 
+, db.Acquisition_Source, db.Creation_date, db.creation_counter, db.creation_BA 
+, db.Point_Balance, db.Loyalty_Tier_Current, db.Active, db.Mars_ID, db.Email 
+, db.customer_code 
+, db.customer_code AS Subscriber_Key 
+ 
+, CASE 
+WHEN sdb.Mobile_Formatted IS NULL OR sdb.Mobile_Formatted = ''  
+THEN NULL 
+ 
+WHEN sdb.Mobile_Formatted LIKE sdb.CountryCode + '%'  
+THEN sdb.Mobile_Formatted 
+ 
+WHEN PATINDEX('%[^0]%', sdb.Mobile_Formatted) > 0  
+THEN CONCAT(sdb.CountryCode, SUBSTRING(sdb.Mobile_Formatted, PATINDEX('%[^0]%', sdb.Mobile_Formatted), LEN(sdb.Mobile_Formatted))) 
+ 
+ELSE NULL 
+END AS Mobile 
+ 
+, '{{LOCALE}}' AS locale /* Update according to BU country */ 
+, '{{CUSTOMER_TYPE}}' AS customer_type 
+, '{{RECORD_TYPE}}' AS record_type /* Usually the touchpoint, but depends on your preference */ 
+ 
+FROM {{SPACE_DB}} db 
+ 
+/* REQUIRED for mobile formatting */ 
+INNER JOIN (  
+	SELECT a.CUSTOMER_CODE, '{{COUNTRY_CODE}}' AS CountryCode, /* Update country code accordingly */ 
+	REPLACE(REPLACE(REPLACE(LTRIM(RTRIM(a.MOBILE)), '+', ''), ' ', ''), '-', '') AS Mobile_Formatted 
+ 
+	FROM {{SPACE_DB}} a 
+	) sdb  
+ON sdb.CUSTOMER_CODE = db.CUSTOMER_CODE 
+
+{{PREVIOUS_ENTRY_JOIN}}
+
+/* for last sampled */ 
+INNER JOIN ( 
+	SELECT CUSTOMER_CODE, ORDER_DT, ORDER_NUM, COUNTER_ID, EAN 
+	FROM ( 
+		SELECT CUSTOMER_CODE, ORDER_DT, ORDER_NUM, COUNTER_ID, EAN, 
+		ROW_NUMBER() OVER (PARTITION BY CUSTOMER_CODE ORDER BY ORDER_DT DESC) AS rn 
+ 
+		FROM SPACE_Sales_Master sm 
+ 
+		WHERE sm.Price * sm.QUANTITY = 0 
+ 
+		GROUP BY CUSTOMER_CODE, ORDER_DT, ORDER_NUM, COUNTER_ID, EAN 
+	) x 
+	WHERE x.rn = 1 
+	{{SAMPLER_COUNTER_ID_FILTER}}
+	{{SAMPLER_EAN_FILTER}}
+	{{SAMPLER_SNIPPET}}
+) sm 
+ON db.customer_code = sm.customer_code 
+ 
+
+{{OPT_IN_CLAUSE}}
+
+{{WHATSAPP}}
+
+{{ENGAGEMENTS}}
+
+{{AI_AUDIENCE}}
+
+{{VOUCHERS}}
+
+AND db.active = 'True' /*  please include this condition to avoid duplicate records */ 
+
+ 
+/* Update country code accordingly */ 
+
+) z WHERE z.Mobile LIKE '{{COUNTRY_CODE}}%'`,
+
+            customer: `SELECT 
+
+z.brand_code, z.first_name, z.last_name, z.Email_Perm_Status, z.SMS_Perm_Status 
+, z.Acquisition_Source, z.Creation_date, z.creation_counter, z.creation_BA, z.Point_Balance 
+, z.Loyalty_Tier_Current, z.Active, z.Mars_ID, z.Email, z.customer_code, z.Subscriber_Key 
+, z.Locale, z.Customer_Type, z.Record_Type, z.Mobile 
+ 
+FROM ( 
+
+SELECT 
+
+db.brand_code, db.first_name, db.last_name, db.Email_Perm_Status, db.SMS_Perm_Status 
+, db.Acquisition_Source, db.Creation_date, db.creation_counter, db.creation_BA 
+, db.Point_Balance, db.Loyalty_Tier_Current, db.Active, db.Mars_ID, db.Email 
+, db.customer_code 
+, db.customer_code AS Subscriber_Key 
+ 
+, CASE 
+WHEN sdb.Mobile_Formatted IS NULL OR sdb.Mobile_Formatted = ''  
+THEN NULL 
+ 
+WHEN sdb.Mobile_Formatted LIKE sdb.CountryCode + '%'  
+THEN sdb.Mobile_Formatted 
+ 
+WHEN PATINDEX('%[^0]%', sdb.Mobile_Formatted) > 0  
+THEN CONCAT(sdb.CountryCode, SUBSTRING(sdb.Mobile_Formatted, PATINDEX('%[^0]%', sdb.Mobile_Formatted), LEN(sdb.Mobile_Formatted))) 
+ 
+ELSE NULL 
+END AS Mobile 
+ 
+, '{{LOCALE}}' AS locale /* Update according to BU country */ 
+, '{{CUSTOMER_TYPE}}' AS customer_type 
+, '{{RECORD_TYPE}}' AS record_type /* Usually the touchpoint, but depends on your preference */ 
+ 
+FROM {{SPACE_DB}} db 
+ 
+/* REQUIRED for mobile formatting */ 
+INNER JOIN (  
+	SELECT a.CUSTOMER_CODE, '{{COUNTRY_CODE}}' AS CountryCode, /* Update country code accordingly */ 
+	REPLACE(REPLACE(REPLACE(LTRIM(RTRIM(a.MOBILE)), '+', ''), ' ', ''), '-', '') AS Mobile_Formatted 
+ 
+	FROM {{SPACE_DB}} a 
+	) sdb  
+ON sdb.CUSTOMER_CODE = db.CUSTOMER_CODE 
+
+{{PREVIOUS_ENTRY_JOIN}}
+
+{{LP_WITH_EAN_SNIPPET}}
+
+{{OPT_IN_CLAUSE}}
+
+AND db.active = 'True' /* REQUIRED to remove duplicate records */ 
+ 
+{{LP_WITHOUT_EAN_SNIPPET}}
+
+{{LOYALTY_SNIPPET}}
+
+{{WHATSAPP}}
+
+{{ENGAGEMENTS}}
+
+{{AI_AUDIENCE}}
+
+{{VOUCHERS}}
+ 
+{{EVERPURCHASE_SNIPPET}}
+ 
+/* Update country code accordingly */ 
+
+) z WHERE z.Mobile LIKE '{{COUNTRY_CODE}}%'`
+        };
+
+        // ---------- SQL snippets ----------
+        const snippets = {
+            previousEntry: `
+/* IF Audience is from previous touchpoint */ 
+INNER JOIN {{PREVIOUS_ENTRY_TABLE}} en  
+ON db.CUSTOMER_CODE = en. CUSTOMER_CODE 
+`,
+            edmSuppression: `
+AND NOT EXISTS(  
+    SELECT 1 FROM {{EDM_SUPPRESSION_TABLE}} em  
+    WHERE db.EMAIL = em.Email 
+    OR db.CUSTOMER_CODE = em.SubscriberKey ) 
+`,
+            smsSuppression: `
+AND NOT EXISTS( 
+    SELECT 1 FROM {{SMS_SUPPRESSION_TABLE}} sm 
+    WHERE db.MOBILE = sm.Mobile 
+)
+`,
+            whatsapp: `
+/* FOR WHATSAPP SENDS */ 
+AND NOT EXISTS( 
+	SELECT 1 FROM WA_unsubscribe_DE wa  
+	WHERE db.MOBILE = wa.MOBILE 
+	) 
+`,
+            engagements: `
+/* FOR Engagements / / EXAMPLE: P6M Open */  
+AND EXISTS(  
+	SELECT 1 FROM _Open op  
+	WHERE ( 
+		db.CUSTOMER_CODE = op.Subscriberkey   
+	AND CAST(EventDate AS DATE) > DATEADD(month, -{{ENGAGEMENTS_MONTHS}}, GETDATE()) 
+	) 
+`,
+            aiAudience: `
+/* FOR AI Audience */  
+AND EXISTS(  
+	SELECT 1 FROM [Tealium-CDP-Audience-DE] ai  
+	WHERE db.CUSTOMER_CODE = ai.[LUCID]  
+	AND ai.[Tealium Audiences] LIKE '%Very Likely%' 
+	) 
+`,
+            vouchers: `
+/* FOR Vouchers */  
+AND EXISTS(  
+	SELECT 1 FROM SPACE_Vouchers_Master vo  
+	WHERE db.CUSTOMER_CODE = vo.CUSTOMER_CODE  
+	AND VOUCHER_STATUS = 'available'  
+	AND VOUCHER_ID = '{{VOUCHER_ID}}' /* change voucher_id according to brief */ 
+	 ) 
+`
+        };
+
+        // ---------- DOM refs ----------
+        const buttons = document.querySelectorAll('.btn');
+        const queryCode = document.getElementById('queryCode');
+        const queryLabel = document.getElementById('queryLabel');
+        const copyBtn = document.getElementById('copyBtn');
+        const brandSelect = document.getElementById('brandSelect');
+
+        const settingBrand = document.getElementById('settingBrand');
+        const settingLocale = document.getElementById('settingLocale');
+        const settingSpaceDB = document.getElementById('settingSpaceDB');
+        const settingCountryCode = document.getElementById('settingCountryCode');
+
+        // Summary elements
+        const summaryQueryType = document.getElementById('summaryQueryType');
+        const summaryProspect = document.getElementById('summaryProspect');
+        const summarySampler = document.getElementById('summarySampler');
+        const summaryLastPurchase = document.getElementById('summaryLastPurchase');
+        const summaryEP = document.getElementById('summaryEP');
+        const summaryRecordType = document.getElementById('summaryRecordType');
+        const summaryVoucher = document.getElementById('summaryVoucher');
+
+        // Controls
+        const recordTypeInput = document.getElementById('recordTypeInput');
+        const chkPreviousEntry = document.getElementById('chkPreviousEntry');
+        const previousEntryTable = document.getElementById('previousEntryTable');
+        const chkEmailOptin = document.getElementById('chkEmailOptin');
+        const chkSmsOptin = document.getElementById('chkSmsOptin');
+        const chkEDMSuppression = document.getElementById('chkEDMSuppression');
+        const edmSuppressionTable = document.getElementById('edmSuppressionTable');
+        const chkSMSSuppression = document.getElementById('chkSMSSuppression');
+        const smsSuppressionTable = document.getElementById('smsSuppressionTable');
+        const voucherInput = document.getElementById('voucherInput');
+
+        // Prospect controls - now radio only
+        const prospectMonths = document.getElementById('prospectMonths');
+        const prospectRelativeGroup = document.getElementById('prospectRelativeGroup');
+        const prospectAbsoluteGroup = document.getElementById('prospectAbsoluteGroup');
+        const prospectTypeRadios = document.querySelectorAll('input[name="prospectType"]');
+        const prospectLoyaltyTiers = document.getElementById('prospectLoyaltyTiers');
+
+        // Prospect date components
+        const prospectStartYear = document.getElementById('prospectStartYear');
+        const prospectStartMonth = document.getElementById('prospectStartMonth');
+        const prospectStartDay = document.getElementById('prospectStartDay');
+        const prospectEndYear = document.getElementById('prospectEndYear');
+        const prospectEndMonth = document.getElementById('prospectEndMonth');
+        const prospectEndDay = document.getElementById('prospectEndDay');
+
+        // Sampler controls - now radio only
+        const samplerMonths = document.getElementById('samplerMonths');
+        const samplerRelativeGroup = document.getElementById('samplerRelativeGroup');
+        const samplerAbsoluteGroup = document.getElementById('samplerAbsoluteGroup');
+        const samplerTypeRadios = document.querySelectorAll('input[name="samplerType"]');
+        const chkSamplerCounterId = document.getElementById('chkSamplerCounterId');
+        const chkSamplerEan = document.getElementById('chkSamplerEan');
+        const samplerCounterIdList = document.getElementById('samplerCounterIdList');
+        const samplerEanList = document.getElementById('samplerEanList');
+
+        // Sampler date components
+        const samplerStartYear = document.getElementById('samplerStartYear');
+        const samplerStartMonth = document.getElementById('samplerStartMonth');
+        const samplerStartDay = document.getElementById('samplerStartDay');
+        const samplerEndYear = document.getElementById('samplerEndYear');
+        const samplerEndMonth = document.getElementById('samplerEndMonth');
+        const samplerEndDay = document.getElementById('samplerEndDay');
+
+        // Customer controls
+        const customerFilterSelect = document.getElementById('customerFilterSelect');
+        const lpWithEANMonths = document.getElementById('lpWithEANMonths');
+        const lpWithEANRelativeGroup = document.getElementById('lpWithEANRelativeGroup');
+        const lpWithEANAbsoluteGroup = document.getElementById('lpWithEANAbsoluteGroup');
+        const lpWithEANTypeRadios = document.querySelectorAll('input[name="lpWithEANType"]');
+        const lpWithoutEANMonths = document.getElementById('lpWithoutEANMonths');
+        const lpWithoutEANRelativeGroup = document.getElementById('lpWithoutEANRelativeGroup');
+        const lpWithoutEANAbsoluteGroup = document.getElementById('lpWithoutEANAbsoluteGroup');
+        const lpWithoutEANTypeRadios = document.querySelectorAll('input[name="lpWithoutEANType"]');
+        const everpurchaseMonths = document.getElementById('everpurchaseMonths');
+        const everpurchaseRelativeGroup = document.getElementById('everpurchaseRelativeGroup');
+        const everpurchaseAbsoluteGroup = document.getElementById('everpurchaseAbsoluteGroup');
+        const everpurchaseTypeRadios = document.querySelectorAll('input[name="everpurchaseType"]');
+        const chkLoyalty = document.getElementById('chkLoyalty');
+        const loyaltyTiersInput = document.getElementById('loyaltyTiers');
+        const chkCustomerCounterId = document.getElementById('chkCustomerCounterId');
+        const chkCustomerEan = document.getElementById('chkCustomerEan');
+        const customerCounterIdList = document.getElementById('customerCounterIdList');
+        const customerEanList = document.getElementById('customerEanList');
+
+        // Customer date components - LP with EAN
+        const lpWithEANStartYear = document.getElementById('lpWithEANStartYear');
+        const lpWithEANStartMonth = document.getElementById('lpWithEANStartMonth');
+        const lpWithEANStartDay = document.getElementById('lpWithEANStartDay');
+        const lpWithEANEndYear = document.getElementById('lpWithEANEndYear');
+        const lpWithEANEndMonth = document.getElementById('lpWithEANEndMonth');
+        const lpWithEANEndDay = document.getElementById('lpWithEANEndDay');
+
+        // Customer date components - LP without EAN
+        const lpWithoutEANStartYear = document.getElementById('lpWithoutEANStartYear');
+        const lpWithoutEANStartMonth = document.getElementById('lpWithoutEANStartMonth');
+        const lpWithoutEANStartDay = document.getElementById('lpWithoutEANStartDay');
+        const lpWithoutEANEndYear = document.getElementById('lpWithoutEANEndYear');
+        const lpWithoutEANEndMonth = document.getElementById('lpWithoutEANEndMonth');
+        const lpWithoutEANEndDay = document.getElementById('lpWithoutEANEndDay');
+
+        // Customer date components - EP
+        const everpurchaseStartYear = document.getElementById('everpurchaseStartYear');
+        const everpurchaseStartMonth = document.getElementById('everpurchaseStartMonth');
+        const everpurchaseStartDay = document.getElementById('everpurchaseStartDay');
+        const everpurchaseEndYear = document.getElementById('everpurchaseEndYear');
+        const everpurchaseEndMonth = document.getElementById('everpurchaseEndMonth');
+        const everpurchaseEndDay = document.getElementById('everpurchaseEndDay');
+
+        // Other checkboxes
+        const chkWhatsapp = document.getElementById('chkWhatsapp');
+        const chkEngagements = document.getElementById('chkEngagements');
+        const engagementsMonths = document.getElementById('engagementsMonths');
+        const chkVouchers = document.getElementById('chkVouchers');
+
+        // Rows
+        const prospectRow = document.getElementById('prospectRow');
+        const prospectLoyaltyRow = document.getElementById('prospectLoyaltyRow');
+        const samplerRow = document.getElementById('samplerRow');
+        const customerSection = document.getElementById('customerSection');
+        const lpWithEANRow = document.getElementById('lpWithEANRow');
+        const lpWithoutEANRow = document.getElementById('lpWithoutEANRow');
+        const everpurchaseRow = document.getElementById('everpurchaseRow');
+        const loyaltyRow = document.getElementById('loyaltyRow');
+        const customerFilterRow = document.getElementById('customerFilterRow');
+        const emailOptinRow = document.getElementById('emailOptinRow');
+        const smsOptinRow = document.getElementById('smsOptinRow');
+        const edmSuppressionRow = document.getElementById('edmSuppressionRow');
+        const smsSuppressionRow = document.getElementById('smsSuppressionRow');
+
+        // ---------- Date helper functions ----------
+        function populateDateSelects(select, start, end) {
+            select.innerHTML = '';
+            for (let i = start; i <= end; i++) {
+                const option = document.createElement('option');
+                option.value = i.toString().padStart(2, '0');
+                option.textContent = i.toString().padStart(2, '0');
+                select.appendChild(option);
+            }
+        }
+
+        function initializeDateComponents() {
+            // Populate year selects (from 2020 to 2030)
+            const yearSelects = document.querySelectorAll('.year-select');
+            yearSelects.forEach(select => {
+                for (let i = 2030; i >= 2020; i--) {
+                    const option = document.createElement('option');
+                    option.value = i.toString();
+                    option.textContent = i.toString();
+                    select.appendChild(option);
+                }
+            });
+
+            // Populate month selects (1-12)
+            const monthSelects = document.querySelectorAll('.month-select');
+            monthSelects.forEach(select => {
+                for (let i = 1; i <= 12; i++) {
+                    const option = document.createElement('option');
+                    option.value = i.toString().padStart(2, '0');
+                    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                    option.textContent = monthNames[i - 1];
+                    select.appendChild(option);
+                }
+            });
+
+            // Populate day selects (1-31)
+            const daySelects = document.querySelectorAll('.day-select');
+            daySelects.forEach(select => {
+                for (let i = 1; i <= 31; i++) {
+                    const option = document.createElement('option');
+                    option.value = i.toString().padStart(2, '0');
+                    option.textContent = i.toString().padStart(2, '0');
+                    select.appendChild(option);
+                }
+            });
+        }
+
+        function getDateFromComponents(yearSelect, monthSelect, daySelect) {
+            const year = yearSelect.value;
+            const month = monthSelect.value;
+            const day = daySelect.value;
+            if (year && month && day) {
+                return `${year}-${month}-${day}`;
+            }
+            return '';
+        }
+
+        function setDateComponents(yearSelect, monthSelect, daySelect, dateStr) {
+            if (dateStr) {
+                const parts = dateStr.split('-');
+                if (parts.length === 3) {
+                    yearSelect.value = parts[0];
+                    monthSelect.value = parts[1];
+                    daySelect.value = parts[2];
+                }
+            }
+        }
+
+        function formatDateDisplay(dateStr) {
+            if (!dateStr) return '';
+            const parts = dateStr.split('-');
+            if (parts.length === 3) {
+                const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                const month = monthNames[parseInt(parts[1]) - 1];
+                return `${month}${parts[0]}`;
+            }
+            return dateStr;
+        }
+
+        // ---------- Populate brands ----------
+        brandList.forEach((item, index) => {
+            const opt = document.createElement('option');
+            opt.value = item.locale;
+            opt.dataset.spaceDB = item.spaceDB;
+            opt.textContent = item.label;
+            opt.dataset.index = index;
+            brandSelect.appendChild(opt);
+        });
+
+        // ---------- State ----------
+        let currentActiveType = 'prospect';
+        let currentDisplayedQuery = '';
+
+        // Store settings per query type
+        const settingsStore = {
+            prospect: {
+                prospectType: 'relative',
+                prospectMonths: 6,
+                prospectStartDate: '2025-06-01',
+                prospectEndDate: '2026-07-31',
+                prospectLoyaltyTiers: "'BLACK GOLD','GOLD','ROSE','BLACK','SILVER'"
+            },
+            sampler: {
+                samplerType: 'relative',
+                samplerMonths: 3,
+                samplerStartDate: '2025-06-01',
+                samplerEndDate: '2026-07-31',
+                samplerCounterId: true,
+                samplerEan: true,
+                samplerCounterIdList: "'KX0','450KX0'",
+                samplerEanList: "'4936968883583', '3614274507713'"
+            },
+            customer: {
+                customerFilter: 'lp_with_ean',
+                lpWithEANType: 'relative',
+                lpWithEANMonths: 36,
+                lpWithEANStartDate: '2025-06-01',
+                lpWithEANEndDate: '2026-07-31',
+                lpWithoutEANType: 'relative',
+                lpWithoutEANMonths: 36,
+                lpWithoutEANStartDate: '2025-06-01',
+                lpWithoutEANEndDate: '2026-07-31',
+                everpurchaseType: 'relative',
+                everpurchaseMonths: 6,
+                everpurchaseStartDate: '2024-02-01',
+                everpurchaseEndDate: '2025-07-31',
+                loyaltyTiers: "'RUBY','GOLD','SAPPHIRE','BLACK DIAMOND'",
+                customerCounterId: true,
+                customerEan: true,
+                customerCounterIdList: "'KX0','450KX0'",
+                customerEanList: "'4936968883583', '3614274507713'"
+            },
+            ai: {
+                previousEntry: false,
+                previousEntryTable: 'previous_entry_DE',
+                emailOptin: true,
+                smsOptin: true,
+                edmSuppression: true,
+                edmSuppressionTable: 'AutosuppresionDE',
+                smsSuppression: true,
+                smsSuppressionTable: 'SMS_optout_de',
+                engagements: false,
+                engagementsMonths: 6
+            },
+            seed: {}
+        };
+
+        // Store common settings
+        const commonSettings = {
+            recordType: 'SMS1',
+            previousEntry: false,
+            previousEntryTable: 'previous_entry_DE',
+            emailOptin: true,
+            smsOptin: true,
+            edmSuppression: true,
+            edmSuppressionTable: 'AutosuppresionDE',
+            smsSuppression: true,
+            smsSuppressionTable: 'SMS_optout_de',
+            whatsapp: false,
+            engagements: false,
+            engagementsMonths: 6,
+            vouchers: false,
+            voucherId: 'O350'
+        };
+
+        // ---------- Helpers ----------
+        function getCurrentBrandData() {
+            const selected = brandSelect.options[brandSelect.selectedIndex];
+            const index = parseInt(selected.dataset.index, 10);
+            return brandList[index];
+        }
+
+        function updateSettings() {
+            const brandData = getCurrentBrandData();
+            const localeData = localeMap[brandData.locale];
+            settingBrand.textContent = brandData.label;
+            settingLocale.textContent = localeData.label;
+            settingSpaceDB.textContent = brandData.spaceDB;
+            settingCountryCode.textContent = localeData.code;
+        }
+
+        function getCheckboxStates() {
+            return {
+                previousEntry: chkPreviousEntry.checked,
+                emailOptin: chkEmailOptin.checked,
+                smsOptin: chkSmsOptin.checked,
+                edmSuppression: chkEDMSuppression.checked,
+                smsSuppression: chkSMSSuppression.checked,
+                whatsapp: chkWhatsapp.checked,
+                engagements: chkEngagements.checked,
+                aiAudience: false,
+                vouchers: chkVouchers.checked,
+                samplerCounterId: chkSamplerCounterId.checked,
+                samplerEan: chkSamplerEan.checked,
+                customerCounterId: chkCustomerCounterId.checked,
+                customerEan: chkCustomerEan.checked,
+                loyalty: chkLoyalty.checked
+            };
+        }
+
+        function saveCurrentSettings() {
+            const type = currentActiveType;
+            commonSettings.recordType = recordTypeInput.value.trim() || 'SMS1';
+            commonSettings.voucherId = voucherInput.value.trim() || 'O350';
+            
+            if (type === 'prospect') {
+                const selected = document.querySelector('input[name="prospectType"]:checked');
+                settingsStore.prospect.prospectType = selected ? selected.value : 'relative';
+                settingsStore.prospect.prospectMonths = prospectMonths.value;
+                settingsStore.prospect.prospectStartDate = getDateFromComponents(prospectStartYear, prospectStartMonth, prospectStartDay) || '2025-06-01';
+                settingsStore.prospect.prospectEndDate = getDateFromComponents(prospectEndYear, prospectEndMonth, prospectEndDay) || '2026-07-31';
+                settingsStore.prospect.prospectLoyaltyTiers = prospectLoyaltyTiers.value;
+            } else if (type === 'sampler') {
+                const selected = document.querySelector('input[name="samplerType"]:checked');
+                settingsStore.sampler.samplerType = selected ? selected.value : 'relative';
+                settingsStore.sampler.samplerMonths = samplerMonths.value;
+                settingsStore.sampler.samplerStartDate = getDateFromComponents(samplerStartYear, samplerStartMonth, samplerStartDay) || '2025-06-01';
+                settingsStore.sampler.samplerEndDate = getDateFromComponents(samplerEndYear, samplerEndMonth, samplerEndDay) || '2026-07-31';
+                settingsStore.sampler.samplerCounterId = chkSamplerCounterId.checked;
+                settingsStore.sampler.samplerEan = chkSamplerEan.checked;
+                settingsStore.sampler.samplerCounterIdList = samplerCounterIdList.value;
+                settingsStore.sampler.samplerEanList = samplerEanList.value;
+            } else if (type === 'customer') {
+                settingsStore.customer.customerFilter = customerFilterSelect.value;
+                
+                const lpSelected = document.querySelector('input[name="lpWithEANType"]:checked');
+                settingsStore.customer.lpWithEANType = lpSelected ? lpSelected.value : 'relative';
+                settingsStore.customer.lpWithEANMonths = lpWithEANMonths.value;
+                settingsStore.customer.lpWithEANStartDate = getDateFromComponents(lpWithEANStartYear, lpWithEANStartMonth, lpWithEANStartDay) || '2025-06-01';
+                settingsStore.customer.lpWithEANEndDate = getDateFromComponents(lpWithEANEndYear, lpWithEANEndMonth, lpWithEANEndDay) || '2026-07-31';
+                
+                const lpWithoutSelected = document.querySelector('input[name="lpWithoutEANType"]:checked');
+                settingsStore.customer.lpWithoutEANType = lpWithoutSelected ? lpWithoutSelected.value : 'relative';
+                settingsStore.customer.lpWithoutEANMonths = lpWithoutEANMonths.value;
+                settingsStore.customer.lpWithoutEANStartDate = getDateFromComponents(lpWithoutEANStartYear, lpWithoutEANStartMonth, lpWithoutEANStartDay) || '2025-06-01';
+                settingsStore.customer.lpWithoutEANEndDate = getDateFromComponents(lpWithoutEANEndYear, lpWithoutEANEndMonth, lpWithoutEANEndDay) || '2026-07-31';
+                
+                const epSelected = document.querySelector('input[name="everpurchaseType"]:checked');
+                settingsStore.customer.everpurchaseType = epSelected ? epSelected.value : 'relative';
+                settingsStore.customer.everpurchaseMonths = everpurchaseMonths.value;
+                settingsStore.customer.everpurchaseStartDate = getDateFromComponents(everpurchaseStartYear, everpurchaseStartMonth, everpurchaseStartDay) || '2024-02-01';
+                settingsStore.customer.everpurchaseEndDate = getDateFromComponents(everpurchaseEndYear, everpurchaseEndMonth, everpurchaseEndDay) || '2025-07-31';
+                
+                settingsStore.customer.loyaltyTiers = loyaltyTiersInput.value;
+                settingsStore.customer.customerCounterId = chkCustomerCounterId.checked;
+                settingsStore.customer.customerEan = chkCustomerEan.checked;
+                settingsStore.customer.customerCounterIdList = customerCounterIdList.value;
+                settingsStore.customer.customerEanList = customerEanList.value;
+            } else if (type === 'ai') {
+                settingsStore.ai.previousEntry = chkPreviousEntry.checked;
+                settingsStore.ai.previousEntryTable = previousEntryTable.value;
+                settingsStore.ai.emailOptin = chkEmailOptin.checked;
+                settingsStore.ai.smsOptin = chkSmsOptin.checked;
+                settingsStore.ai.edmSuppression = chkEDMSuppression.checked;
+                settingsStore.ai.edmSuppressionTable = edmSuppressionTable.value;
+                settingsStore.ai.smsSuppression = chkSMSSuppression.checked;
+                settingsStore.ai.smsSuppressionTable = smsSuppressionTable.value;
+                settingsStore.ai.engagements = chkEngagements.checked;
+                settingsStore.ai.engagementsMonths = engagementsMonths.value;
+            }
+            
+            // Save common settings
+            commonSettings.previousEntry = chkPreviousEntry.checked;
+            commonSettings.previousEntryTable = previousEntryTable.value;
+            commonSettings.emailOptin = chkEmailOptin.checked;
+            commonSettings.smsOptin = chkSmsOptin.checked;
+            commonSettings.edmSuppression = chkEDMSuppression.checked;
+            commonSettings.edmSuppressionTable = edmSuppressionTable.value;
+            commonSettings.smsSuppression = chkSMSSuppression.checked;
+            commonSettings.smsSuppressionTable = smsSuppressionTable.value;
+            commonSettings.whatsapp = chkWhatsapp.checked;
+            commonSettings.engagements = chkEngagements.checked;
+            commonSettings.engagementsMonths = engagementsMonths.value;
+            commonSettings.vouchers = chkVouchers.checked;
+            commonSettings.voucherId = voucherInput.value.trim() || 'O350';
+            commonSettings.recordType = recordTypeInput.value.trim() || 'SMS1';
+        }
+
+        function restoreSettings(type) {
+            // Restore common settings
+            recordTypeInput.value = commonSettings.recordType;
+            voucherInput.value = commonSettings.voucherId;
+            chkPreviousEntry.checked = commonSettings.previousEntry;
+            previousEntryTable.value = commonSettings.previousEntryTable;
+            chkEmailOptin.checked = commonSettings.emailOptin;
+            chkSmsOptin.checked = commonSettings.smsOptin;
+            chkEDMSuppression.checked = commonSettings.edmSuppression;
+            edmSuppressionTable.value = commonSettings.edmSuppressionTable;
+            chkSMSSuppression.checked = commonSettings.smsSuppression;
+            smsSuppressionTable.value = commonSettings.smsSuppressionTable;
+            chkWhatsapp.checked = commonSettings.whatsapp;
+            chkEngagements.checked = commonSettings.engagements;
+            engagementsMonths.value = commonSettings.engagementsMonths;
+            chkVouchers.checked = commonSettings.vouchers;
+            
+            if (type === 'prospect') {
+                const settings = settingsStore.prospect;
+                document.querySelector(`input[name="prospectType"][value="${settings.prospectType}"]`).checked = true;
+                prospectMonths.value = settings.prospectMonths;
+                setDateComponents(prospectStartYear, prospectStartMonth, prospectStartDay, settings.prospectStartDate);
+                setDateComponents(prospectEndYear, prospectEndMonth, prospectEndDay, settings.prospectEndDate);
+                prospectLoyaltyTiers.value = settings.prospectLoyaltyTiers;
+                toggleProspectType();
+            } else if (type === 'sampler') {
+                const settings = settingsStore.sampler;
+                document.querySelector(`input[name="samplerType"][value="${settings.samplerType}"]`).checked = true;
+                samplerMonths.value = settings.samplerMonths;
+                setDateComponents(samplerStartYear, samplerStartMonth, samplerStartDay, settings.samplerStartDate);
+                setDateComponents(samplerEndYear, samplerEndMonth, samplerEndDay, settings.samplerEndDate);
+                chkSamplerCounterId.checked = settings.samplerCounterId;
+                chkSamplerEan.checked = settings.samplerEan;
+                samplerCounterIdList.value = settings.samplerCounterIdList;
+                samplerEanList.value = settings.samplerEanList;
+                toggleSamplerType();
+            } else if (type === 'customer') {
+                const settings = settingsStore.customer;
+                customerFilterSelect.value = settings.customerFilter;
+                
+                document.querySelector(`input[name="lpWithEANType"][value="${settings.lpWithEANType}"]`).checked = true;
+                lpWithEANMonths.value = settings.lpWithEANMonths;
+                setDateComponents(lpWithEANStartYear, lpWithEANStartMonth, lpWithEANStartDay, settings.lpWithEANStartDate);
+                setDateComponents(lpWithEANEndYear, lpWithEANEndMonth, lpWithEANEndDay, settings.lpWithEANEndDate);
+                
+                document.querySelector(`input[name="lpWithoutEANType"][value="${settings.lpWithoutEANType}"]`).checked = true;
+                lpWithoutEANMonths.value = settings.lpWithoutEANMonths;
+                setDateComponents(lpWithoutEANStartYear, lpWithoutEANStartMonth, lpWithoutEANStartDay, settings.lpWithoutEANStartDate);
+                setDateComponents(lpWithoutEANEndYear, lpWithoutEANEndMonth, lpWithoutEANEndDay, settings.lpWithoutEANEndDate);
+                
+                document.querySelector(`input[name="everpurchaseType"][value="${settings.everpurchaseType}"]`).checked = true;
+                everpurchaseMonths.value = settings.everpurchaseMonths;
+                setDateComponents(everpurchaseStartYear, everpurchaseStartMonth, everpurchaseStartDay, settings.everpurchaseStartDate);
+                setDateComponents(everpurchaseEndYear, everpurchaseEndMonth, everpurchaseEndDay, settings.everpurchaseEndDate);
+                
+                loyaltyTiersInput.value = settings.loyaltyTiers;
+                chkCustomerCounterId.checked = settings.customerCounterId;
+                chkCustomerEan.checked = settings.customerEan;
+                customerCounterIdList.value = settings.customerCounterIdList;
+                customerEanList.value = settings.customerEanList;
+                
+                toggleLPWithEANType();
+                toggleLPWithoutEANType();
+                toggleEverpurchaseType();
+                updateCustomerFilterVisibility();
+            } else if (type === 'ai') {
+                const settings = settingsStore.ai;
+                chkPreviousEntry.checked = settings.previousEntry;
+                previousEntryTable.value = settings.previousEntryTable;
+                chkEmailOptin.checked = settings.emailOptin;
+                chkSmsOptin.checked = settings.smsOptin;
+                chkEDMSuppression.checked = settings.edmSuppression;
+                edmSuppressionTable.value = settings.edmSuppressionTable;
+                chkSMSSuppression.checked = settings.smsSuppression;
+                smsSuppressionTable.value = settings.smsSuppressionTable;
+                chkEngagements.checked = settings.engagements;
+                engagementsMonths.value = settings.engagementsMonths;
+            }
+            
+            // Show/hide previous entry input
+            if (chkPreviousEntry.checked) {
+                previousEntryTable.classList.remove('hidden');
+            } else {
+                previousEntryTable.classList.add('hidden');
+            }
+        }
+
+        function toggleProspectType() {
+            const selected = document.querySelector('input[name="prospectType"]:checked');
+            if (selected && selected.value === 'absolute') {
+                prospectRelativeGroup.classList.add('hidden');
+                prospectAbsoluteGroup.classList.remove('hidden');
+            } else {
+                prospectRelativeGroup.classList.remove('hidden');
+                prospectAbsoluteGroup.classList.add('hidden');
+            }
+        }
+
+        function toggleSamplerType() {
+            const selected = document.querySelector('input[name="samplerType"]:checked');
+            if (selected && selected.value === 'absolute') {
+                samplerRelativeGroup.classList.add('hidden');
+                samplerAbsoluteGroup.classList.remove('hidden');
+            } else {
+                samplerRelativeGroup.classList.remove('hidden');
+                samplerAbsoluteGroup.classList.add('hidden');
+            }
+        }
+
+        function toggleLPWithEANType() {
+            const selected = document.querySelector('input[name="lpWithEANType"]:checked');
+            if (selected && selected.value === 'absolute') {
+                lpWithEANRelativeGroup.classList.add('hidden');
+                lpWithEANAbsoluteGroup.classList.remove('hidden');
+            } else {
+                lpWithEANRelativeGroup.classList.remove('hidden');
+                lpWithEANAbsoluteGroup.classList.add('hidden');
+            }
+        }
+
+        function toggleLPWithoutEANType() {
+            const selected = document.querySelector('input[name="lpWithoutEANType"]:checked');
+            if (selected && selected.value === 'absolute') {
+                lpWithoutEANRelativeGroup.classList.add('hidden');
+                lpWithoutEANAbsoluteGroup.classList.remove('hidden');
+            } else {
+                lpWithoutEANRelativeGroup.classList.remove('hidden');
+                lpWithoutEANAbsoluteGroup.classList.add('hidden');
+            }
+        }
+
+        function toggleEverpurchaseType() {
+            const selected = document.querySelector('input[name="everpurchaseType"]:checked');
+            if (selected && selected.value === 'absolute') {
+                everpurchaseRelativeGroup.classList.add('hidden');
+                everpurchaseAbsoluteGroup.classList.remove('hidden');
+            } else {
+                everpurchaseRelativeGroup.classList.remove('hidden');
+                everpurchaseAbsoluteGroup.classList.add('hidden');
+            }
+        }
+
+        function updateCustomerFilterVisibility() {
+            const selected = customerFilterSelect.value;
+            lpWithEANRow.classList.toggle('hidden', selected !== 'lp_with_ean');
+            lpWithoutEANRow.classList.toggle('hidden', selected !== 'lp_without_ean');
+            everpurchaseRow.classList.toggle('hidden', selected !== 'everpurchase');
+        }
+
+        // ---------- Update summary ----------
+        function updateSummary(type) {
+            const recordType = recordTypeInput.value.trim() || 'SMS1';
+            const voucherId = voucherInput.value.trim() || 'O350';
+            
+            const typeLabels = {
+                prospect: 'Prospect',
+                sampler: 'Sampler',
+                customer: 'Customer',
+                ai: 'AI Audience',
+                seed: 'Seed'
+            };
+        }
+
+        // ---------- Build the opt-in clause ----------
+        function buildOptInClause(states) {
+            const emailOptin = states.emailOptin;
+            const smsOptin = states.smsOptin;
+            const edmSupp = states.edmSuppression;
+            const smsSupp = states.smsSuppression;
+            let edmTable = edmSuppressionTable.value.trim();
+            if (!edmTable) edmTable = 'AutosuppresionDE';
+            let smsTable = smsSuppressionTable.value.trim();
+            if (!smsTable) smsTable = 'SMS_optout_de';
+
+            let emailBranch = '';
+            let smsBranch = '';
+
+            if (emailOptin) {
+                let edmSnippet = edmSupp ? snippets.edmSuppression.replace(/\{\{EDM_SUPPRESSION_TABLE\}\}/g, edmTable) : '';
+                emailBranch = `(  
+		db.EMAIL_PERM_STATUS = 'Y'  
+		AND (db.EMAIL IS NOT NULL AND db.EMAIL != '')  
+		${edmSnippet}
+	)`;
+            }
+            if (smsOptin) {
+                let smsSnippet = smsSupp ? snippets.smsSuppression.replace(/\{\{SMS_SUPPRESSION_TABLE\}\}/g, smsTable) : '';
+                smsBranch = `( 
+		db.SMS_PERM_STATUS = 'Y' 
+		AND(db.MOBILE IS NOT NULL AND db.MOBILE != '') 
+		${smsSnippet}
+	)`;
+            }
+
+            if (emailOptin && smsOptin) {
+                return `WHERE  
+/* opt-ins – Adjust as per requirement */ 
+( 	 
+	${emailBranch} 
+	OR  
+	${smsBranch}
+)`;
+            } else if (emailOptin) {
+                return `WHERE  
+/* opt-ins – Adjust as per requirement */ 
+( 	 
+	${emailBranch}
+)`;
+            } else if (smsOptin) {
+                return `WHERE  
+/* opt-ins – Adjust as per requirement */ 
+( 	 
+	${smsBranch}
+)`;
+            } else {
+                return `WHERE 1=0 /* No opt-in selected – no rows will be returned */`;
+            }
+        }
+
+        // ---------- Display function ----------
+        function showQuery(type) {
+            // Save current settings before switching
+            if (currentActiveType !== type) {
+                saveCurrentSettings();
+            }
+
+            // Handle SEED query separately
+            if (type === 'seed') {
+                currentActiveType = 'seed';
+                const brandData = getCurrentBrandData();
+                const localeData = localeMap[brandData.locale];
+                const localeLabel = localeData ? localeData.label : 'SG';
+                const seedLabel = brandData.seedDB;
+
+                const seedQuery = `SELECT 
+  COALESCE(e.Subscriber_Key, s.Subscriber_Key) AS Subscriber_Key
+, COALESCE(e.first_name, s.first_name) AS first_name
+, COALESCE(e.last_name, s.last_name) AS last_name
+, COALESCE(e.Email, s.Email) AS Email
+, COALESCE(e.Mobile, s.Mobile) AS Mobile
+, 'SEED' AS customer_type 
+, 'SEED' AS Record_Type 
+, '${localeLabel}' AS Locale
+
+FROM [${seedLabel}] s 
+LEFT JOIN [${localeLabel}_CAMPAIGN_NAME_03242026_ENTRY] e 
+    ON e.EMAIL = s.EMAIL 
+
+WHERE (s.EMAIL != '' AND s.EMAIL IS NOT NULL)
+ /*AND (s.MOBILE != '' AND s.MOBILE IS NOT NULL)/*                   
+ /*if MY_GAB use s.Mobile_Formatted/*
+
+`;
+
+                currentDisplayedQuery = seedQuery;
+                try {
+                    const highlighted = hljs.highlight(seedQuery, { language: 'sql' });
+                    queryCode.innerHTML = highlighted.value;
+                } catch (e) {
+                    queryCode.textContent = seedQuery;
+                }
+                queryLabel.textContent = 'SEED Query';
+
+                // Disable all controls for SEED
+                disableAllControls(true);
+                
+                // Hide all special rows
+                prospectRow.classList.add('hidden');
+                prospectLoyaltyRow.classList.add('hidden');
+                samplerRow.classList.add('hidden');
+                customerSection.classList.add('hidden');
+
+                buttons.forEach(btn => {
+                    btn.classList.remove('active');
+                    if (btn.dataset.query === 'seed') btn.classList.add('active');
+                });
+
+                copyBtn.textContent = 'Copy';
+                copyBtn.classList.remove('copied');
+                updateSettings();
+                updateSummary(type);
+                return;
+            }
+
+            // Handle AI AUDIENCE
+            if (type === 'ai') {
+                currentActiveType = 'ai';
+                restoreSettings('ai');
+                
+                // Disable most controls for AI
+                disableAllControls(true);
+                
+                // Enable allowed controls for AI
+                const allowedIds = ['recordTypeInput', 'voucherInput', 'chkEmailOptin', 'chkSmsOptin', 'chkEDMSuppression', 'chkSMSSuppression', 
+                                   'edmSuppressionTable', 'smsSuppressionTable', 'chkPreviousEntry', 
+                                   'previousEntryTable', 'chkEngagements', 'engagementsMonths'];
+                allowedIds.forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.disabled = false;
+                });
+                
+                // Remove disabled class from allowed rows
+                ['emailOptinRow', 'smsOptinRow', 'edmSuppressionRow', 'smsSuppressionRow'].forEach(rowId => {
+                    const row = document.getElementById(rowId);
+                    if (row) {
+                        const topLine = row.querySelector('.filter-top-line');
+                        if (topLine) topLine.classList.remove('disabled');
+                    }
+                });
+                // Previous entry and engagements
+                const prevRow = document.querySelector('.prev-entry-wrapper');
+                if (prevRow) prevRow.classList.remove('disabled');
+                const engagementsLabel = document.querySelector('label:has(#chkEngagements)');
+                if (engagementsLabel) engagementsLabel.classList.remove('disabled');
+
+                // Hide all special rows
+                prospectRow.classList.add('hidden');
+                prospectLoyaltyRow.classList.add('hidden');
+                samplerRow.classList.add('hidden');
+                customerSection.classList.add('hidden');
+
+                // Build the AI query
+                buildAIQuery();
+                updateSummary(type);
+                return;
+            }
+
+            // For PROSPECT, SAMPLER, CUSTOMER - enable all controls
+            disableAllControls(false);
+            
+            // Remove disabled class from all rows
+            document.querySelectorAll('.filter-top-line').forEach(el => {
+                el.classList.remove('disabled');
+            });
+            document.querySelectorAll('.prev-entry-wrapper').forEach(el => {
+                el.classList.remove('disabled');
+            });
+            document.querySelectorAll('label:has(input[type="checkbox"])').forEach(el => {
+                el.classList.remove('disabled');
+            });
+
+            // Restore settings for this type
+            restoreSettings(type);
+
+            const baseQuery = queries[type];
+            if (!baseQuery) return;
+
+            const brandData = getCurrentBrandData();
+            const localeData = localeMap[brandData.locale];
+            if (!localeData) return;
+
+            const spaceDB = brandData.spaceDB;
+            const states = getCheckboxStates();
+            const recordType = recordTypeInput.value.trim() || 'SMS1';
+            const voucherId = voucherInput.value.trim() || 'O350';
+
+            let prevTable = previousEntryTable.value.trim();
+            if (!prevTable) prevTable = 'previous_entry_DE';
+
+            let engMonths = parseInt(engagementsMonths.value, 10);
+            if (isNaN(engMonths) || engMonths < 1) engMonths = 6;
+
+            const customerType = customerTypeMap[type] || 'Customer';
+
+            const optInClause = buildOptInClause(states);
+
+            let prospectSnippet = '';
+            if (type === 'prospect') {
+                const selectedType = document.querySelector('input[name="prospectType"]:checked');
+                if (selectedType && selectedType.value === 'absolute') {
+                    const start = getDateFromComponents(prospectStartYear, prospectStartMonth, prospectStartDay);
+                    const end = getDateFromComponents(prospectEndYear, prospectEndMonth, prospectEndDay);
+                    if (start && end) {
+                        prospectSnippet =
+                            `
+/* Prospect date range – adjust as per requirement */ 
+AND db.CREATION_DATE BETWEEN CAST('${start}' AS DATE) AND CAST('${end}' AS DATE)`;
+                    }
+                } else {
+                    let prospectVal = parseInt(prospectMonths.value, 10);
+                    if (isNaN(prospectVal) || prospectVal < 1) prospectVal = 6;
+                    prospectSnippet =
+                        `
+/* P${prospectVal}M prospects – adjust as per requirement */ 
+AND db.CREATION_DATE >= DATEADD(month, -${prospectVal}, GETDATE())`;
+                }
+            }
+
+            let prospectLoyaltySnippet = '';
+            if (type === 'prospect') {
+                let tiers = prospectLoyaltyTiers.value.trim();
+                if (!tiers) tiers = "'BLACK GOLD','GOLD','ROSE'";
+                prospectLoyaltySnippet =
+                    `
+AND db.Loyalty_Tier_Current NOT IN (${tiers}) /* Prospect loyalty filter */`;
+            }
+
+            let samplerSnippet = '';
+            if (type === 'sampler') {
+                const selectedType = document.querySelector('input[name="samplerType"]:checked');
+                if (selectedType && selectedType.value === 'absolute') {
+                    const start = getDateFromComponents(samplerStartYear, samplerStartMonth, samplerStartDay);
+                    const end = getDateFromComponents(samplerEndYear, samplerEndMonth, samplerEndDay);
+                    if (start && end) {
+                        samplerSnippet =
+                            `
+AND ORDER_DT BETWEEN CAST('${start}' AS DATE) AND CAST('${end}' AS DATE)`;
+                    }
+                } else {
+                    let samplerVal = parseInt(samplerMonths.value, 10);
+                    if (isNaN(samplerVal) || samplerVal < 1) samplerVal = 3;
+                    samplerSnippet =
+                        `
+AND ORDER_DT >= DATEADD(month, -${samplerVal}, GETDATE())`;
+                }
+            }
+
+            let lpWithEANSnippet = '';
+            if (type === 'customer' && customerFilterSelect.value === 'lp_with_ean') {
+                const selectedType = document.querySelector('input[name="lpWithEANType"]:checked');
+                const innerJoinBase = `/* for last purchase W/EAN – remove if everpurchase */ 
+INNER JOIN ( 
+	SELECT CUSTOMER_CODE, ORDER_DT, ORDER_NUM, COUNTER_ID, EAN 
+	FROM ( 
+		SELECT CUSTOMER_CODE, ORDER_DT, ORDER_NUM, COUNTER_ID, EAN, 
+		ROW_NUMBER() OVER (PARTITION BY CUSTOMER_CODE ORDER BY ORDER_DT DESC) AS rn 
+ 
+		FROM SPACE_Sales_Master sm 
+
+WHERE sm.Price * sm.QUANTITY > 0 
+		 
+	GROUP BY CUSTOMER_CODE, ORDER_DT, ORDER_NUM, COUNTER_ID, EAN 
+	) x 
+	WHERE x.rn = 1 
+	{{LP_WITH_EAN_COUNTER_ID_FILTER}}
+	{{LP_WITH_EAN_EAN_FILTER}}
+	`;
+
+                let filterClause = '';
+                if (selectedType && selectedType.value === 'absolute') {
+                    const start = getDateFromComponents(lpWithEANStartYear, lpWithEANStartMonth, lpWithEANStartDay);
+                    const end = getDateFromComponents(lpWithEANEndYear, lpWithEANEndMonth, lpWithEANEndDay);
+                    if (start && end) {
+                        filterClause =
+                            `AND ORDER_DT BETWEEN CAST('${start}' AS DATE) AND CAST('${end}' AS DATE) /* adjust as needed*/`;
+                    }
+                } else {
+                    let val = parseInt(lpWithEANMonths.value, 10);
+                    if (isNaN(val) || val < 1) val = 36;
+                    filterClause =
+                        `AND ORDER_DT >= DATEADD(month, -${val}, GETDATE()) /* adjust as per brief */`;
+                }
+
+                lpWithEANSnippet = innerJoinBase + filterClause + `
+) sm 
+ON db.customer_code = sm.customer_code`;
+            }
+
+            let lpWithoutEANSnippet = '';
+            if (type === 'customer' && customerFilterSelect.value === 'lp_without_ean') {
+                const selectedType = document.querySelector('input[name="lpWithoutEANType"]:checked');
+                let dateFilter = '';
+                if (selectedType && selectedType.value === 'absolute') {
+                    const start = getDateFromComponents(lpWithoutEANStartYear, lpWithoutEANStartMonth, lpWithoutEANStartDay);
+                    const end = getDateFromComponents(lpWithoutEANEndYear, lpWithoutEANEndMonth, lpWithoutEANEndDay);
+                    if (start && end) {
+                        dateFilter =
+                            `AND db.LAST_PURCHASE_DATE BETWEEN CAST('${start}' AS DATE) AND CAST('${end}' AS DATE) /* adjust as needed */`;
+                    }
+                } else {
+                    let val = parseInt(lpWithoutEANMonths.value, 10);
+                    if (isNaN(val) || val < 1) val = 36;
+                    dateFilter =
+                        `AND db.LAST_PURCHASE_DATE >= DATEADD(month, -${val}, GETDATE()) /* adjust as needed */`;
+                }
+                lpWithoutEANSnippet =
+                    `
+/* for last purchase w/o EAN – remove if everpurchase */ 
+${dateFilter}
+AND db.TOTAL_SPENT > 0 
+AND db.LAST_PURCHASE_STORE IN ('KX0','450KX0') /* for specific stores – remove if not needed */`;
+            }
+
+            let everpurchaseSnippet = '';
+            if (type === 'customer' && customerFilterSelect.value === 'everpurchase') {
+                const selectedType = document.querySelector('input[name="everpurchaseType"]:checked');
+                let dateFilter = '';
+                if (selectedType && selectedType.value === 'absolute') {
+                    const start = getDateFromComponents(everpurchaseStartYear, everpurchaseStartMonth, everpurchaseStartDay);
+                    const end = getDateFromComponents(everpurchaseEndYear, everpurchaseEndMonth, everpurchaseEndDay);
+                    if (start && end) {
+                        dateFilter =
+                            `AND sm.ORDER_DT BETWEEN CAST('${start}' AS DATE) AND CAST('${end}' AS DATE) /* adjust as needed*/`;
+                    }
+                } else {
+                    let everVal = parseInt(everpurchaseMonths.value, 10);
+                    if (isNaN(everVal) || everVal < 1) everVal = 6;
+                    dateFilter =
+                        `AND sm.ORDER_DT >= DATEADD(month, -${everVal}, GETDATE()) /* adjust as needed*/`;
+                }
+
+                let counterIdList = customerCounterIdList.value.trim();
+                let eanList = customerEanList.value.trim();
+                let counterIdFilter = states.customerCounterId && counterIdList ?
+                    `AND sm.counter_id IN (${counterIdList}) /* adjust as needed */` :
+                    '';
+                let eanFilter = states.customerEan && eanList ?
+                    `AND sm.EAN IN (${eanList}) /* adjust as needed*/` :
+                    '';
+
+                everpurchaseSnippet =
+                    `
+/* FOR Everpurchase */ 
+AND EXISTS( 
+	SELECT DISTINCT customer_code /* Make sure DISTINCT is present */ 
+ 
+	FROM SPACE_Sales_Master sm 
+		 
+	WHERE db.customer_code = sm.customer_code 
+	AND sm.Price * sm.QUANTITY > 0 
+	${dateFilter}
+	${counterIdFilter}
+	${eanFilter}
+)`;
+            }
+
+            let loyaltySnippet = '';
+            if (type === 'customer' && states.loyalty) {
+                let tiers = loyaltyTiersInput.value.trim();
+                if (!tiers) tiers = "'RUBY','GOLD','SAPPHIRE','BLACK DIAMOND'";
+                loyaltySnippet =
+                    `
+/* If loyalty is needed - adjust as per BU's loyalty values*/ 
+AND db.Loyalty_Tier_Current IN (${tiers})`;
+            }
+
+            let prevEntrySnippet = states.previousEntry ? snippets.previousEntry : '';
+            prevEntrySnippet = prevEntrySnippet.replace(/\{\{PREVIOUS_ENTRY_TABLE\}\}/g, prevTable);
+
+            let engagementsSnippet = states.engagements ? snippets.engagements : '';
+            engagementsSnippet = engagementsSnippet.replace(/\{\{ENGAGEMENTS_MONTHS\}\}/g, engMonths);
+
+            let samplerCounterIdFilter = '';
+            if (type === 'sampler' && states.samplerCounterId) {
+                let val = samplerCounterIdList.value.trim();
+                if (val) {
+                    samplerCounterIdFilter =
+                    `AND COUNTER_ID IN (${val}) /* for specific stores – remove if not needed */`;
+                }
+            }
+            let samplerEanFilter = '';
+            if (type === 'sampler' && states.samplerEan) {
+                let val = samplerEanList.value.trim();
+                if (val) {
+                    samplerEanFilter = `AND EAN IN (${val}) /* adjust as needed*/`;
+                }
+            }
+
+            let lpWithEanCounterIdFilter = '';
+            if (type === 'customer' && states.customerCounterId) {
+                let val = customerCounterIdList.value.trim();
+                if (val) {
+                    lpWithEanCounterIdFilter =
+                    `AND COUNTER_ID IN (${val}) /* for specific stores – remove if not needed */`;
+                }
+            }
+            let lpWithEanEanFilter = '';
+            if (type === 'customer' && states.customerEan) {
+                let val = customerEanList.value.trim();
+                if (val) {
+                    lpWithEanEanFilter = `AND EAN IN (${val}) /* adjust as needed*/`;
+                }
+            }
+
+            let voucherSnippet = '';
+            if (states.vouchers) {
+                voucherSnippet = snippets.vouchers.replace(/\{\{VOUCHER_ID\}\}/g, voucherId);
+            }
+
+            let finalQuery = baseQuery
+                .replace(/\{\{SPACE_DB\}\}/g, spaceDB)
+                .replace(/\{\{LOCALE\}\}/g, localeData.label)
+                .replace(/\{\{COUNTRY_CODE\}\}/g, localeData.code)
+                .replace(/\{\{CUSTOMER_TYPE\}\}/g, customerType)
+                .replace(/\{\{RECORD_TYPE\}\}/g, recordType)
+                .replace(/\{\{PREVIOUS_ENTRY_JOIN\}\}/g, prevEntrySnippet)
+                .replace(/\{\{OPT_IN_CLAUSE\}\}/g, optInClause)
+                .replace(/\{\{PROSPECT_SNIPPET\}\}/g, prospectSnippet)
+                .replace(/\{\{PROSPECT_LOYALTY_SNIPPET\}\}/g, prospectLoyaltySnippet)
+                .replace(/\{\{WHATSAPP\}\}/g, states.whatsapp ? snippets.whatsapp : '')
+                .replace(/\{\{ENGAGEMENTS\}\}/g, engagementsSnippet)
+                .replace(/\{\{AI_AUDIENCE\}\}/g, '') // Removed AI Audience snippet
+                .replace(/\{\{VOUCHERS\}\}/g, voucherSnippet)
+                .replace(/\{\{SAMPLER_SNIPPET\}\}/g, samplerSnippet)
+                .replace(/\{\{LP_WITH_EAN_SNIPPET\}\}/g, lpWithEANSnippet)
+                .replace(/\{\{LP_WITHOUT_EAN_SNIPPET\}\}/g, lpWithoutEANSnippet)
+                .replace(/\{\{LOYALTY_SNIPPET\}\}/g, loyaltySnippet)
+                .replace(/\{\{EVERPURCHASE_SNIPPET\}\}/g, everpurchaseSnippet)
+                .replace(/\{\{SAMPLER_COUNTER_ID_FILTER\}\}/g, samplerCounterIdFilter)
+                .replace(/\{\{SAMPLER_EAN_FILTER\}\}/g, samplerEanFilter)
+                .replace(/\{\{LP_WITH_EAN_COUNTER_ID_FILTER\}\}/g, lpWithEanCounterIdFilter)
+                .replace(/\{\{LP_WITH_EAN_EAN_FILTER\}\}/g, lpWithEanEanFilter);
+
+            finalQuery = finalQuery
+                .replace(/\s+\n/g, '\n')
+                .replace(/\n{2,}/g, '\n')
+                .trim();
+
+            currentDisplayedQuery = finalQuery;
+
+            try {
+                const highlighted = hljs.highlight(finalQuery, { language: 'sql' });
+                queryCode.innerHTML = highlighted.value;
+            } catch (e) {
+                queryCode.textContent = finalQuery;
+            }
+
+            const labelMap = { prospect: 'PROSPECT', sampler: 'SAMPLER', customer: 'CUSTOMER' };
+            queryLabel.textContent = `${labelMap[type]} Query`;
+
+            buttons.forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.query === type) btn.classList.add('active');
+            });
+
+            copyBtn.textContent = 'Copy';
+            copyBtn.classList.remove('copied');
+
+            currentActiveType = type;
+
+            // Show/hide conditional controls
+            if (type === 'prospect') {
+                prospectRow.classList.remove('hidden');
+                prospectLoyaltyRow.classList.remove('hidden');
+                samplerRow.classList.add('hidden');
+                customerSection.classList.add('hidden');
+                toggleProspectType();
+            } else if (type === 'sampler') {
+                prospectRow.classList.add('hidden');
+                prospectLoyaltyRow.classList.add('hidden');
+                samplerRow.classList.remove('hidden');
+                customerSection.classList.add('hidden');
+                toggleSamplerType();
+            } else if (type === 'customer') {
+                prospectRow.classList.add('hidden');
+                prospectLoyaltyRow.classList.add('hidden');
+                samplerRow.classList.add('hidden');
+                customerSection.classList.remove('hidden');
+                toggleLPWithEANType();
+                toggleLPWithoutEANType();
+                toggleEverpurchaseType();
+                updateCustomerFilterVisibility();
+            }
+
+            if (states.previousEntry) {
+                previousEntryTable.classList.remove('hidden');
+            } else {
+                previousEntryTable.classList.add('hidden');
+            }
+
+            updateSettings();
+            updateSummary(type);
+        }
+
+        // ---------- Build AI query ----------
+        function buildAIQuery() {
+            const baseQuery = queries.prospect;
+            const brandData = getCurrentBrandData();
+            const localeData = localeMap[brandData.locale];
+            if (!localeData) return;
+
+            const spaceDB = brandData.spaceDB;
+            const states = getCheckboxStates();
+            const recordType = recordTypeInput.value.trim() || 'SMS1';
+            const voucherId = voucherInput.value.trim() || 'O350';
+
+            let prevTable = previousEntryTable.value.trim();
+            if (!prevTable) prevTable = 'previous_entry_DE';
+
+            let engMonths = parseInt(engagementsMonths.value, 10);
+            if (isNaN(engMonths) || engMonths < 1) engMonths = 6;
+
+            const customerType = 'AI Audience';
+
+            const optInClause = buildOptInClause(states);
+            let prevEntrySnippet = states.previousEntry ? snippets.previousEntry : '';
+            prevEntrySnippet = prevEntrySnippet.replace(/\{\{PREVIOUS_ENTRY_TABLE\}\}/g, prevTable);
+
+            let engagementsSnippet = states.engagements ? snippets.engagements : '';
+            engagementsSnippet = engagementsSnippet.replace(/\{\{ENGAGEMENTS_MONTHS\}\}/g, engMonths);
+
+            let voucherSnippet = '';
+            if (states.vouchers) {
+                voucherSnippet = snippets.vouchers.replace(/\{\{VOUCHER_ID\}\}/g, voucherId);
+            }
+
+            let finalQuery = baseQuery
+                .replace(/\{\{SPACE_DB\}\}/g, spaceDB)
+                .replace(/\{\{LOCALE\}\}/g, localeData.label)
+                .replace(/\{\{COUNTRY_CODE\}\}/g, localeData.code)
+                .replace(/\{\{CUSTOMER_TYPE\}\}/g, customerType)
+                .replace(/\{\{RECORD_TYPE\}\}/g, recordType)
+                .replace(/\{\{PREVIOUS_ENTRY_JOIN\}\}/g, prevEntrySnippet)
+                .replace(/\{\{OPT_IN_CLAUSE\}\}/g, optInClause)
+                .replace(/\{\{PROSPECT_SNIPPET\}\}/g, '')
+                .replace(/\{\{PROSPECT_LOYALTY_SNIPPET\}\}/g, '')
+                .replace(/\{\{WHATSAPP\}\}/g, '')
+                .replace(/\{\{ENGAGEMENTS\}\}/g, engagementsSnippet)
+                .replace(/\{\{AI_AUDIENCE\}\}/g, snippets.aiAudience)
+                .replace(/\{\{VOUCHERS\}\}/g, voucherSnippet)
+                .replace(/AND db\.FIRST_PURCHASE_DATE IS NULL\s*\n/g, '')
+                .replace(/\/\* Loyalty – adjust as BU's loyalty values \*\/\s*\nAND db\.LOYALTY_TIER_CURRENT NOT IN \('BLACK GOLD','GOLD','ROSE'\)\s*\n/g, '');
+
+            finalQuery = finalQuery
+                .replace(/\s+\n/g, '\n')
+                .replace(/\n{2,}/g, '\n')
+                .trim();
+
+            currentDisplayedQuery = finalQuery;
+
+            try {
+                const highlighted = hljs.highlight(finalQuery, { language: 'sql' });
+                queryCode.innerHTML = highlighted.value;
+            } catch (e) {
+                queryCode.textContent = finalQuery;
+            }
+
+            queryLabel.textContent = 'AI AUDIENCE Query';
+
+            buttons.forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.query === 'ai') btn.classList.add('active');
+            });
+
+            copyBtn.textContent = 'Copy';
+            copyBtn.classList.remove('copied');
+            currentActiveType = 'ai';
+            updateSettings();
+            updateSummary('ai');
+        }
+
+        // ---------- Helper to disable/enable all controls ----------
+        function disableAllControls(disabled) {
+            const allControls = document.querySelectorAll('.checkbox-column input, .checkbox-column select');
+            
+            allControls.forEach(control => {
+                if (currentActiveType === 'ai') {
+                    const allowedIds = ['recordTypeInput', 'voucherInput', 'chkEmailOptin', 'chkSmsOptin', 'chkEDMSuppression', 'chkSMSSuppression', 
+                                       'edmSuppressionTable', 'smsSuppressionTable', 'chkPreviousEntry', 
+                                       'previousEntryTable', 'chkEngagements', 'engagementsMonths'];
+                    if (allowedIds.includes(control.id)) {
+                        return;
+                    }
+                }
+                control.disabled = disabled;
+            });
+
+            // Handle labels
+            document.querySelectorAll('.checkbox-column label, .checkbox-column .filter-top-line').forEach(label => {
+                if (currentActiveType === 'ai') {
+                    const parentRow = label.closest('.filter-row');
+                    if (parentRow) {
+                        const allowedRowIds = ['emailOptinRow', 'smsOptinRow', 'edmSuppressionRow', 'smsSuppressionRow'];
+                        if (allowedRowIds.includes(parentRow.id)) {
+                            return;
+                        }
+                    }
+                    const prevWrapper = label.closest('.prev-entry-wrapper');
+                    if (prevWrapper) return;
+                    const engagementsLabel = label.closest('label');
+                    if (engagementsLabel && engagementsLabel.querySelector('#chkEngagements')) return;
+                    const recordTypeWrapper = label.closest('.record-type-wrapper');
+                    if (recordTypeWrapper) return;
+                    const voucherWrapper = label.closest('.voucher-wrapper');
+                    if (voucherWrapper) return;
+                }
+                if (disabled) {
+                    label.classList.add('disabled');
+                } else {
+                    label.classList.remove('disabled');
+                }
+            });
+
+            // Handle text inputs
+            document.querySelectorAll('.checkbox-column input[type="text"], .checkbox-column input[type="number"], .checkbox-column input[type="date"]').forEach(input => {
+                if (currentActiveType === 'ai') {
+                    const allowedIds = ['recordTypeInput', 'voucherInput', 'edmSuppressionTable', 'smsSuppressionTable', 'previousEntryTable', 'engagementsMonths'];
+                    if (allowedIds.includes(input.id)) {
+                        return;
+                    }
+                }
+                input.disabled = disabled;
+            });
+        }
+
+        // ---------- Event listeners ----------
+        buttons.forEach(btn => {
+            btn.addEventListener('click', function() {
+                showQuery(this.dataset.query);
+            });
+        });
+
+        brandSelect.addEventListener('change', function() {
+            if (currentActiveType === 'seed') {
+                showQuery('seed');
+            } else if (currentActiveType === 'ai') {
+                buildAIQuery();
+            } else {
+                showQuery(currentActiveType);
+            }
+        });
+
+        // All checkboxes - modified to save settings
+        document.querySelectorAll('input[type="checkbox"]').forEach(chk => {
+            chk.addEventListener('change', function() {
+                if (currentActiveType === 'seed') return;
+                if (currentActiveType === 'ai') {
+                    const allowedIds = ['chkEmailOptin', 'chkSmsOptin', 'chkEDMSuppression', 'chkSMSSuppression', 
+                                       'chkPreviousEntry', 'chkEngagements'];
+                    if (allowedIds.includes(this.id)) {
+                        saveCurrentSettings();
+                        buildAIQuery();
+                    }
+                    return;
+                }
+                if (this === chkPreviousEntry) {
+                    if (this.checked) {
+                        previousEntryTable.classList.remove('hidden');
+                    } else {
+                        previousEntryTable.classList.add('hidden');
+                    }
+                }
+                saveCurrentSettings();
+                showQuery(currentActiveType);
+            });
+        });
+
+        // Text inputs
+        document.querySelectorAll('.checkbox-column input[type="text"], .checkbox-column input[type="number"]').forEach(input => {
+            input.addEventListener('input', function() {
+                if (currentActiveType === 'seed') return;
+                if (currentActiveType === 'ai') {
+                    const allowedIds = ['recordTypeInput', 'voucherInput', 'edmSuppressionTable', 'smsSuppressionTable', 'previousEntryTable', 'engagementsMonths'];
+                    if (allowedIds.includes(this.id)) {
+                        saveCurrentSettings();
+                        buildAIQuery();
+                    }
+                    return;
+                }
+                saveCurrentSettings();
+                showQuery(currentActiveType);
+            });
+        });
+
+        // Date component changes
+        document.querySelectorAll('.date-components select').forEach(select => {
+            select.addEventListener('change', function() {
+                if (currentActiveType === 'seed' || currentActiveType === 'ai') return;
+                saveCurrentSettings();
+                showQuery(currentActiveType);
+            });
+        });
+
+        // Prospect type radio buttons
+        prospectTypeRadios.forEach(radio => {
+            radio.addEventListener('change', function() {
+                if (currentActiveType === 'seed' || currentActiveType === 'ai') return;
+                saveCurrentSettings();
+                toggleProspectType();
+                showQuery(currentActiveType);
+            });
+        });
+
+        // Sampler type radio buttons
+        samplerTypeRadios.forEach(radio => {
+            radio.addEventListener('change', function() {
+                if (currentActiveType === 'seed' || currentActiveType === 'ai') return;
+                saveCurrentSettings();
+                toggleSamplerType();
+                showQuery(currentActiveType);
+            });
+        });
+
+        // Customer type radio buttons
+        lpWithEANTypeRadios.forEach(radio => {
+            radio.addEventListener('change', function() {
+                if (currentActiveType === 'seed' || currentActiveType === 'ai') return;
+                saveCurrentSettings();
+                toggleLPWithEANType();
+                showQuery(currentActiveType);
+            });
+        });
+
+        lpWithoutEANTypeRadios.forEach(radio => {
+            radio.addEventListener('change', function() {
+                if (currentActiveType === 'seed' || currentActiveType === 'ai') return;
+                saveCurrentSettings();
+                toggleLPWithoutEANType();
+                showQuery(currentActiveType);
+            });
+        });
+
+        everpurchaseTypeRadios.forEach(radio => {
+            radio.addEventListener('change', function() {
+                if (currentActiveType === 'seed' || currentActiveType === 'ai') return;
+                saveCurrentSettings();
+                toggleEverpurchaseType();
+                showQuery(currentActiveType);
+            });
+        });
+
+        // Customer filter dropdown
+        customerFilterSelect.addEventListener('change', function() {
+            if (currentActiveType === 'seed' || currentActiveType === 'ai') return;
+            saveCurrentSettings();
+            updateCustomerFilterVisibility();
+            showQuery(currentActiveType);
+        });
+
+        // ---------- Copy ----------
+        copyBtn.addEventListener('click', function() {
+            if (!currentDisplayedQuery || currentDisplayedQuery.trim() === '') {
+                alert('No query to copy.');
+                return;
+            }
+
+            navigator.clipboard.writeText(currentDisplayedQuery).then(() => {
+                this.textContent = 'Copied!';
+                this.classList.add('copied');
+                setTimeout(() => {
+                    this.textContent = 'Copy';
+                    this.classList.remove('copied');
+                }, 2000);
+            }).catch(() => {
+                try {
+                    const textarea = document.createElement('textarea');
+                    textarea.value = currentDisplayedQuery;
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textarea);
+                    this.textContent = 'Copied!';
+                    this.classList.add('copied');
+                    setTimeout(() => {
+                        this.textContent = 'Copy';
+                        this.classList.remove('copied');
+                    }, 2000);
+                } catch (fallbackErr) {
+                    alert('Unable to copy. Please select and copy the text manually.');
+                }
+            });
+        });
+
+        // ---------- Initialize ----------
+        initializeDateComponents();
+        
+        // Set default dates - From: 2025, To: 2026
+        setDateComponents(prospectStartYear, prospectStartMonth, prospectStartDay, '2025-06-01');
+        setDateComponents(prospectEndYear, prospectEndMonth, prospectEndDay, '2026-07-31');
+        setDateComponents(samplerStartYear, samplerStartMonth, samplerStartDay, '2025-06-01');
+        setDateComponents(samplerEndYear, samplerEndMonth, samplerEndDay, '2026-07-31');
+        setDateComponents(lpWithEANStartYear, lpWithEANStartMonth, lpWithEANStartDay, '2025-06-01');
+        setDateComponents(lpWithEANEndYear, lpWithEANEndMonth, lpWithEANEndDay, '2026-07-31');
+        setDateComponents(lpWithoutEANStartYear, lpWithoutEANStartMonth, lpWithoutEANStartDay, '2025-06-01');
+        setDateComponents(lpWithoutEANEndYear, lpWithoutEANEndMonth, lpWithoutEANEndDay, '2026-07-31');
+        setDateComponents(everpurchaseStartYear, everpurchaseStartMonth, everpurchaseStartDay, '2024-02-01');
+        setDateComponents(everpurchaseEndYear, everpurchaseEndMonth, everpurchaseEndDay, '2025-07-31');
+
+        // ---------- Initial load ----------
+        showQuery('prospect');
+    </script>
+</body>
+</html>
