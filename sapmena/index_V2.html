@@ -2470,32 +2470,57 @@ WHERE (s.EMAIL != '' AND s.EMAIL IS NOT NULL)
                 currentActiveType = 'ai';
                 restoreSettings('ai');
                 
-                // Disable most controls for AI
+                // First, disable all controls
                 disableAllControls(true);
                 
-                // Enable allowed controls for AI
+                // THEN enable allowed controls (override the disable)
                 const allowedIds = ['recordTypeInput', 'voucherInput', 'chkEmailOptin', 'chkSmsOptin', 'chkEDMSuppression', 'chkSMSSuppression', 
-                                   'edmSuppressionTable', 'smsSuppressionTable', 'chkPreviousEntry', 
-                                   'previousEntryTable', 'chkEngagements', 'engagementsMonths'];
+                                'edmSuppressionTable', 'smsSuppressionTable', 'chkPreviousEntry', 
+                                'previousEntryTable', 'chkEngagements', 'engagementsMonths'];
                 allowedIds.forEach(id => {
                     const el = document.getElementById(id);
-                    if (el) el.disabled = false;
+                    if (el) {
+                        el.disabled = false;
+                        // Also remove any "disabled" class from parent labels
+                        const parentLabel = el.closest('label');
+                        if (parentLabel) {
+                            parentLabel.classList.remove('disabled');
+                        }
+                    }
                 });
                 
                 // Remove disabled class from allowed rows
-                ['emailOptinRow', 'smsOptinRow', 'edmSuppressionRow', 'smsSuppressionRow'].forEach(rowId => {
-                    const row = document.getElementById(rowId);
+                const allowedRowIds = ['emailOptinRow', 'smsOptinRow', 'edmSuppressionRow', 'smsSuppressionRow', 'prev-entry-wrapper'];
+                allowedRowIds.forEach(rowId => {
+                    const row = document.getElementById(rowId) || document.querySelector(rowId);
                     if (row) {
+                        row.classList.remove('disabled');
                         const topLine = row.querySelector('.filter-top-line');
                         if (topLine) topLine.classList.remove('disabled');
                     }
                 });
-                // Previous entry and engagements
-                const prevRow = document.querySelector('.prev-entry-wrapper');
-                if (prevRow) prevRow.classList.remove('disabled');
+                
+                // Explicitly handle previous entry wrapper
+                const prevWrapper = document.querySelector('.prev-entry-wrapper');
+                if (prevWrapper) {
+                    prevWrapper.classList.remove('disabled');
+                    // Also enable the checkbox and input inside
+                    const checkbox = prevWrapper.querySelector('#chkPreviousEntry');
+                    const input = prevWrapper.querySelector('#previousEntryTable');
+                    if (checkbox) checkbox.disabled = false;
+                    if (input) input.disabled = false;
+                }
+                
+                // Handle engagements label
                 const engagementsLabel = document.querySelector('label:has(#chkEngagements)');
-                if (engagementsLabel) engagementsLabel.classList.remove('disabled');
-
+                if (engagementsLabel) {
+                    engagementsLabel.classList.remove('disabled');
+                    const chk = engagementsLabel.querySelector('#chkEngagements');
+                    if (chk) chk.disabled = false;
+                    const input = engagementsLabel.querySelector('#engagementsMonths');
+                    if (input) input.disabled = false;
+                }
+                
                 // Hide all special rows
                 prospectRow.classList.add('hidden');
                 prospectLoyaltyRow.classList.add('hidden');
