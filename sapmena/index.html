@@ -1245,13 +1245,13 @@
                         </div>
                         <!-- Sampler-specific extra options - rearranged -->
                         <div class="filter-extra-options" style="margin-top:4px;">
-                            <label><input type="checkbox" id="chkSamplerCounterId" checked /> COUNTER_ID filter</label>
+                            <label><input type="checkbox" id="chkSamplerCounterId" checked /> COUNTER_ID (Store Codes)</label>
                             <div class="filter-input-group">
                                 <input type="text" id="samplerCounterIdList" value="'KX0','450KX0'" />
                             </div>
                         </div>
                         <div class="filter-extra-options">
-                            <label><input type="checkbox" id="chkSamplerEan" checked /> EAN filter</label>
+                            <label><input type="checkbox" id="chkSamplerEan" checked /> EAN (Product Codes)</label>
                             <div class="filter-input-group">
                                 <input type="text" id="samplerEanList" value="'4936968883583', '3614274507713'" />
                             </div>
@@ -1788,23 +1788,23 @@ INNER JOIN {{PREVIOUS_ENTRY_TABLE}} en
 ON db.CUSTOMER_CODE = en. CUSTOMER_CODE 
 `,
             edmSuppression: `
-AND NOT EXISTS(  
-    SELECT 1 FROM {{EDM_SUPPRESSION_TABLE}} em  
-    WHERE db.EMAIL = em.Email 
-    OR db.CUSTOMER_CODE = em.SubscriberKey ) 
+    AND NOT EXISTS(  
+        SELECT 1 FROM {{EDM_SUPPRESSION_TABLE}} em  
+        WHERE db.EMAIL = em.Email 
+        OR db.CUSTOMER_CODE = em.SubscriberKey ) 
 `,
             smsSuppression: `
-AND NOT EXISTS( 
-    SELECT 1 FROM {{SMS_SUPPRESSION_TABLE}} sm 
-    WHERE db.MOBILE = sm.Mobile 
-)
+    AND NOT EXISTS( 
+        SELECT 1 FROM {{SMS_SUPPRESSION_TABLE}} sm 
+        WHERE db.MOBILE = sm.Mobile 
+    )
 `,
             whatsapp: `
 /* FOR WHATSAPP SENDS */ 
 AND NOT EXISTS( 
-	SELECT 1 FROM WA_unsubscribe_DE wa  
-	WHERE db.MOBILE = wa.MOBILE 
-	) 
+    SELECT 1 FROM WA_unsubscribe_DE wa  
+    WHERE db.MOBILE = wa.MOBILE 
+    ) 
 `,
             engagements: `
 /* FOR Engagements / / EXAMPLE: P6M Open */  
@@ -2433,50 +2433,44 @@ AND EXISTS(
 
             // For Email+SMS combined opt-in
             if (optInSettings.type === 'email_and_sms') {
-                return `WHERE  
-        /* opt-ins – Adjust as per requirement */ 
-        (
-            (
-                db.EMAIL_PERM_STATUS = 'Y'
-                AND (db.EMAIL IS NOT NULL AND db.EMAIL != '')
-                ${emailSuppression}
-            )
-            OR
-            (
-                db.SMS_PERM_STATUS = 'Y'
-                AND (db.MOBILE IS NOT NULL AND db.MOBILE != '')
-                ${smsSuppression}
-            )
-        )`;
+                return `
+WHERE ((
+    db.EMAIL_PERM_STATUS = 'Y'
+    AND (db.EMAIL IS NOT NULL AND db.EMAIL != '')
+    ${emailSuppression}
+)
+OR
+(
+db.SMS_PERM_STATUS = 'Y'
+AND (db.MOBILE IS NOT NULL AND db.MOBILE != '')
+    ${smsSuppression}
+))`;
             }
 
             // For Email+WHA combined opt-in
             if (optInSettings.type === 'email_and_wha') {
-                return `WHERE  
-        /* opt-ins – Adjust as per requirement */ 
-        (
-            (
-                db.EMAIL_PERM_STATUS = 'Y'
-                AND (db.EMAIL IS NOT NULL AND db.EMAIL != '')
-                ${emailSuppression}
-            )
-            OR
-            (
-                db.SMS_PERM_STATUS = 'Y' AND db.EMAIL_PERM_STATUS != 'Y'
-                AND (db.MOBILE IS NOT NULL AND db.MOBILE != '')
-                ${smsSuppression}
-            )
-        )`;
+                return `
+WHERE ((
+     db.EMAIL_PERM_STATUS = 'Y'
+     AND (db.EMAIL IS NOT NULL AND db.EMAIL != '')
+     ${emailSuppression}
+     )
+     OR
+     (
+     db.SMS_PERM_STATUS = 'Y' AND db.EMAIL_PERM_STATUS != 'Y'
+     AND (db.MOBILE IS NOT NULL AND db.MOBILE != '')
+     ${smsSuppression}
+))`;
             }
 
             // For other opt-in types, build the standard clause with suppression
             const optInCondition = optInSettings.condition;
-            return `WHERE  
-        /* opt-ins – Adjust as per requirement */ 
-        ( 	${optInCondition} 
-            ${edmSnippet}
-            ${smsSnippet}
-        )`;
+            return `
+WHERE ( 	
+    ${optInCondition} 
+    ${edmSnippet}
+    ${smsSnippet}
+)`;
         }
 
         // ---------- Display function ----------
@@ -2700,7 +2694,7 @@ AND db.CREATION_DATE >= DATEADD(month, -${prospectVal}, GETDATE())`;
                 let tiers = prospectLoyaltyTiers.value.trim();
                 if (!tiers) tiers = "'BLACK GOLD','GOLD','ROSE'";
                 prospectLoyaltySnippet =
-                    `AND db.Loyalty_Tier_Current NOT IN (${tiers}) /* Prospect loyalty filter */`;
+                    `AND db.Loyalty_Tier_Current NOT IN (${tiers})`;
             }
 
             let samplerSnippet = '';
