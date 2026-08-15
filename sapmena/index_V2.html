@@ -1090,7 +1090,14 @@
                         <label for="recordTypeInput">Record Type:</label>
                         <input type="text" id="recordTypeInput" value="SMS1" />
                     </div>
-
+                    <!-- Previous Entry Join -->
+                    <div class="prev-entry-wrapper">
+                        <label class="prev-entry-row">
+                            <input type="checkbox" id="chkPreviousEntry" />
+                            <span>Previous Touchpoint DE</span>
+                        </label>
+                        <input type="text" id="previousEntryTable" value="previous_entry_DE" class="prev-entry-input hidden" />
+                    </div>
                     <!-- Email Opt-in Dropdown -->
                     <div class="optin-dropdown-wrapper">
                         <label for="emailOptinDropdown">Opt-in Settings:</label>
@@ -1100,20 +1107,13 @@
                             <option value="sms_optin">SMS Opt-in</option>
                             <option value="sms_only">SMS Opt-in Only</option>
                             <option value="wha_optin">WHA Opt-in</option>
+                            <option value="email_and_sms">Email+SMS(Combined)</option>
+                            <option value="email_and_wha">Email+WHA(Combined)</option>
                         </select>
                     </div>
 
                     <!-- SMS Opt-in Dropdown (hidden, kept for compatibility but not used) -->
                     <!-- We'll use the dropdown above to control both -->
-
-                    <!-- Previous Entry Join -->
-                    <div class="prev-entry-wrapper">
-                        <label class="prev-entry-row">
-                            <input type="checkbox" id="chkPreviousEntry" />
-                            <span>Previous Touchpoint DE</span>
-                        </label>
-                        <input type="text" id="previousEntryTable" value="previous_entry_DE" class="prev-entry-input hidden" />
-                    </div>
 
                     <!-- EDM Suppression -->
                     <div class="filter-row" id="edmSuppressionRow">
@@ -1517,28 +1517,38 @@
         const optInMap = {
             'email_optin': {
                 condition: `db.EMAIL_PERM_STATUS = 'Y'`,
-                recordType: 'EDM1',
+                recordType: `'EDM1' AS record_type`,
                 label: 'Email Opt-in'
             },
             'email_only': {
                 condition: `db.EMAIL_PERM_STATUS = 'Y' AND db.SMS_PERM_STATUS != 'Y'`,
-                recordType: 'EDM1',
+                recordType: `'EDM1' AS record_type`,
                 label: 'Email Opt-in Only'
             },
             'sms_optin': {
                 condition: `db.SMS_PERM_STATUS = 'Y'`,
-                recordType: 'SMS1',
+                recordType: `'SMS1' AS record_type`,
                 label: 'SMS Opt-in'
             },
             'sms_only': {
                 condition: `db.SMS_PERM_STATUS = 'Y' AND db.EMAIL_PERM_STATUS != 'Y'`,
-                recordType: 'SMS1',
+                recordType: `'SMS1' AS record_type`,
                 label: 'SMS Opt-in Only'
             },
             'wha_optin': {
                 condition: `db.SMS_PERM_STATUS = 'Y' AND db.EMAIL_PERM_STATUS != 'Y'`,
-                recordType: 'WHA1',
+                recordType: `'WHA1' AS record_type`,
                 label: 'WHA Opt-in'
+            },
+            'email_and_sms': {
+                condition: `(db.EMAIL_PERM_STATUS = 'Y' AND db.EMAIL IS NOT NULL AND db.EMAIL != '') OR (db.SMS_PERM_STATUS = 'Y' AND db.MOBILE IS NOT NULL AND db.MOBILE != '')`,
+                recordType: `CASE WHEN db.SMS_PERM_STATUS = 'Y' AND db.EMAIL_PERM_STATUS !='Y' THEN 'SMS1' ELSE 'EDM1' END AS record_type`,
+                label: 'Email+SMS'
+            },
+            'email_and_wha': {
+                condition: `(db.EMAIL_PERM_STATUS = 'Y' AND db.EMAIL IS NOT NULL AND db.EMAIL != '') OR (db.SMS_PERM_STATUS = 'Y' AND db.EMAIL_PERM_STATUS !='Y' AND db.MOBILE IS NOT NULL AND db.MOBILE != '')`,
+                recordType: `CASE WHEN db.SMS_PERM_STATUS = 'Y' AND db.EMAIL_PERM_STATUS !='Y' THEN 'WHA1' ELSE 'EDM1' END AS record_type`,
+                label: 'Email+WHA'
             }
         };
 
@@ -1576,7 +1586,7 @@ END AS Mobile
  
 , '{{LOCALE}}' AS locale /* Update according to BU country */ 
 , '{{CUSTOMER_TYPE}}' AS customer_type 
-, '{{RECORD_TYPE}}' AS record_type /* Usually the touchpoint, but depends on your preference */ 
+, {{RECORD_TYPE}}  /* Usually the touchpoint, but depends on your preference */ 
  
 FROM {{SPACE_DB}} db 
  
@@ -1645,7 +1655,7 @@ END AS Mobile
  
 , '{{LOCALE}}' AS locale /* Update according to BU country */ 
 , '{{CUSTOMER_TYPE}}' AS customer_type 
-, '{{RECORD_TYPE}}' AS record_type /* Usually the touchpoint, but depends on your preference */ 
+, {{RECORD_TYPE}}/* Usually the touchpoint, but depends on your preference */ 
  
 FROM {{SPACE_DB}} db 
  
@@ -1730,7 +1740,7 @@ END AS Mobile
  
 , '{{LOCALE}}' AS locale /* Update according to BU country */ 
 , '{{CUSTOMER_TYPE}}' AS customer_type 
-, '{{RECORD_TYPE}}' AS record_type /* Usually the touchpoint, but depends on your preference */ 
+, {{RECORD_TYPE}}/* Usually the touchpoint, but depends on your preference */ 
  
 FROM {{SPACE_DB}} db 
  
@@ -2416,16 +2426,57 @@ AND EXISTS(
             let edmSnippet = edmSupp ? snippets.edmSuppression.replace(/\{\{EDM_SUPPRESSION_TABLE\}\}/g, edmTable) : '';
             let smsSnippet = smsSupp ? snippets.smsSuppression.replace(/\{\{SMS_SUPPRESSION_TABLE\}\}/g, smsTable) : '';
 
-            // Build the opt-in condition based on dropdown selection
-            let optInCondition = optInSettings.condition;
+            let emailSuppression = edmSupp ? 
+                `AND NOT EXISTS(SELECT 1 FROM ${edmTable} em WHERE db.EMAIL = em.Email OR db.CUSTOMER_CODE = em.SubscriberKey)` : '';
+            let smsSuppression = smsSupp ? 
+                `AND NOT EXISTS(SELECT 1 FROM ${smsTable} sm WHERE db.MOBILE = sm.Mobile)` : '';
 
-            // Build the full opt-in clause with suppression
+            // For Email+SMS combined opt-in
+            if (optInSettings.type === 'email_and_sms') {
+                return `WHERE  
+        /* opt-ins – Adjust as per requirement */ 
+        (
+            (
+                db.EMAIL_PERM_STATUS = 'Y'
+                AND (db.EMAIL IS NOT NULL AND db.EMAIL != '')
+                ${emailSuppression}
+            )
+            OR
+            (
+                db.SMS_PERM_STATUS = 'Y'
+                AND (db.MOBILE IS NOT NULL AND db.MOBILE != '')
+                ${smsSuppression}
+            )
+        )`;
+            }
+
+            // For Email+WHA combined opt-in
+            if (optInSettings.type === 'email_and_wha') {
+                return `WHERE  
+        /* opt-ins – Adjust as per requirement */ 
+        (
+            (
+                db.EMAIL_PERM_STATUS = 'Y'
+                AND (db.EMAIL IS NOT NULL AND db.EMAIL != '')
+                ${emailSuppression}
+            )
+            OR
+            (
+                db.SMS_PERM_STATUS = 'Y' AND db.EMAIL_PERM_STATUS != 'Y'
+                AND (db.MOBILE IS NOT NULL AND db.MOBILE != '')
+                ${smsSuppression}
+            )
+        )`;
+            }
+
+            // For other opt-in types, build the standard clause with suppression
+            const optInCondition = optInSettings.condition;
             return `WHERE  
-/* opt-ins – Adjust as per requirement */ 
-( 	${optInCondition} 
-	${edmSnippet}
-	${smsSnippet}
-)`;
+        /* opt-ins – Adjust as per requirement */ 
+        ( 	${optInCondition} 
+            ${edmSnippet}
+            ${smsSnippet}
+        )`;
         }
 
         // ---------- Display function ----------

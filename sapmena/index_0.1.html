@@ -290,38 +290,6 @@
             box-shadow: 0 0 0 2px rgba(30, 58, 138, 0.15);
         }
 
-        /* --- Dropdown styling for opt-in --- */
-        .optin-dropdown {
-            padding: 4px 8px;
-            border: 1px solid #d1d9e3;
-            border-radius: 0px;
-            font-size: 13px;
-            font-weight: 500;
-            background: #fff;
-            color: #1e293b;
-            outline: none;
-            cursor: pointer;
-            min-width: 160px;
-        }
-        .optin-dropdown:focus {
-            border-color: #1e3a8a;
-            box-shadow: 0 0 0 2px rgba(30, 58, 138, 0.15);
-        }
-        .optin-dropdown-wrapper {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 3px 0;
-            flex-wrap: wrap;
-        }
-        .optin-dropdown-wrapper label {
-            font-weight: 500;
-            color: #1e293b;
-            font-size: 14px;
-            cursor: default;
-            padding: 0;
-        }
-
         /* --- Date components --- */
         .date-components {
             display: inline-flex;
@@ -958,9 +926,6 @@
                 flex-direction: column;
                 gap: 6px;
             }
-            .optin-dropdown {
-                min-width: 120px;
-            }
         }
         @media (max-width: 600px) {
             .control-bar {
@@ -1044,13 +1009,6 @@
             .voucher-wrapper {
                 flex-wrap: wrap;
             }
-            .optin-dropdown-wrapper {
-                flex-wrap: wrap;
-            }
-            .optin-dropdown {
-                min-width: 100px;
-                width: 100%;
-            }
         }
     </style>
 </head>
@@ -1059,6 +1017,7 @@
         <div class="header-row">
             <div class="header-left">
                 <h1>Space DB Query Builder</h1>
+                <!-- <a href="snippets.html" class="snippets-btn">Snippets</a> -->
             </div>
         </div>
         <div class="subhead">Choose a brand – sets DB, locale, and country code. Checkbox/Input for settings.</div>
@@ -1086,10 +1045,11 @@
                 <!-- Checkbox column -->
                 <div class="checkbox-column" id="checkboxGroup">
                     <!-- Record Type -->
-                    <div class="record-type-wrapper" style="display: none !important;">
+                    <div class="record-type-wrapper">
                         <label for="recordTypeInput">Record Type:</label>
                         <input type="text" id="recordTypeInput" value="SMS1" />
                     </div>
+
                     <!-- Previous Entry Join -->
                     <div class="prev-entry-wrapper">
                         <label class="prev-entry-row">
@@ -1098,22 +1058,22 @@
                         </label>
                         <input type="text" id="previousEntryTable" value="previous_entry_DE" class="prev-entry-input hidden" />
                     </div>
-                    <!-- Email Opt-in Dropdown -->
-                    <div class="optin-dropdown-wrapper">
-                        <label for="emailOptinDropdown">Opt-in Settings:</label>
-                        <select id="emailOptinDropdown" class="optin-dropdown">
-                            <option value="email_optin">Email Opt-in</option>
-                            <option value="email_only">Email Opt-in Only</option>
-                            <option value="sms_optin">SMS Opt-in</option>
-                            <option value="sms_only">SMS Opt-in Only</option>
-                            <option value="wha_optin">WHA Opt-in</option>
-                            <option value="email_and_sms">Email+SMS(Combined)</option>
-                            <option value="email_and_wha">Email+WHA(Combined)</option>
-                        </select>
+
+                    <!-- Email Opt-in -->
+                    <div class="filter-row" id="emailOptinRow">
+                        <div class="filter-top-line">
+                            <input type="checkbox" id="chkEmailOptin" checked />
+                            <span>Email Opt-in</span>
+                        </div>
                     </div>
 
-                    <!-- SMS Opt-in Dropdown (hidden, kept for compatibility but not used) -->
-                    <!-- We'll use the dropdown above to control both -->
+                    <!-- SMS Opt-in -->
+                    <div class="filter-row" id="smsOptinRow">
+                        <div class="filter-top-line">
+                            <input type="checkbox" id="chkSmsOptin" checked />
+                            <span>SMS Opt-in</span>
+                        </div>
+                    </div>
 
                     <!-- EDM Suppression -->
                     <div class="filter-row" id="edmSuppressionRow">
@@ -1151,6 +1111,10 @@
                     </label>
 
                     <!-- Vouchers -->
+                    <!-- <div class="voucher-wrapper">
+                        <label for="voucherInput">Voucher:</label>
+                        <input type="text" id="voucherInput" value="O350" />
+                    </div> -->
                     <label><input type="checkbox" id="chkVouchers" /> Voucher<input type="text" id="voucherInput" value="O350" /></label>
 
                     <!-- Prospect (PROSPECT only) - Now radio only -->
@@ -1444,6 +1408,18 @@
                 </div>
             </div>
         </div>
+
+        <!-- <div class="footer" id="footerSummary">
+            <div class="summary-row">
+                <span class="summary-item"><span class="label">Query:</span> <span class="value" id="summaryQueryType">Prospect</span></span>
+                <span class="summary-item"><span class="label">Prospect:</span> <span class="value" id="summaryProspect">6M</span></span>
+                <span class="summary-item"><span class="label">Sampler:</span> <span class="value" id="summarySampler">3M</span></span>
+                <span class="summary-item"><span class="label">Last Purchase:</span> <span class="value" id="summaryLastPurchase">36M</span></span>
+                <span class="summary-item"><span class="label">EP:</span> <span class="value" id="summaryEP">6M</span></span>
+                <span class="summary-item"><span class="label">Record Type:</span> <span class="value" id="summaryRecordType">SMS1</span></span>
+                <span class="summary-item"><span class="label">Voucher:</span> <span class="value" id="summaryVoucher">O350</span></span>
+            </div>
+        </div> -->
     </div>
 
     <!-- Highlight.js -->
@@ -1513,45 +1489,6 @@
             customer: 'Customer'
         };
 
-        // ---------- Opt-in mapping ----------
-        const optInMap = {
-            'email_optin': {
-                condition: `db.EMAIL_PERM_STATUS = 'Y'`,
-                recordType: `'EDM1' AS record_type`,
-                label: 'Email Opt-in'
-            },
-            'email_only': {
-                condition: `db.EMAIL_PERM_STATUS = 'Y' AND db.SMS_PERM_STATUS != 'Y'`,
-                recordType: `'EDM1' AS record_type`,
-                label: 'Email Opt-in Only'
-            },
-            'sms_optin': {
-                condition: `db.SMS_PERM_STATUS = 'Y'`,
-                recordType: `'SMS1' AS record_type`,
-                label: 'SMS Opt-in'
-            },
-            'sms_only': {
-                condition: `db.SMS_PERM_STATUS = 'Y' AND db.EMAIL_PERM_STATUS != 'Y'`,
-                recordType: `'SMS1' AS record_type`,
-                label: 'SMS Opt-in Only'
-            },
-            'wha_optin': {
-                condition: `db.SMS_PERM_STATUS = 'Y' AND db.EMAIL_PERM_STATUS != 'Y'`,
-                recordType: `'WHA1' AS record_type`,
-                label: 'WHA Opt-in'
-            },
-            'email_and_sms': {
-                condition: `(db.EMAIL_PERM_STATUS = 'Y' AND db.EMAIL IS NOT NULL AND db.EMAIL != '') OR (db.SMS_PERM_STATUS = 'Y' AND db.MOBILE IS NOT NULL AND db.MOBILE != '')`,
-                recordType: `CASE WHEN db.SMS_PERM_STATUS = 'Y' AND db.EMAIL_PERM_STATUS !='Y' THEN 'SMS1' ELSE 'EDM1' END AS record_type`,
-                label: 'Email+SMS'
-            },
-            'email_and_wha': {
-                condition: `(db.EMAIL_PERM_STATUS = 'Y' AND db.EMAIL IS NOT NULL AND db.EMAIL != '') OR (db.SMS_PERM_STATUS = 'Y' AND db.EMAIL_PERM_STATUS !='Y' AND db.MOBILE IS NOT NULL AND db.MOBILE != '')`,
-                recordType: `CASE WHEN db.SMS_PERM_STATUS = 'Y' AND db.EMAIL_PERM_STATUS !='Y' THEN 'WHA1' ELSE 'EDM1' END AS record_type`,
-                label: 'Email+WHA'
-            }
-        };
-
         // ---------- Query definitions ----------
         const queries = {
             prospect: `SELECT 
@@ -1586,7 +1523,7 @@ END AS Mobile
  
 , '{{LOCALE}}' AS locale /* Update according to BU country */ 
 , '{{CUSTOMER_TYPE}}' AS customer_type 
-, {{RECORD_TYPE}}  /* Usually the touchpoint, but depends on your preference */ 
+, '{{RECORD_TYPE}}' AS record_type /* Usually the touchpoint, but depends on your preference */ 
  
 FROM {{SPACE_DB}} db 
  
@@ -1655,7 +1592,7 @@ END AS Mobile
  
 , '{{LOCALE}}' AS locale /* Update according to BU country */ 
 , '{{CUSTOMER_TYPE}}' AS customer_type 
-, {{RECORD_TYPE}}/* Usually the touchpoint, but depends on your preference */ 
+, '{{RECORD_TYPE}}' AS record_type /* Usually the touchpoint, but depends on your preference */ 
  
 FROM {{SPACE_DB}} db 
  
@@ -1740,7 +1677,7 @@ END AS Mobile
  
 , '{{LOCALE}}' AS locale /* Update according to BU country */ 
 , '{{CUSTOMER_TYPE}}' AS customer_type 
-, {{RECORD_TYPE}}/* Usually the touchpoint, but depends on your preference */ 
+, '{{RECORD_TYPE}}' AS record_type /* Usually the touchpoint, but depends on your preference */ 
  
 FROM {{SPACE_DB}} db 
  
@@ -1857,9 +1794,10 @@ AND EXISTS(
 
         // Controls
         const recordTypeInput = document.getElementById('recordTypeInput');
-        const emailOptinDropdown = document.getElementById('emailOptinDropdown');
         const chkPreviousEntry = document.getElementById('chkPreviousEntry');
         const previousEntryTable = document.getElementById('previousEntryTable');
+        const chkEmailOptin = document.getElementById('chkEmailOptin');
+        const chkSmsOptin = document.getElementById('chkSmsOptin');
         const chkEDMSuppression = document.getElementById('chkEDMSuppression');
         const edmSuppressionTable = document.getElementById('edmSuppressionTable');
         const chkSMSSuppression = document.getElementById('chkSMSSuppression');
@@ -1960,6 +1898,8 @@ AND EXISTS(
         const everpurchaseRow = document.getElementById('everpurchaseRow');
         const loyaltyRow = document.getElementById('loyaltyRow');
         const customerFilterRow = document.getElementById('customerFilterRow');
+        const emailOptinRow = document.getElementById('emailOptinRow');
+        const smsOptinRow = document.getElementById('smsOptinRow');
         const edmSuppressionRow = document.getElementById('edmSuppressionRow');
         const smsSuppressionRow = document.getElementById('smsSuppressionRow');
 
@@ -2098,6 +2038,8 @@ AND EXISTS(
             ai: {
                 previousEntry: false,
                 previousEntryTable: 'previous_entry_DE',
+                emailOptin: true,
+                smsOptin: true,
                 edmSuppression: true,
                 edmSuppressionTable: 'AutosuppresionDE',
                 smsSuppression: true,
@@ -2111,9 +2053,10 @@ AND EXISTS(
         // Store common settings
         const commonSettings = {
             recordType: 'SMS1',
-            optInType: 'email_optin',
             previousEntry: false,
             previousEntryTable: 'previous_entry_DE',
+            emailOptin: true,
+            smsOptin: true,
             edmSuppression: true,
             edmSuppressionTable: 'AutosuppresionDE',
             smsSuppression: true,
@@ -2144,6 +2087,8 @@ AND EXISTS(
         function getCheckboxStates() {
             return {
                 previousEntry: chkPreviousEntry.checked,
+                emailOptin: chkEmailOptin.checked,
+                smsOptin: chkSmsOptin.checked,
                 edmSuppression: chkEDMSuppression.checked,
                 smsSuppression: chkSMSSuppression.checked,
                 whatsapp: chkWhatsapp.checked,
@@ -2158,22 +2103,9 @@ AND EXISTS(
             };
         }
 
-        function getOptInSettings() {
-            const optInValue = emailOptinDropdown.value;
-            const optInConfig = optInMap[optInValue];
-            return {
-                type: optInValue,
-                condition: optInConfig ? optInConfig.condition : `db.EMAIL_PERM_STATUS = 'Y'`,
-                recordType: optInConfig ? optInConfig.recordType : 'EDM1',
-                label: optInConfig ? optInConfig.label : 'Email Opt-in'
-            };
-        }
-
         function saveCurrentSettings() {
             const type = currentActiveType;
-            const optInSettings = getOptInSettings();
             commonSettings.recordType = recordTypeInput.value.trim() || 'SMS1';
-            commonSettings.optInType = emailOptinDropdown.value;
             commonSettings.voucherId = voucherInput.value.trim() || 'O350';
             
             if (type === 'prospect') {
@@ -2222,6 +2154,8 @@ AND EXISTS(
             } else if (type === 'ai') {
                 settingsStore.ai.previousEntry = chkPreviousEntry.checked;
                 settingsStore.ai.previousEntryTable = previousEntryTable.value;
+                settingsStore.ai.emailOptin = chkEmailOptin.checked;
+                settingsStore.ai.smsOptin = chkSmsOptin.checked;
                 settingsStore.ai.edmSuppression = chkEDMSuppression.checked;
                 settingsStore.ai.edmSuppressionTable = edmSuppressionTable.value;
                 settingsStore.ai.smsSuppression = chkSMSSuppression.checked;
@@ -2233,6 +2167,8 @@ AND EXISTS(
             // Save common settings
             commonSettings.previousEntry = chkPreviousEntry.checked;
             commonSettings.previousEntryTable = previousEntryTable.value;
+            commonSettings.emailOptin = chkEmailOptin.checked;
+            commonSettings.smsOptin = chkSmsOptin.checked;
             commonSettings.edmSuppression = chkEDMSuppression.checked;
             commonSettings.edmSuppressionTable = edmSuppressionTable.value;
             commonSettings.smsSuppression = chkSMSSuppression.checked;
@@ -2243,17 +2179,16 @@ AND EXISTS(
             commonSettings.vouchers = chkVouchers.checked;
             commonSettings.voucherId = voucherInput.value.trim() || 'O350';
             commonSettings.recordType = recordTypeInput.value.trim() || 'SMS1';
-            commonSettings.optInType = emailOptinDropdown.value;
         }
 
         function restoreSettings(type) {
             // Restore common settings
-            const optInSettings = getOptInSettings();
             recordTypeInput.value = commonSettings.recordType;
-            emailOptinDropdown.value = commonSettings.optInType;
             voucherInput.value = commonSettings.voucherId;
             chkPreviousEntry.checked = commonSettings.previousEntry;
             previousEntryTable.value = commonSettings.previousEntryTable;
+            chkEmailOptin.checked = commonSettings.emailOptin;
+            chkSmsOptin.checked = commonSettings.smsOptin;
             chkEDMSuppression.checked = commonSettings.edmSuppression;
             edmSuppressionTable.value = commonSettings.edmSuppressionTable;
             chkSMSSuppression.checked = commonSettings.smsSuppression;
@@ -2262,12 +2197,6 @@ AND EXISTS(
             chkEngagements.checked = commonSettings.engagements;
             engagementsMonths.value = commonSettings.engagementsMonths;
             chkVouchers.checked = commonSettings.vouchers;
-            
-            // Update record type based on opt-in selection
-            const optInConfig = optInMap[commonSettings.optInType];
-            if (optInConfig) {
-                recordTypeInput.value = optInConfig.recordType;
-            }
             
             if (type === 'prospect') {
                 const settings = settingsStore.prospect;
@@ -2321,6 +2250,8 @@ AND EXISTS(
                 const settings = settingsStore.ai;
                 chkPreviousEntry.checked = settings.previousEntry;
                 previousEntryTable.value = settings.previousEntryTable;
+                chkEmailOptin.checked = settings.emailOptin;
+                chkSmsOptin.checked = settings.smsOptin;
                 chkEDMSuppression.checked = settings.edmSuppression;
                 edmSuppressionTable.value = settings.edmSuppressionTable;
                 chkSMSSuppression.checked = settings.smsSuppression;
@@ -2415,7 +2346,8 @@ AND EXISTS(
 
         // ---------- Build the opt-in clause ----------
         function buildOptInClause(states) {
-            const optInSettings = getOptInSettings();
+            const emailOptin = states.emailOptin;
+            const smsOptin = states.smsOptin;
             const edmSupp = states.edmSuppression;
             const smsSupp = states.smsSuppression;
             let edmTable = edmSuppressionTable.value.trim();
@@ -2423,60 +2355,49 @@ AND EXISTS(
             let smsTable = smsSuppressionTable.value.trim();
             if (!smsTable) smsTable = 'SMS_optout_de';
 
-            let edmSnippet = edmSupp ? snippets.edmSuppression.replace(/\{\{EDM_SUPPRESSION_TABLE\}\}/g, edmTable) : '';
-            let smsSnippet = smsSupp ? snippets.smsSuppression.replace(/\{\{SMS_SUPPRESSION_TABLE\}\}/g, smsTable) : '';
+            let emailBranch = '';
+            let smsBranch = '';
 
-            let emailSuppression = edmSupp ? 
-                `AND NOT EXISTS(SELECT 1 FROM ${edmTable} em WHERE db.EMAIL = em.Email OR db.CUSTOMER_CODE = em.SubscriberKey)` : '';
-            let smsSuppression = smsSupp ? 
-                `AND NOT EXISTS(SELECT 1 FROM ${smsTable} sm WHERE db.MOBILE = sm.Mobile)` : '';
-
-            // For Email+SMS combined opt-in
-            if (optInSettings.type === 'email_and_sms') {
-                return `WHERE  
-        /* opt-ins – Adjust as per requirement */ 
-        (
-            (
-                db.EMAIL_PERM_STATUS = 'Y'
-                AND (db.EMAIL IS NOT NULL AND db.EMAIL != '')
-                ${emailSuppression}
-            )
-            OR
-            (
-                db.SMS_PERM_STATUS = 'Y'
-                AND (db.MOBILE IS NOT NULL AND db.MOBILE != '')
-                ${smsSuppression}
-            )
-        )`;
+            if (emailOptin) {
+                let edmSnippet = edmSupp ? snippets.edmSuppression.replace(/\{\{EDM_SUPPRESSION_TABLE\}\}/g, edmTable) : '';
+                emailBranch = `(  
+		db.EMAIL_PERM_STATUS = 'Y'  
+		AND (db.EMAIL IS NOT NULL AND db.EMAIL != '')  
+		${edmSnippet}
+	)`;
+            }
+            if (smsOptin) {
+                let smsSnippet = smsSupp ? snippets.smsSuppression.replace(/\{\{SMS_SUPPRESSION_TABLE\}\}/g, smsTable) : '';
+                smsBranch = `( 
+		db.SMS_PERM_STATUS = 'Y' 
+		AND(db.MOBILE IS NOT NULL AND db.MOBILE != '') 
+		${smsSnippet}
+	)`;
             }
 
-            // For Email+WHA combined opt-in
-            if (optInSettings.type === 'email_and_wha') {
+            if (emailOptin && smsOptin) {
                 return `WHERE  
-        /* opt-ins – Adjust as per requirement */ 
-        (
-            (
-                db.EMAIL_PERM_STATUS = 'Y'
-                AND (db.EMAIL IS NOT NULL AND db.EMAIL != '')
-                ${emailSuppression}
-            )
-            OR
-            (
-                db.SMS_PERM_STATUS = 'Y' AND db.EMAIL_PERM_STATUS != 'Y'
-                AND (db.MOBILE IS NOT NULL AND db.MOBILE != '')
-                ${smsSuppression}
-            )
-        )`;
+/* opt-ins – Adjust as per requirement */ 
+( 	 
+	${emailBranch} 
+	OR  
+	${smsBranch}
+)`;
+            } else if (emailOptin) {
+                return `WHERE  
+/* opt-ins – Adjust as per requirement */ 
+( 	 
+	${emailBranch}
+)`;
+            } else if (smsOptin) {
+                return `WHERE  
+/* opt-ins – Adjust as per requirement */ 
+( 	 
+	${smsBranch}
+)`;
+            } else {
+                return `WHERE 1=0 /* No opt-in selected – no rows will be returned */`;
             }
-
-            // For other opt-in types, build the standard clause with suppression
-            const optInCondition = optInSettings.condition;
-            return `WHERE  
-        /* opt-ins – Adjust as per requirement */ 
-        ( 	${optInCondition} 
-            ${edmSnippet}
-            ${smsSnippet}
-        )`;
         }
 
         // ---------- Display function ----------
@@ -2495,34 +2416,24 @@ AND EXISTS(
                 const seedLabel = brandData.seedDB;
 
                 const seedQuery = `SELECT 
-  COALESCE(e.Subscriber_Key, s.Subscriber_Key) AS Customer_Code
+  COALESCE(e.Subscriber_Key, s.Subscriber_Key) AS Subscriber_Key
 , COALESCE(e.first_name, s.first_name) AS first_name
 , COALESCE(e.last_name, s.last_name) AS last_name
 , COALESCE(e.Email, s.Email) AS Email
 , COALESCE(e.Mobile, s.Mobile) AS Mobile
-/*, COALESCE(e.Mobile, s.Mobile_Number) AS Mobile*/
-/*, COALESCE(e.Mobile, s.Mobile_Formatted) AS Mobile*/
 , 'SEED' AS customer_type 
 , 'SEED' AS Record_Type 
 , '${localeLabel}' AS Locale
 
 FROM [${seedLabel}] s 
 LEFT JOIN [${localeLabel}_CAMPAIGN_NAME_03242026_ENTRY] e 
-    ON e.EMAIL = s.EMAIL
-    /*ON e.Mobile = s.Mobile*/ 
-    /*ON e.Mobile = s.Mobile_Number*/ 
-    /*ON e.Mobile = s.Mobile_Formatted*/ 
+    ON e.EMAIL = s.EMAIL 
 
-    WHERE s.EMAIL != '' AND s.EMAIL IS NOT NULL
-   /*WHERE (s.MOBILE != '' AND s.MOBILE IS NOT NULL)*/ 
-   /*WHERE (s.MOBILE != '' AND s.MOBILE_NUMBER IS NOT NULL)*/  
-   /*WHERE (s.MOBILE != '' AND s.Mobile_Formatted IS NOT NULL)*/                  
- 
- 
+WHERE (s.EMAIL != '' AND s.EMAIL IS NOT NULL)
+ /*AND (s.MOBILE != '' AND s.MOBILE IS NOT NULL)/*                   
  /*if MY_GAB use s.Mobile_Formatted/*
- /*in some BAU that s.Mobile will not work use s.Mobile_Number*/
-`
-;
+
+`;
 
                 currentDisplayedQuery = seedQuery;
                 try {
@@ -2559,65 +2470,32 @@ LEFT JOIN [${localeLabel}_CAMPAIGN_NAME_03242026_ENTRY] e
                 currentActiveType = 'ai';
                 restoreSettings('ai');
                 
-                // First, disable all controls
+                // Disable most controls for AI
                 disableAllControls(true);
                 
-                // THEN enable allowed controls (override the disable)
-                const allowedIds = ['recordTypeInput', 'emailOptinDropdown', 'voucherInput', 'chkEDMSuppression', 'chkSMSSuppression', 
-                                'edmSuppressionTable', 'smsSuppressionTable', 'chkPreviousEntry', 
-                                'previousEntryTable', 'chkEngagements', 'engagementsMonths'];
+                // Enable allowed controls for AI
+                const allowedIds = ['recordTypeInput', 'voucherInput', 'chkEmailOptin', 'chkSmsOptin', 'chkEDMSuppression', 'chkSMSSuppression', 
+                                   'edmSuppressionTable', 'smsSuppressionTable', 'chkPreviousEntry', 
+                                   'previousEntryTable', 'chkEngagements', 'engagementsMonths'];
                 allowedIds.forEach(id => {
                     const el = document.getElementById(id);
-                    if (el) {
-                        el.disabled = false;
-                        // Also remove any "disabled" class from parent labels
-                        const parentLabel = el.closest('label');
-                        if (parentLabel) {
-                            parentLabel.classList.remove('disabled');
-                        }
-                    }
+                    if (el) el.disabled = false;
                 });
                 
                 // Remove disabled class from allowed rows
-                const allowedRowIds = ['edmSuppressionRow', 'smsSuppressionRow', 'prev-entry-wrapper'];
-                allowedRowIds.forEach(rowId => {
-                    const row = document.getElementById(rowId) || document.querySelector(rowId);
+                ['emailOptinRow', 'smsOptinRow', 'edmSuppressionRow', 'smsSuppressionRow'].forEach(rowId => {
+                    const row = document.getElementById(rowId);
                     if (row) {
-                        row.classList.remove('disabled');
                         const topLine = row.querySelector('.filter-top-line');
                         if (topLine) topLine.classList.remove('disabled');
                     }
                 });
-                
-                // Explicitly handle previous entry wrapper
-                const prevWrapper = document.querySelector('.prev-entry-wrapper');
-                if (prevWrapper) {
-                    prevWrapper.classList.remove('disabled');
-                    // Also enable the checkbox and input inside
-                    const checkbox = prevWrapper.querySelector('#chkPreviousEntry');
-                    const input = prevWrapper.querySelector('#previousEntryTable');
-                    if (checkbox) checkbox.disabled = false;
-                    if (input) input.disabled = false;
-                }
-                
-                // Handle engagements label
+                // Previous entry and engagements
+                const prevRow = document.querySelector('.prev-entry-wrapper');
+                if (prevRow) prevRow.classList.remove('disabled');
                 const engagementsLabel = document.querySelector('label:has(#chkEngagements)');
-                if (engagementsLabel) {
-                    engagementsLabel.classList.remove('disabled');
-                    const chk = engagementsLabel.querySelector('#chkEngagements');
-                    if (chk) chk.disabled = false;
-                    const input = engagementsLabel.querySelector('#engagementsMonths');
-                    if (input) input.disabled = false;
-                }
-                
-                // Handle opt-in dropdown
-                const optinWrapper = document.querySelector('.optin-dropdown-wrapper');
-                if (optinWrapper) {
-                    optinWrapper.classList.remove('disabled');
-                    const dropdown = optinWrapper.querySelector('#emailOptinDropdown');
-                    if (dropdown) dropdown.disabled = false;
-                }
-                
+                if (engagementsLabel) engagementsLabel.classList.remove('disabled');
+
                 // Hide all special rows
                 prospectRow.classList.add('hidden');
                 prospectLoyaltyRow.classList.add('hidden');
@@ -2643,9 +2521,6 @@ LEFT JOIN [${localeLabel}_CAMPAIGN_NAME_03242026_ENTRY] e
             document.querySelectorAll('label:has(input[type="checkbox"])').forEach(el => {
                 el.classList.remove('disabled');
             });
-            document.querySelectorAll('.optin-dropdown-wrapper').forEach(el => {
-                el.classList.remove('disabled');
-            });
 
             // Restore settings for this type
             restoreSettings(type);
@@ -2659,7 +2534,6 @@ LEFT JOIN [${localeLabel}_CAMPAIGN_NAME_03242026_ENTRY] e
 
             const spaceDB = brandData.spaceDB;
             const states = getCheckboxStates();
-            const optInSettings = getOptInSettings();
             const recordType = recordTypeInput.value.trim() || 'SMS1';
             const voucherId = voucherInput.value.trim() || 'O350';
 
@@ -2700,7 +2574,8 @@ AND db.CREATION_DATE >= DATEADD(month, -${prospectVal}, GETDATE())`;
                 let tiers = prospectLoyaltyTiers.value.trim();
                 if (!tiers) tiers = "'BLACK GOLD','GOLD','ROSE'";
                 prospectLoyaltySnippet =
-                    `AND db.Loyalty_Tier_Current NOT IN (${tiers}) /* Prospect loyalty filter */`;
+                    `
+AND db.Loyalty_Tier_Current NOT IN (${tiers}) /* Prospect loyalty filter */`;
             }
 
             let samplerSnippet = '';
@@ -2711,13 +2586,15 @@ AND db.CREATION_DATE >= DATEADD(month, -${prospectVal}, GETDATE())`;
                     const end = getDateFromComponents(samplerEndYear, samplerEndMonth, samplerEndDay);
                     if (start && end) {
                         samplerSnippet =
-                            `AND ORDER_DT BETWEEN CAST('${start}' AS DATE) AND CAST('${end}' AS DATE)`;
+                            `
+AND ORDER_DT BETWEEN CAST('${start}' AS DATE) AND CAST('${end}' AS DATE)`;
                     }
                 } else {
                     let samplerVal = parseInt(samplerMonths.value, 10);
                     if (isNaN(samplerVal) || samplerVal < 1) samplerVal = 3;
                     samplerSnippet =
-                        `AND ORDER_DT >= DATEADD(month, -${samplerVal}, GETDATE())`;
+                        `
+AND ORDER_DT >= DATEADD(month, -${samplerVal}, GETDATE())`;
                 }
             }
 
@@ -2725,14 +2602,17 @@ AND db.CREATION_DATE >= DATEADD(month, -${prospectVal}, GETDATE())`;
             if (type === 'customer' && customerFilterSelect.value === 'lp_with_ean') {
                 const selectedType = document.querySelector('input[name="lpWithEANType"]:checked');
                 const innerJoinBase = `/* for last purchase W/EAN – remove if everpurchase */ 
-    INNER JOIN ( 
+INNER JOIN ( 
 	SELECT CUSTOMER_CODE, ORDER_DT, ORDER_NUM, COUNTER_ID, EAN 
 	FROM ( 
 		SELECT CUSTOMER_CODE, ORDER_DT, ORDER_NUM, COUNTER_ID, EAN, 
 		ROW_NUMBER() OVER (PARTITION BY CUSTOMER_CODE ORDER BY ORDER_DT DESC) AS rn 
+ 
 		FROM SPACE_Sales_Master sm 
-        WHERE sm.Price * sm.QUANTITY > 0 
-	    GROUP BY CUSTOMER_CODE, ORDER_DT, ORDER_NUM, COUNTER_ID, EAN 
+
+WHERE sm.Price * sm.QUANTITY > 0 
+		 
+	GROUP BY CUSTOMER_CODE, ORDER_DT, ORDER_NUM, COUNTER_ID, EAN 
 	) x 
 	WHERE x.rn = 1 
 	{{LP_WITH_EAN_COUNTER_ID_FILTER}}
@@ -2812,17 +2692,19 @@ AND db.LAST_PURCHASE_STORE IN ('KX0','450KX0') /* for specific stores – remove
                     '';
 
                 everpurchaseSnippet =
-     `/* FOR Everpurchase */ 
+                    `
+/* FOR Everpurchase */ 
 AND EXISTS( 
-	  SELECT DISTINCT customer_code /* Make sure DISTINCT is present */ 
+	SELECT DISTINCT customer_code /* Make sure DISTINCT is present */ 
  
-	  FROM SPACE_Sales_Master sm 
+	FROM SPACE_Sales_Master sm 
 		 
-	  WHERE db.customer_code = sm.customer_code 
-	  AND sm.Price * sm.QUANTITY > 0 
-	  ${dateFilter}
-	  ${counterIdFilter}
-	  ${eanFilter})`;
+	WHERE db.customer_code = sm.customer_code 
+	AND sm.Price * sm.QUANTITY > 0 
+	${dateFilter}
+	${counterIdFilter}
+	${eanFilter}
+)`;
             }
 
             let loyaltySnippet = '';
@@ -2830,8 +2712,9 @@ AND EXISTS(
                 let tiers = loyaltyTiersInput.value.trim();
                 if (!tiers) tiers = "'RUBY','GOLD','SAPPHIRE','BLACK DIAMOND'";
                 loyaltySnippet =
-                    `/* If loyalty is needed - adjust as per BU's loyalty values*/ 
-                    AND db.Loyalty_Tier_Current IN (${tiers})`;
+                    `
+/* If loyalty is needed - adjust as per BU's loyalty values*/ 
+AND db.Loyalty_Tier_Current IN (${tiers})`;
             }
 
             let prevEntrySnippet = states.previousEntry ? snippets.previousEntry : '';
@@ -2971,7 +2854,6 @@ AND EXISTS(
 
             const spaceDB = brandData.spaceDB;
             const states = getCheckboxStates();
-            const optInSettings = getOptInSettings();
             const recordType = recordTypeInput.value.trim() || 'SMS1';
             const voucherId = voucherInput.value.trim() || 'O350';
 
@@ -3046,7 +2928,7 @@ AND EXISTS(
             
             allControls.forEach(control => {
                 if (currentActiveType === 'ai') {
-                    const allowedIds = ['recordTypeInput', 'emailOptinDropdown', 'voucherInput', 'chkEDMSuppression', 'chkSMSSuppression', 
+                    const allowedIds = ['recordTypeInput', 'voucherInput', 'chkEmailOptin', 'chkSmsOptin', 'chkEDMSuppression', 'chkSMSSuppression', 
                                        'edmSuppressionTable', 'smsSuppressionTable', 'chkPreviousEntry', 
                                        'previousEntryTable', 'chkEngagements', 'engagementsMonths'];
                     if (allowedIds.includes(control.id)) {
@@ -3057,11 +2939,11 @@ AND EXISTS(
             });
 
             // Handle labels
-            document.querySelectorAll('.checkbox-column label, .checkbox-column .filter-top-line, .optin-dropdown-wrapper').forEach(label => {
+            document.querySelectorAll('.checkbox-column label, .checkbox-column .filter-top-line').forEach(label => {
                 if (currentActiveType === 'ai') {
                     const parentRow = label.closest('.filter-row');
                     if (parentRow) {
-                        const allowedRowIds = ['edmSuppressionRow', 'smsSuppressionRow'];
+                        const allowedRowIds = ['emailOptinRow', 'smsOptinRow', 'edmSuppressionRow', 'smsSuppressionRow'];
                         if (allowedRowIds.includes(parentRow.id)) {
                             return;
                         }
@@ -3074,8 +2956,6 @@ AND EXISTS(
                     if (recordTypeWrapper) return;
                     const voucherWrapper = label.closest('.voucher-wrapper');
                     if (voucherWrapper) return;
-                    const optinWrapper = label.closest('.optin-dropdown-wrapper');
-                    if (optinWrapper) return;
                 }
                 if (disabled) {
                     label.classList.add('disabled');
@@ -3113,29 +2993,12 @@ AND EXISTS(
             }
         });
 
-        // Email opt-in dropdown change - updates record type
-        emailOptinDropdown.addEventListener('change', function() {
-            const optInConfig = optInMap[this.value];
-            if (optInConfig) {
-                recordTypeInput.value = optInConfig.recordType;
-            }
-            
-            if (currentActiveType === 'seed') return;
-            if (currentActiveType === 'ai') {
-                saveCurrentSettings();
-                buildAIQuery();
-                return;
-            }
-            saveCurrentSettings();
-            showQuery(currentActiveType);
-        });
-
         // All checkboxes - modified to save settings
         document.querySelectorAll('input[type="checkbox"]').forEach(chk => {
             chk.addEventListener('change', function() {
                 if (currentActiveType === 'seed') return;
                 if (currentActiveType === 'ai') {
-                    const allowedIds = ['chkEDMSuppression', 'chkSMSSuppression', 
+                    const allowedIds = ['chkEmailOptin', 'chkSmsOptin', 'chkEDMSuppression', 'chkSMSSuppression', 
                                        'chkPreviousEntry', 'chkEngagements'];
                     if (allowedIds.includes(this.id)) {
                         saveCurrentSettings();
