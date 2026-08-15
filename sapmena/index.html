@@ -55,24 +55,6 @@
             color: #1e293b;
             margin-bottom: 0;
         }
-        .snippets-btn {
-            padding: 8px 20px;
-            border: 2px solid #1e3a8a;
-            border-radius: 30px;
-            background: transparent;
-            color: #1e3a8a;
-            font-weight: 600;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            text-decoration: none;
-            display: inline-block;
-        }
-        .snippets-btn:hover {
-            background: #1e3a8a;
-            color: #fff;
-            transform: translateY(-2px);
-        }
         .subhead {
             color: #64748b;
             margin-bottom: 20px;
@@ -163,7 +145,6 @@
             background: #047857;
         }
 
-        /* ---------- Settings display ---------- */
         .settings-display {
             background: #f1f5f9;
             border-radius: 12px;
@@ -195,7 +176,6 @@
             border: 1px solid #d1d9e3;
         }
 
-        /* ---------- Side-by-side layout ---------- */
         .main-layout {
             display: flex;
             gap: 20px;
@@ -204,7 +184,6 @@
             align-items: stretch;
         }
 
-        /* --- LEFT PANEL --- */
         .left-panel {
             flex: 0 0 540px;
             min-width: 420px;
@@ -214,7 +193,6 @@
             height: 100%;
         }
 
-        /* --- CHECKBOX COLUMN --- */
         .checkbox-column {
             background: #f8fafc;
             border-radius: 12px;
@@ -256,7 +234,6 @@
             flex-shrink: 0;
         }
 
-        /* --- Flat input boxes --- */
         .checkbox-column input[type="number"],
         .checkbox-column input[type="date"],
         .checkbox-column input[type="text"] {
@@ -290,7 +267,6 @@
             box-shadow: 0 0 0 2px rgba(30, 58, 138, 0.15);
         }
 
-        /* --- Dropdown styling for opt-in --- */
         .optin-dropdown {
             padding: 4px 8px;
             border: 1px solid #d1d9e3;
@@ -322,7 +298,6 @@
             padding: 0;
         }
 
-        /* --- Date components --- */
         .date-components {
             display: inline-flex;
             align-items: center;
@@ -359,7 +334,6 @@
             padding: 0 2px;
         }
 
-        /* --- Date range with aligned rows --- */
         .date-range-container {
             display: flex;
             flex-direction: column;
@@ -386,7 +360,6 @@
             gap: 4px;
         }
 
-        /* --- Previous Entry --- */
         .prev-entry-wrapper {
             display: flex;
             flex-direction: column;
@@ -431,7 +404,6 @@
             box-shadow: 0 0 0 2px rgba(30, 58, 138, 0.15);
         }
 
-        /* --- Record Type --- */
         .record-type-wrapper {
             display: flex;
             align-items: center;
@@ -460,36 +432,6 @@
             box-shadow: 0 0 0 2px rgba(30, 58, 138, 0.15);
         }
 
-        /* --- Voucher Input --- */
-        .voucher-wrapper {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 3px 0;
-        }
-        .voucher-wrapper label {
-            font-weight: 500;
-            color: #1e293b;
-            font-size: 14px;
-            cursor: default;
-        }
-        .voucher-wrapper input[type="text"] {
-            padding: 4px 8px;
-            border: 1px solid #d1d9e3;
-            border-radius: 0px;
-            font-size: 13px;
-            font-weight: 500;
-            background: #fff;
-            color: #1e293b;
-            outline: none;
-            width: 150px;
-        }
-        .voucher-wrapper input[type="text"]:focus {
-            border-color: #1e3a8a;
-            box-shadow: 0 0 0 2px rgba(30, 58, 138, 0.15);
-        }
-
-        /* --- Filter Rows --- */
         .filter-row {
             display: flex;
             flex-direction: column;
@@ -612,72 +554,7 @@
             border-color: #1e3a8a;
             box-shadow: 0 0 0 2px rgba(30, 58, 138, 0.15);
         }
-        .filter-extra-inputs {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            margin-left: 0px;
-            width: 100%;
-            max-width: 400px;
-        }
-        .filter-extra-inputs-row {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 13px;
-        }
-        .filter-extra-inputs-row label {
-            font-weight: normal;
-            min-width: 70px;
-            padding: 0;
-            cursor: default;
-        }
-        .filter-extra-inputs-row input[type="text"] {
-            width: 100%;
-            padding: 4px 8px;
-            border: 1px solid #d1d9e3;
-            border-radius: 0px;
-            font-size: 13px;
-            font-weight: 400;
-            background: #fff;
-            color: #1e293b;
-            outline: none;
-        }
-        .filter-extra-inputs-row input[type="text"]:focus {
-            border-color: #1e3a8a;
-            box-shadow: 0 0 0 2px rgba(30, 58, 138, 0.15);
-        }
-        .filter-radio-group {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex-wrap: wrap;
-            margin-left: 24px;
-        }
-        .filter-radio-group label {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            font-weight: normal;
-            font-size: 13px;
-            cursor: pointer;
-            padding: 0;
-            white-space: nowrap;
-        }
-        .filter-radio-group input[type="radio"] {
-            width: 13px;
-            height: 13px;
-            accent-color: #1e3a8a;
-            cursor: pointer;
-            margin: 0;
-        }
-        .filter-config-group {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            margin-left: 24px;
-            width: 100%;
-        }
+
         .customer-select-row {
             display: flex;
             align-items: center;
@@ -699,7 +576,6 @@
             box-shadow: 0 0 0 2px rgba(30, 58, 138, 0.15);
         }
 
-        /* ---------- Query column ---------- */
         .query-column {
             flex: 1;
             min-width: 0;
@@ -775,7 +651,6 @@
             color: #abb2bf !important;
         }
 
-        /* ---------- FORCED STYLES ---------- */
         #queryCode,
         #queryCode.hljs,
         #queryCode * {
@@ -821,33 +696,6 @@
             color: #61afef !important;
         }
 
-        .footer {
-            margin-top: 16px;
-            color: #1e293b;
-            font-size: 13px;
-            text-align: left;
-            flex-shrink: 0;
-            padding: 8px 4px;
-            line-height: 1.6;
-        }
-        .footer .summary-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            align-items: baseline;
-        }
-        .footer .summary-item {
-            font-weight: 500;
-            color: #1e293b;
-        }
-        .footer .summary-item .label {
-            color: #64748b;
-            font-weight: 400;
-        }
-        .footer .summary-item .value {
-            color: #1e3a8a;
-            font-weight: 600;
-        }
         .hidden {
             display: none !important;
         }
@@ -911,16 +759,6 @@
             .filter-extra-options .filter-input-group input[type="text"] {
                 min-width: 150px;
             }
-            .filter-extra-inputs {
-                margin-left: 0px;
-                max-width: 100%;
-            }
-            .filter-config-group {
-                margin-left: 0px;
-            }
-            .filter-radio-group {
-                margin-left: 0px;
-            }
             .settings-display {
                 flex-shrink: 0;
             }
@@ -953,10 +791,6 @@
             .header-row {
                 flex-wrap: wrap;
                 gap: 8px;
-            }
-            .footer .summary-row {
-                flex-direction: column;
-                gap: 6px;
             }
             .optin-dropdown {
                 min-width: 120px;
@@ -1003,15 +837,6 @@
             .left-panel {
                 max-height: 50vh;
             }
-            .filter-extra-inputs-row {
-                flex-wrap: wrap;
-            }
-            .filter-extra-inputs-row label {
-                min-width: 60px;
-            }
-            .filter-config-group {
-                flex-wrap: wrap;
-            }
             .customer-select-row {
                 flex-wrap: wrap;
             }
@@ -1039,9 +864,6 @@
                 min-width: 120px;
             }
             .record-type-wrapper {
-                flex-wrap: wrap;
-            }
-            .voucher-wrapper {
                 flex-wrap: wrap;
             }
             .optin-dropdown-wrapper {
@@ -1079,18 +901,14 @@
             </div>
         </div>
 
-        <!-- Main side-by-side layout -->
         <div class="main-layout">
-            <!-- LEFT PANEL -->
             <div class="left-panel">
-                <!-- Checkbox column -->
                 <div class="checkbox-column" id="checkboxGroup">
-                    <!-- Record Type -->
                     <div class="record-type-wrapper" style="display: none !important;">
                         <label for="recordTypeInput">Record Type:</label>
                         <input type="text" id="recordTypeInput" value="SMS1" />
                     </div>
-                    <!-- Previous Entry Join -->
+
                     <div class="prev-entry-wrapper">
                         <label class="prev-entry-row">
                             <input type="checkbox" id="chkPreviousEntry" />
@@ -1098,7 +916,7 @@
                         </label>
                         <input type="text" id="previousEntryTable" value="previous_entry_DE" class="prev-entry-input hidden" />
                     </div>
-                    <!-- Email Opt-in Dropdown -->
+
                     <div class="optin-dropdown-wrapper">
                         <label for="emailOptinDropdown">Opt-in Settings:</label>
                         <select id="emailOptinDropdown" class="optin-dropdown">
@@ -1112,10 +930,6 @@
                         </select>
                     </div>
 
-                    <!-- SMS Opt-in Dropdown (hidden, kept for compatibility but not used) -->
-                    <!-- We'll use the dropdown above to control both -->
-
-                    <!-- EDM Suppression -->
                     <div class="filter-row" id="edmSuppressionRow">
                         <div class="filter-top-line">
                             <input type="checkbox" id="chkEDMSuppression" checked />
@@ -1126,7 +940,6 @@
                         </div>
                     </div>
 
-                    <!-- SMS Suppression -->
                     <div class="filter-row" id="smsSuppressionRow">
                         <div class="filter-top-line">
                             <input type="checkbox" id="chkSMSSuppression" checked />
@@ -1137,10 +950,8 @@
                         </div>
                     </div>
 
-                    <!-- WhatsApp Unsubscribe -->
                     <label><input type="checkbox" id="chkWhatsapp" /> WhatsApp Unsubscribe</label>
 
-                    <!-- Engagements -->
                     <label>
                         <input type="checkbox" id="chkEngagements" />
                         <span class="engagements-label-text">
@@ -1150,10 +961,32 @@
                         </span>
                     </label>
 
-                    <!-- Vouchers -->
                     <label><input type="checkbox" id="chkVouchers" /> Voucher<input type="text" id="voucherInput" value="O350" /></label>
 
-                    <!-- Prospect (PROSPECT only) - Now radio only -->
+                    <div class="filter-row" id="ageFilterRow">
+                        <div class="filter-top-line">
+                            <input type="checkbox" id="chkAgeFilter" />
+                            <span>Age Filter</span>
+                            <span class="filter-input-group" style="margin-left: 8px;">
+                                <label style="font-weight: normal; font-size: 13px;">From:</label>
+                                <input type="number" id="ageFrom" value="20" min="1" max="120" step="1" style="width: 60px;" />
+                                <label style="font-weight: normal; font-size: 13px;">To:</label>
+                                <input type="number" id="ageTo" value="80" min="1" max="120" step="1" style="width: 60px;" />
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="filter-row" id="activeSleepingRow">
+                        <div class="filter-top-line">
+                            <input type="checkbox" id="chkActiveSleeping" />
+                            <span>Active/Sleeping Customer</span>
+                            <span class="filter-input-group" style="margin-left: 8px;">
+                                <label style="font-weight: normal; font-size: 13px;">Months:</label>
+                                <input type="number" id="activeSleepingMonths" value="12" min="1" max="99" step="1" style="width: 60px;" />
+                            </span>
+                        </div>
+                    </div>
+
                     <div id="prospectRow" class="filter-row hidden">
                         <div class="filter-top-line">
                             <span class="filter-label-text">
@@ -1194,7 +1027,6 @@
                         </div>
                     </div>
 
-                    <!-- Prospect Loyalty (PROSPECT only) -->
                     <div id="prospectLoyaltyRow" class="filter-row hidden">
                         <div class="filter-top-line">
                             <span>Exclusion (adjust as BU's loyalty values)</span>
@@ -1204,7 +1036,6 @@
                         </div>
                     </div>
 
-                    <!-- Sampler (SAMPLER only) - Now radio only -->
                     <div id="samplerRow" class="filter-row hidden">
                         <div class="filter-top-line">
                             <span class="filter-label-text">
@@ -1243,7 +1074,6 @@
                                 </div>
                             </div>
                         </div>
-                        <!-- Sampler-specific extra options - rearranged -->
                         <div class="filter-extra-options" style="margin-top:4px;">
                             <label><input type="checkbox" id="chkSamplerCounterId" checked /> COUNTER_ID (Store Codes)</label>
                             <div class="filter-input-group">
@@ -1258,9 +1088,7 @@
                         </div>
                     </div>
 
-                    <!-- Customer Section -->
                     <div id="customerSection" class="hidden">
-                        <!-- Customer Dropdown Selector -->
                         <div class="filter-row">
                             <div class="customer-select-row">
                                 <span style="font-weight:500;">Customer Filter:</span>
@@ -1272,7 +1100,7 @@
                             </div>
                         </div>
                         <div style="color:#ffffff;">-------------------------------------------</div>
-                        <!-- LP with EAN -->
+
                         <div id="lpWithEANRow" class="filter-row">
                             <div class="filter-top-line">
                                 <span class="filter-label-text">
@@ -1313,7 +1141,6 @@
                             </div>
                         </div>
 
-                        <!-- LP without EAN -->
                         <div id="lpWithoutEANRow" class="filter-row hidden">
                             <div class="filter-top-line">
                                 <span class="filter-label-text">
@@ -1354,7 +1181,6 @@
                             </div>
                         </div>
 
-                        <!-- EP -->
                         <div id="everpurchaseRow" class="filter-row hidden">
                             <div class="filter-top-line">
                                 <span class="filter-label-text">
@@ -1395,7 +1221,6 @@
                             </div>
                         </div>
 
-                        <!-- Customer-wide COUNTER_ID and EAN filters - rearranged -->
                         <div id="customerFilterRow" class="filter-row">
                             <div class="filter-extra-options" style="margin-left:0;">
                                 <label><input type="checkbox" id="chkCustomerCounterId" checked /> COUNTER_ID filter</label>
@@ -1411,7 +1236,6 @@
                             </div>
                         </div>
 
-                        <!-- Loyalty -->
                         <div id="loyaltyRow" class="filter-row">
                             <div class="filter-top-line">
                                 <input type="checkbox" id="chkLoyalty" />
@@ -1424,7 +1248,6 @@
                     </div>
                 </div>
 
-                <!-- Settings display -->
                 <div class="settings-display" id="settingsDisplay">
                     <div class="settings-item"><span class="label">Brand:</span> <span class="value" id="settingBrand">-</span></div>
                     <div class="settings-item"><span class="label">Locale:</span> <span class="value" id="settingLocale">-</span></div>
@@ -1433,7 +1256,6 @@
                 </div>
             </div>
 
-            <!-- Query column -->
             <div class="query-column">
                 <div class="query-wrapper">
                     <div class="query-header">
@@ -1446,7 +1268,6 @@
         </div>
     </div>
 
-    <!-- Highlight.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js">
     </script>
     <script>
@@ -1464,42 +1285,29 @@
 
         // ---------- Brand list ----------
         const brandList = [
-            // Armani
             { label: 'Armani Malaysia', locale: 'MY', spaceDB: 'GAB_Maindb_SCV_V3_0', seedDB: 'MY_GAB_SEED' },
             { label: 'Armani Singapore', locale: 'SG', spaceDB: 'GAB_Maindb_SCV_V3_0', seedDB: 'SG_GAB_SEED' },
             { label: 'Armani Thailand', locale: 'TH', spaceDB: 'GAB_Maindb_SCV_V3_0', seedDB: 'TH_GAB_SEED' },
-
-            // Kiehl's
             { label: "Kiehl's Malaysia", locale: 'MY', spaceDB: 'Kiehls_Maindb_SCV_V3_0', seedDB: "MY_KIE_SEED" },
             { label: "Kiehl's Indonesia", locale: 'ID', spaceDB: 'KIE_Maindb_SCV_V3_0', seedDB: "ID_KIE_SEED" },
             { label: "Kiehl's Philippines", locale: 'PH', spaceDB: 'KIE_Maindb_SCV_V3_0', seedDB: "PH_KIE_SEEDLIST" },
             { label: "Kiehl's Singapore", locale: 'SG', spaceDB: 'KIE_Maindb_SCV_V3_0', seedDB: "SG_KIE_Activation_SEED" },
             { label: "Kiehl's Thailand", locale: 'TH', spaceDB: 'KIE_Maindb_SCV_V3_0', seedDB: "TH_KIE_SEED" },
             { label: "Kiehl's Vietnam", locale: 'VN', spaceDB: 'KIE_Maindb_SCV_V3_0', seedDB: "VN_KIE_SEEDLIST" },
-
-            // La Roche-Posay
             { label: 'La Roche Posay Indonesia', locale: 'ID', spaceDB: 'LRP_Maindb_SCV_V3_0', seedDB: 'ID_LRP_SEED_WHATSAPP' },
             { label: 'La Roche-Posay Malaysia', locale: 'MY', spaceDB: 'LRP_Maindb_SCV_V3_0', seedDB: 'MY_LRP_BETA_TEST_V2' },
             { label: 'La Roche-Posay GCC', locale: 'AE', spaceDB: 'LRP_Maindb_SCV_V3_0', seedDB: 'GCC_LRP_SEED' },
             { label: 'La Roche-Posay Singapore', locale: 'SG', spaceDB: 'LRP_Maindb_SCV_V3_0', seedDB: 'SG_LRP_BETA_TEST' },
-
-            // Lancôme
             { label: 'Lancôme Indonesia', locale: 'ID', spaceDB: 'LAN_Maindb_SCV_V3_0', seedDB: 'ID_LAN_SEED' },
             { label: 'Lancôme Philippines', locale: 'PH', spaceDB: 'LAN_Maindb_SCV_V3_0', seedDB: 'PH_LAN_ACTIVATION_SEEDLIST' },
             { label: 'Lancôme Singapore', locale: 'SG', spaceDB: 'Lancome_Maindb_SCV_V3_0', seedDB: 'SG_LAN_Seedlist' },
             { label: 'Lancôme Thailand', locale: 'TH', spaceDB: 'LAN_Maindb_SCV_V3_0', seedDB: 'TH_LAN_SEED' },
             { label: 'Lancôme Vietnam', locale: 'VN', spaceDB: 'LAN_Maindb_SCV_V3_0', seedDB: 'VN_LAN_Activation_Seedlist' },
             { label: "Lancôme Malaysia", locale: 'MY', spaceDB: 'Lancome_Maindb_SCV_V3_0', seedDB: "MY_LAN_Activation_Seedlist" },
-
-            // SkinCeuticals
             { label: 'Skinceuticals GCC', locale: 'AE', spaceDB: 'SKC_Maindb_SCV_V3_0', seedDB: 'GC_SKC_SEED' },
             { label: 'SkinCeuticals Singapore', locale: 'SG', spaceDB: 'SKC_Maindb_SCV_V3_0', seedDB: 'SG_SKC_SEED' },
-
-            // Vichy
             { label: 'Vichy GCC', locale: 'AE', spaceDB: 'VCY_Maindb_SCV_V3_0', seedDB: 'GCC_VCY_SEED' },
             { label: 'Vichy Thailand', locale: 'TH', spaceDB: 'VCY_Maindb_SCV_V3_0', seedDB: 'TH_VCY_SEED' },
-
-            // Yves Saint Laurent
             { label: 'Yves Saint Laurent Indonesia', locale: 'ID', spaceDB: 'YSL_Maindb_SCV_V3_0', seedDB: 'ID_YSL_SEED_WHATSAPP' },
             { label: 'Yves Saint Laurent Malaysia', locale: 'MY', spaceDB: 'YSL_Maindb_SCV_V3_0', seedDB: 'MY_YSL_Activation_Seedlist' },
             { label: 'Yves Saint Laurent Singapore', locale: 'SG', spaceDB: 'YSL_Maindb_SCV_V3_0', seedDB: 'SG_YSL_SEED' },
@@ -1592,11 +1400,11 @@ FROM {{SPACE_DB}} db
  
 /* REQUIRED for mobile formatting */ 
 INNER JOIN (  
-	SELECT a.CUSTOMER_CODE, '{{COUNTRY_CODE}}' AS CountryCode, /* Update country code accordingly */ 
-	REPLACE(REPLACE(REPLACE(LTRIM(RTRIM(a.MOBILE)), '+', ''), ' ', ''), '-', '') AS Mobile_Formatted 
+    SELECT a.CUSTOMER_CODE, '{{COUNTRY_CODE}}' AS CountryCode, /* Update country code accordingly */ 
+    REPLACE(REPLACE(REPLACE(LTRIM(RTRIM(a.MOBILE)), '+', ''), ' ', ''), '-', '') AS Mobile_Formatted 
  
-	FROM {{SPACE_DB}} a 
-	) sdb  
+    FROM {{SPACE_DB}} a 
+    ) sdb  
 ON sdb.CUSTOMER_CODE = db.CUSTOMER_CODE 
 
 {{PREVIOUS_ENTRY_JOIN}}
@@ -1618,6 +1426,8 @@ AND db.FIRST_PURCHASE_DATE IS NULL
 {{AI_AUDIENCE}}
 
 {{VOUCHERS}}
+
+{{AGE_FILTER}}
  
 /* Update country code accordingly */ 
 
@@ -1661,32 +1471,32 @@ FROM {{SPACE_DB}} db
  
 /* REQUIRED for mobile formatting */ 
 INNER JOIN (  
-	SELECT a.CUSTOMER_CODE, '{{COUNTRY_CODE}}' AS CountryCode, /* Update country code accordingly */ 
-	REPLACE(REPLACE(REPLACE(LTRIM(RTRIM(a.MOBILE)), '+', ''), ' ', ''), '-', '') AS Mobile_Formatted 
+    SELECT a.CUSTOMER_CODE, '{{COUNTRY_CODE}}' AS CountryCode, /* Update country code accordingly */ 
+    REPLACE(REPLACE(REPLACE(LTRIM(RTRIM(a.MOBILE)), '+', ''), ' ', ''), '-', '') AS Mobile_Formatted 
  
-	FROM {{SPACE_DB}} a 
-	) sdb  
+    FROM {{SPACE_DB}} a 
+    ) sdb  
 ON sdb.CUSTOMER_CODE = db.CUSTOMER_CODE 
 
 {{PREVIOUS_ENTRY_JOIN}}
 
 /* for last sampled */ 
 INNER JOIN ( 
-	SELECT CUSTOMER_CODE, ORDER_DT, ORDER_NUM, COUNTER_ID, EAN 
-	FROM ( 
-		SELECT CUSTOMER_CODE, ORDER_DT, ORDER_NUM, COUNTER_ID, EAN, 
-		ROW_NUMBER() OVER (PARTITION BY CUSTOMER_CODE ORDER BY ORDER_DT DESC) AS rn 
+    SELECT CUSTOMER_CODE, ORDER_DT, ORDER_NUM, COUNTER_ID, EAN 
+    FROM ( 
+        SELECT CUSTOMER_CODE, ORDER_DT, ORDER_NUM, COUNTER_ID, EAN, 
+        ROW_NUMBER() OVER (PARTITION BY CUSTOMER_CODE ORDER BY ORDER_DT DESC) AS rn 
  
-		FROM SPACE_Sales_Master sm 
+        FROM SPACE_Sales_Master sm 
  
-		WHERE sm.Price * sm.QUANTITY = 0 
+        WHERE sm.Price * sm.QUANTITY = 0 
  
-		GROUP BY CUSTOMER_CODE, ORDER_DT, ORDER_NUM, COUNTER_ID, EAN 
-	) x 
-	WHERE x.rn = 1 
-	{{SAMPLER_COUNTER_ID_FILTER}}
-	{{SAMPLER_EAN_FILTER}}
-	{{SAMPLER_SNIPPET}}
+        GROUP BY CUSTOMER_CODE, ORDER_DT, ORDER_NUM, COUNTER_ID, EAN 
+    ) x 
+    WHERE x.rn = 1 
+    {{SAMPLER_COUNTER_ID_FILTER}}
+    {{SAMPLER_EAN_FILTER}}
+    {{SAMPLER_SNIPPET}}
 ) sm 
 ON db.customer_code = sm.customer_code 
  
@@ -1700,6 +1510,8 @@ ON db.customer_code = sm.customer_code
 {{AI_AUDIENCE}}
 
 {{VOUCHERS}}
+
+{{AGE_FILTER}}
 
 AND db.active = 'True' /*  please include this condition to avoid duplicate records */ 
 
@@ -1739,18 +1551,18 @@ ELSE NULL
 END AS Mobile 
  
 , '{{LOCALE}}' AS locale /* Update according to BU country */ 
-, '{{CUSTOMER_TYPE}}' AS customer_type 
+, {{CUSTOMER_TYPE_SNIPPET}} /* Customer Type - Active/Sleeping or static */
 , {{RECORD_TYPE}}/* Usually the touchpoint, but depends on your preference */ 
  
 FROM {{SPACE_DB}} db 
  
 /* REQUIRED for mobile formatting */ 
 INNER JOIN (  
-	SELECT a.CUSTOMER_CODE, '{{COUNTRY_CODE}}' AS CountryCode, /* Update country code accordingly */ 
-	REPLACE(REPLACE(REPLACE(LTRIM(RTRIM(a.MOBILE)), '+', ''), ' ', ''), '-', '') AS Mobile_Formatted 
+    SELECT a.CUSTOMER_CODE, '{{COUNTRY_CODE}}' AS CountryCode, /* Update country code accordingly */ 
+    REPLACE(REPLACE(REPLACE(LTRIM(RTRIM(a.MOBILE)), '+', ''), ' ', ''), '-', '') AS Mobile_Formatted 
  
-	FROM {{SPACE_DB}} a 
-	) sdb  
+    FROM {{SPACE_DB}} a 
+    ) sdb  
 ON sdb.CUSTOMER_CODE = db.CUSTOMER_CODE 
 
 {{PREVIOUS_ENTRY_JOIN}}
@@ -1772,6 +1584,8 @@ AND db.active = 'True' /* REQUIRED to remove duplicate records */
 {{AI_AUDIENCE}}
 
 {{VOUCHERS}}
+
+{{AGE_FILTER}}
  
 {{EVERPURCHASE_SNIPPET}}
  
@@ -1809,28 +1623,28 @@ AND NOT EXISTS(
             engagements: `
 /* FOR Engagements / / EXAMPLE: P6M Open */  
 AND EXISTS(  
-	SELECT 1 FROM _Open op  
-	WHERE ( 
-		db.CUSTOMER_CODE = op.Subscriberkey   
-	AND CAST(EventDate AS DATE) > DATEADD(month, -{{ENGAGEMENTS_MONTHS}}, GETDATE()) 
-	) 
+    SELECT 1 FROM _Open op  
+    WHERE ( 
+        db.CUSTOMER_CODE = op.Subscriberkey   
+    AND CAST(EventDate AS DATE) > DATEADD(month, -{{ENGAGEMENTS_MONTHS}}, GETDATE()) 
+    ) 
 `,
             aiAudience: `
 /* FOR AI Audience */  
 AND EXISTS(  
-	SELECT 1 FROM [Tealium-CDP-Audience-DE] ai  
-	WHERE db.CUSTOMER_CODE = ai.[LUCID]  
-	AND ai.[Tealium Audiences] LIKE '%Very Likely%' 
-	) 
+    SELECT 1 FROM [Tealium-CDP-Audience-DE] ai  
+    WHERE db.CUSTOMER_CODE = ai.[LUCID]  
+    AND ai.[Tealium Audiences] LIKE '%Very Likely%' 
+    ) 
 `,
             vouchers: `
 /* FOR Vouchers */  
 AND EXISTS(  
-	SELECT 1 FROM SPACE_Vouchers_Master vo  
-	WHERE db.CUSTOMER_CODE = vo.CUSTOMER_CODE  
-	AND VOUCHER_STATUS = 'available'  
-	AND VOUCHER_ID = '{{VOUCHER_ID}}' /* change voucher_id according to brief */ 
-	 ) 
+    SELECT 1 FROM SPACE_Vouchers_Master vo  
+    WHERE db.CUSTOMER_CODE = vo.CUSTOMER_CODE  
+    AND VOUCHER_STATUS = 'available'  
+    AND VOUCHER_ID = '{{VOUCHER_ID}}' /* change voucher_id according to brief */ 
+     ) 
 `
         };
 
@@ -1846,16 +1660,6 @@ AND EXISTS(
         const settingSpaceDB = document.getElementById('settingSpaceDB');
         const settingCountryCode = document.getElementById('settingCountryCode');
 
-        // Summary elements
-        const summaryQueryType = document.getElementById('summaryQueryType');
-        const summaryProspect = document.getElementById('summaryProspect');
-        const summarySampler = document.getElementById('summarySampler');
-        const summaryLastPurchase = document.getElementById('summaryLastPurchase');
-        const summaryEP = document.getElementById('summaryEP');
-        const summaryRecordType = document.getElementById('summaryRecordType');
-        const summaryVoucher = document.getElementById('summaryVoucher');
-
-        // Controls
         const recordTypeInput = document.getElementById('recordTypeInput');
         const emailOptinDropdown = document.getElementById('emailOptinDropdown');
         const chkPreviousEntry = document.getElementById('chkPreviousEntry');
@@ -1866,14 +1670,12 @@ AND EXISTS(
         const smsSuppressionTable = document.getElementById('smsSuppressionTable');
         const voucherInput = document.getElementById('voucherInput');
 
-        // Prospect controls - now radio only
         const prospectMonths = document.getElementById('prospectMonths');
         const prospectRelativeGroup = document.getElementById('prospectRelativeGroup');
         const prospectAbsoluteGroup = document.getElementById('prospectAbsoluteGroup');
         const prospectTypeRadios = document.querySelectorAll('input[name="prospectType"]');
         const prospectLoyaltyTiers = document.getElementById('prospectLoyaltyTiers');
 
-        // Prospect date components
         const prospectStartYear = document.getElementById('prospectStartYear');
         const prospectStartMonth = document.getElementById('prospectStartMonth');
         const prospectStartDay = document.getElementById('prospectStartDay');
@@ -1881,7 +1683,6 @@ AND EXISTS(
         const prospectEndMonth = document.getElementById('prospectEndMonth');
         const prospectEndDay = document.getElementById('prospectEndDay');
 
-        // Sampler controls - now radio only
         const samplerMonths = document.getElementById('samplerMonths');
         const samplerRelativeGroup = document.getElementById('samplerRelativeGroup');
         const samplerAbsoluteGroup = document.getElementById('samplerAbsoluteGroup');
@@ -1891,7 +1692,6 @@ AND EXISTS(
         const samplerCounterIdList = document.getElementById('samplerCounterIdList');
         const samplerEanList = document.getElementById('samplerEanList');
 
-        // Sampler date components
         const samplerStartYear = document.getElementById('samplerStartYear');
         const samplerStartMonth = document.getElementById('samplerStartMonth');
         const samplerStartDay = document.getElementById('samplerStartDay');
@@ -1899,7 +1699,6 @@ AND EXISTS(
         const samplerEndMonth = document.getElementById('samplerEndMonth');
         const samplerEndDay = document.getElementById('samplerEndDay');
 
-        // Customer controls
         const customerFilterSelect = document.getElementById('customerFilterSelect');
         const lpWithEANMonths = document.getElementById('lpWithEANMonths');
         const lpWithEANRelativeGroup = document.getElementById('lpWithEANRelativeGroup');
@@ -1920,7 +1719,6 @@ AND EXISTS(
         const customerCounterIdList = document.getElementById('customerCounterIdList');
         const customerEanList = document.getElementById('customerEanList');
 
-        // Customer date components - LP with EAN
         const lpWithEANStartYear = document.getElementById('lpWithEANStartYear');
         const lpWithEANStartMonth = document.getElementById('lpWithEANStartMonth');
         const lpWithEANStartDay = document.getElementById('lpWithEANStartDay');
@@ -1928,7 +1726,6 @@ AND EXISTS(
         const lpWithEANEndMonth = document.getElementById('lpWithEANEndMonth');
         const lpWithEANEndDay = document.getElementById('lpWithEANEndDay');
 
-        // Customer date components - LP without EAN
         const lpWithoutEANStartYear = document.getElementById('lpWithoutEANStartYear');
         const lpWithoutEANStartMonth = document.getElementById('lpWithoutEANStartMonth');
         const lpWithoutEANStartDay = document.getElementById('lpWithoutEANStartDay');
@@ -1936,7 +1733,6 @@ AND EXISTS(
         const lpWithoutEANEndMonth = document.getElementById('lpWithoutEANEndMonth');
         const lpWithoutEANEndDay = document.getElementById('lpWithoutEANEndDay');
 
-        // Customer date components - EP
         const everpurchaseStartYear = document.getElementById('everpurchaseStartYear');
         const everpurchaseStartMonth = document.getElementById('everpurchaseStartMonth');
         const everpurchaseStartDay = document.getElementById('everpurchaseStartDay');
@@ -1944,13 +1740,18 @@ AND EXISTS(
         const everpurchaseEndMonth = document.getElementById('everpurchaseEndMonth');
         const everpurchaseEndDay = document.getElementById('everpurchaseEndDay');
 
-        // Other checkboxes
+        const chkAgeFilter = document.getElementById('chkAgeFilter');
+        const ageFrom = document.getElementById('ageFrom');
+        const ageTo = document.getElementById('ageTo');
+
+        const chkActiveSleeping = document.getElementById('chkActiveSleeping');
+        const activeSleepingMonths = document.getElementById('activeSleepingMonths');
+
         const chkWhatsapp = document.getElementById('chkWhatsapp');
         const chkEngagements = document.getElementById('chkEngagements');
         const engagementsMonths = document.getElementById('engagementsMonths');
         const chkVouchers = document.getElementById('chkVouchers');
 
-        // Rows
         const prospectRow = document.getElementById('prospectRow');
         const prospectLoyaltyRow = document.getElementById('prospectLoyaltyRow');
         const samplerRow = document.getElementById('samplerRow');
@@ -1962,20 +1763,10 @@ AND EXISTS(
         const customerFilterRow = document.getElementById('customerFilterRow');
         const edmSuppressionRow = document.getElementById('edmSuppressionRow');
         const smsSuppressionRow = document.getElementById('smsSuppressionRow');
+        const activeSleepingRow = document.getElementById('activeSleepingRow');
 
         // ---------- Date helper functions ----------
-        function populateDateSelects(select, start, end) {
-            select.innerHTML = '';
-            for (let i = start; i <= end; i++) {
-                const option = document.createElement('option');
-                option.value = i.toString().padStart(2, '0');
-                option.textContent = i.toString().padStart(2, '0');
-                select.appendChild(option);
-            }
-        }
-
         function initializeDateComponents() {
-            // Populate year selects (from 2020 to 2030)
             const yearSelects = document.querySelectorAll('.year-select');
             yearSelects.forEach(select => {
                 for (let i = 2030; i >= 2020; i--) {
@@ -1986,7 +1777,6 @@ AND EXISTS(
                 }
             });
 
-            // Populate month selects (1-12)
             const monthSelects = document.querySelectorAll('.month-select');
             monthSelects.forEach(select => {
                 for (let i = 1; i <= 12; i++) {
@@ -1998,7 +1788,6 @@ AND EXISTS(
                 }
             });
 
-            // Populate day selects (1-31)
             const daySelects = document.querySelectorAll('.day-select');
             daySelects.forEach(select => {
                 for (let i = 1; i <= 31; i++) {
@@ -2031,17 +1820,6 @@ AND EXISTS(
             }
         }
 
-        function formatDateDisplay(dateStr) {
-            if (!dateStr) return '';
-            const parts = dateStr.split('-');
-            if (parts.length === 3) {
-                const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-                const month = monthNames[parseInt(parts[1]) - 1];
-                return `${month}${parts[0]}`;
-            }
-            return dateStr;
-        }
-
         // ---------- Populate brands ----------
         brandList.forEach((item, index) => {
             const opt = document.createElement('option');
@@ -2056,7 +1834,6 @@ AND EXISTS(
         let currentActiveType = 'prospect';
         let currentDisplayedQuery = '';
 
-        // Store settings per query type
         const settingsStore = {
             prospect: {
                 prospectType: 'relative',
@@ -2108,7 +1885,6 @@ AND EXISTS(
             seed: {}
         };
 
-        // Store common settings
         const commonSettings = {
             recordType: 'SMS1',
             optInType: 'email_optin',
@@ -2122,7 +1898,12 @@ AND EXISTS(
             engagements: false,
             engagementsMonths: 6,
             vouchers: false,
-            voucherId: 'O350'
+            voucherId: 'O350',
+            ageFilter: false,
+            ageFrom: 20,
+            ageTo: 80,
+            activeSleeping: false,
+            activeSleepingMonths: 12
         };
 
         // ---------- Helpers ----------
@@ -2154,7 +1935,9 @@ AND EXISTS(
                 samplerEan: chkSamplerEan.checked,
                 customerCounterId: chkCustomerCounterId.checked,
                 customerEan: chkCustomerEan.checked,
-                loyalty: chkLoyalty.checked
+                loyalty: chkLoyalty.checked,
+                ageFilter: chkAgeFilter.checked,
+                activeSleeping: chkActiveSleeping.checked
             };
         }
 
@@ -2171,7 +1954,6 @@ AND EXISTS(
 
         function saveCurrentSettings() {
             const type = currentActiveType;
-            const optInSettings = getOptInSettings();
             commonSettings.recordType = recordTypeInput.value.trim() || 'SMS1';
             commonSettings.optInType = emailOptinDropdown.value;
             commonSettings.voucherId = voucherInput.value.trim() || 'O350';
@@ -2230,7 +2012,6 @@ AND EXISTS(
                 settingsStore.ai.engagementsMonths = engagementsMonths.value;
             }
             
-            // Save common settings
             commonSettings.previousEntry = chkPreviousEntry.checked;
             commonSettings.previousEntryTable = previousEntryTable.value;
             commonSettings.edmSuppression = chkEDMSuppression.checked;
@@ -2244,11 +2025,16 @@ AND EXISTS(
             commonSettings.voucherId = voucherInput.value.trim() || 'O350';
             commonSettings.recordType = recordTypeInput.value.trim() || 'SMS1';
             commonSettings.optInType = emailOptinDropdown.value;
+            
+            commonSettings.ageFilter = chkAgeFilter.checked;
+            commonSettings.ageFrom = ageFrom.value;
+            commonSettings.ageTo = ageTo.value;
+            
+            commonSettings.activeSleeping = chkActiveSleeping.checked;
+            commonSettings.activeSleepingMonths = activeSleepingMonths.value;
         }
 
         function restoreSettings(type) {
-            // Restore common settings
-            const optInSettings = getOptInSettings();
             recordTypeInput.value = commonSettings.recordType;
             emailOptinDropdown.value = commonSettings.optInType;
             voucherInput.value = commonSettings.voucherId;
@@ -2263,7 +2049,13 @@ AND EXISTS(
             engagementsMonths.value = commonSettings.engagementsMonths;
             chkVouchers.checked = commonSettings.vouchers;
             
-            // Update record type based on opt-in selection
+            chkAgeFilter.checked = commonSettings.ageFilter || false;
+            ageFrom.value = commonSettings.ageFrom || 20;
+            ageTo.value = commonSettings.ageTo || 80;
+            
+            chkActiveSleeping.checked = commonSettings.activeSleeping || false;
+            activeSleepingMonths.value = commonSettings.activeSleepingMonths || 12;
+            
             const optInConfig = optInMap[commonSettings.optInType];
             if (optInConfig) {
                 recordTypeInput.value = optInConfig.recordType;
@@ -2329,7 +2121,6 @@ AND EXISTS(
                 engagementsMonths.value = settings.engagementsMonths;
             }
             
-            // Show/hide previous entry input
             if (chkPreviousEntry.checked) {
                 previousEntryTable.classList.remove('hidden');
             } else {
@@ -2399,20 +2190,6 @@ AND EXISTS(
             everpurchaseRow.classList.toggle('hidden', selected !== 'everpurchase');
         }
 
-        // ---------- Update summary ----------
-        function updateSummary(type) {
-            const recordType = recordTypeInput.value.trim() || 'SMS1';
-            const voucherId = voucherInput.value.trim() || 'O350';
-            
-            const typeLabels = {
-                prospect: 'Prospect',
-                sampler: 'Sampler',
-                customer: 'Customer',
-                ai: 'AI Audience',
-                seed: 'Seed'
-            };
-        }
-
         // ---------- Build the opt-in clause ----------
         function buildOptInClause(states) {
             const optInSettings = getOptInSettings();
@@ -2431,7 +2208,6 @@ AND EXISTS(
             let smsSuppression = smsSupp ? 
                 `AND NOT EXISTS(SELECT 1 FROM ${smsTable} sm WHERE db.MOBILE = sm.Mobile)` : '';
 
-            // For Email+SMS combined opt-in
             if (optInSettings.type === 'email_and_sms') {
                 return `
 WHERE ((
@@ -2447,7 +2223,6 @@ AND (db.MOBILE IS NOT NULL AND db.MOBILE != '')
 ))`;
             }
 
-            // For Email+WHA combined opt-in
             if (optInSettings.type === 'email_and_wha') {
                 return `
 WHERE ((
@@ -2463,7 +2238,6 @@ WHERE ((
 ))`;
             }
 
-            // For other opt-in types, build the standard clause with suppression
             const optInCondition = optInSettings.condition;
             return `
 WHERE ( 	
@@ -2473,14 +2247,50 @@ WHERE (
 )`;
         }
 
+        // ---------- Build age filter snippet ----------
+        function buildAgeFilterSnippet() {
+            if (!chkAgeFilter.checked) return '';
+            
+            let fromAge = parseInt(ageFrom.value, 10);
+            let toAge = parseInt(ageTo.value, 10);
+            
+            if (isNaN(fromAge) || fromAge < 1) fromAge = 20;
+            if (isNaN(toAge) || toAge < 1) toAge = 80;
+            if (fromAge > toAge) {
+                [fromAge, toAge] = [toAge, fromAge];
+            }
+            
+            return `
+/* Age filter */ 
+AND (DATEDIFF(YEAR, CAST(db.DOB AS DATE), GETDATE()) - 
+    CASE 
+        WHEN MONTH(GETDATE()) < MONTH(CAST(db.DOB AS DATE)) 
+        OR (MONTH(GETDATE()) = MONTH(CAST(db.DOB AS DATE)) AND DAY(GETDATE()) < DAY(CAST(db.DOB AS DATE))) 
+        THEN 1 
+        ELSE 0 
+    END) BETWEEN ${fromAge} AND ${toAge}`;
+        }
+
+        // ---------- Build Active/Sleeping Customer snippet ----------
+        function buildActiveSleepingSnippet() {
+            if (!chkActiveSleeping.checked) return `'Customer' AS customer_type`;
+            
+            let months = parseInt(activeSleepingMonths.value, 10);
+            if (isNaN(months) || months < 1) months = 12;
+            
+            return `CASE
+        WHEN db.last_purchase_date >= CAST(DATEADD(month, -${months}, GETDATE()) AS DATE)
+        THEN 'Active Customer'
+        ELSE 'Sleeping Customer'
+    END AS customer_type`;
+        }
+
         // ---------- Display function ----------
         function showQuery(type) {
-            // Save current settings before switching
             if (currentActiveType !== type) {
                 saveCurrentSettings();
             }
 
-            // Handle SEED query separately
             if (type === 'seed') {
                 currentActiveType = 'seed';
                 const brandData = getCurrentBrandData();
@@ -2494,8 +2304,6 @@ WHERE (
 , COALESCE(e.last_name, s.last_name) AS last_name
 , COALESCE(e.Email, s.Email) AS Email
 , COALESCE(e.Mobile, s.Mobile) AS Mobile
-/*, COALESCE(e.Mobile, s.Mobile_Number) AS Mobile*/
-/*, COALESCE(e.Mobile, s.Mobile_Formatted) AS Mobile*/
 , 'SEED' AS customer_type 
 , 'SEED' AS Record_Type 
 , '${localeLabel}' AS Locale
@@ -2503,20 +2311,9 @@ WHERE (
 FROM [${seedLabel}] s 
 LEFT JOIN [${localeLabel}_CAMPAIGN_NAME_03242026_ENTRY] e 
     ON e.EMAIL = s.EMAIL
-    /*ON e.Mobile = s.Mobile*/ 
-    /*ON e.Mobile = s.Mobile_Number*/ 
-    /*ON e.Mobile = s.Mobile_Formatted*/ 
 
     WHERE s.EMAIL != '' AND s.EMAIL IS NOT NULL
-   /*WHERE (s.MOBILE != '' AND s.MOBILE IS NOT NULL)*/ 
-   /*WHERE (s.MOBILE != '' AND s.MOBILE_NUMBER IS NOT NULL)*/  
-   /*WHERE (s.MOBILE != '' AND s.Mobile_Formatted IS NOT NULL)*/                  
- 
- 
- /*if MY_GAB use s.Mobile_Formatted/*
- /*in some BAU that s.Mobile will not work use s.Mobile_Number*/
-`
-;
+`;
 
                 currentDisplayedQuery = seedQuery;
                 try {
@@ -2527,14 +2324,13 @@ LEFT JOIN [${localeLabel}_CAMPAIGN_NAME_03242026_ENTRY] e
                 }
                 queryLabel.textContent = 'SEED Query';
 
-                // Disable all controls for SEED
                 disableAllControls(true);
                 
-                // Hide all special rows
                 prospectRow.classList.add('hidden');
                 prospectLoyaltyRow.classList.add('hidden');
                 samplerRow.classList.add('hidden');
                 customerSection.classList.add('hidden');
+                activeSleepingRow.classList.add('hidden');
 
                 buttons.forEach(btn => {
                     btn.classList.remove('active');
@@ -2544,19 +2340,15 @@ LEFT JOIN [${localeLabel}_CAMPAIGN_NAME_03242026_ENTRY] e
                 copyBtn.textContent = 'Copy';
                 copyBtn.classList.remove('copied');
                 updateSettings();
-                updateSummary(type);
                 return;
             }
 
-            // Handle AI AUDIENCE
             if (type === 'ai') {
                 currentActiveType = 'ai';
                 restoreSettings('ai');
                 
-                // First, disable all controls
                 disableAllControls(true);
                 
-                // THEN enable allowed controls (override the disable)
                 const allowedIds = ['recordTypeInput', 'emailOptinDropdown', 'voucherInput', 'chkEDMSuppression', 'chkSMSSuppression', 
                                 'edmSuppressionTable', 'smsSuppressionTable', 'chkPreviousEntry', 
                                 'previousEntryTable', 'chkEngagements', 'engagementsMonths'];
@@ -2564,7 +2356,6 @@ LEFT JOIN [${localeLabel}_CAMPAIGN_NAME_03242026_ENTRY] e
                     const el = document.getElementById(id);
                     if (el) {
                         el.disabled = false;
-                        // Also remove any "disabled" class from parent labels
                         const parentLabel = el.closest('label');
                         if (parentLabel) {
                             parentLabel.classList.remove('disabled');
@@ -2572,7 +2363,6 @@ LEFT JOIN [${localeLabel}_CAMPAIGN_NAME_03242026_ENTRY] e
                     }
                 });
                 
-                // Remove disabled class from allowed rows
                 const allowedRowIds = ['edmSuppressionRow', 'smsSuppressionRow', 'prev-entry-wrapper'];
                 allowedRowIds.forEach(rowId => {
                     const row = document.getElementById(rowId) || document.querySelector(rowId);
@@ -2583,18 +2373,15 @@ LEFT JOIN [${localeLabel}_CAMPAIGN_NAME_03242026_ENTRY] e
                     }
                 });
                 
-                // Explicitly handle previous entry wrapper
                 const prevWrapper = document.querySelector('.prev-entry-wrapper');
                 if (prevWrapper) {
                     prevWrapper.classList.remove('disabled');
-                    // Also enable the checkbox and input inside
                     const checkbox = prevWrapper.querySelector('#chkPreviousEntry');
                     const input = prevWrapper.querySelector('#previousEntryTable');
                     if (checkbox) checkbox.disabled = false;
                     if (input) input.disabled = false;
                 }
                 
-                // Handle engagements label
                 const engagementsLabel = document.querySelector('label:has(#chkEngagements)');
                 if (engagementsLabel) {
                     engagementsLabel.classList.remove('disabled');
@@ -2604,7 +2391,6 @@ LEFT JOIN [${localeLabel}_CAMPAIGN_NAME_03242026_ENTRY] e
                     if (input) input.disabled = false;
                 }
                 
-                // Handle opt-in dropdown
                 const optinWrapper = document.querySelector('.optin-dropdown-wrapper');
                 if (optinWrapper) {
                     optinWrapper.classList.remove('disabled');
@@ -2612,22 +2398,18 @@ LEFT JOIN [${localeLabel}_CAMPAIGN_NAME_03242026_ENTRY] e
                     if (dropdown) dropdown.disabled = false;
                 }
                 
-                // Hide all special rows
                 prospectRow.classList.add('hidden');
                 prospectLoyaltyRow.classList.add('hidden');
                 samplerRow.classList.add('hidden');
                 customerSection.classList.add('hidden');
+                activeSleepingRow.classList.add('hidden');
 
-                // Build the AI query
                 buildAIQuery();
-                updateSummary(type);
                 return;
             }
 
-            // For PROSPECT, SAMPLER, CUSTOMER - enable all controls
             disableAllControls(false);
             
-            // Remove disabled class from all rows
             document.querySelectorAll('.filter-top-line').forEach(el => {
                 el.classList.remove('disabled');
             });
@@ -2641,7 +2423,6 @@ LEFT JOIN [${localeLabel}_CAMPAIGN_NAME_03242026_ENTRY] e
                 el.classList.remove('disabled');
             });
 
-            // Restore settings for this type
             restoreSettings(type);
 
             const baseQuery = queries[type];
@@ -2664,8 +2445,14 @@ LEFT JOIN [${localeLabel}_CAMPAIGN_NAME_03242026_ENTRY] e
             if (isNaN(engMonths) || engMonths < 1) engMonths = 6;
 
             const customerType = customerTypeMap[type] || 'Customer';
+            
+            let customerTypeSnippet = `'${customerType}' AS customer_type`;
+            if (type === 'customer') {
+                customerTypeSnippet = buildActiveSleepingSnippet();
+            }
 
             const optInClause = buildOptInClause(states);
+            const ageFilterSnippet = buildAgeFilterSnippet();
 
             let prospectSnippet = '';
             if (type === 'prospect') {
@@ -2720,18 +2507,18 @@ AND db.CREATION_DATE >= DATEADD(month, -${prospectVal}, GETDATE())`;
                 const selectedType = document.querySelector('input[name="lpWithEANType"]:checked');
                 const innerJoinBase = `/* for last purchase W/EAN – remove if everpurchase */ 
     INNER JOIN ( 
-	SELECT CUSTOMER_CODE, ORDER_DT, ORDER_NUM, COUNTER_ID, EAN 
-	FROM ( 
-		SELECT CUSTOMER_CODE, ORDER_DT, ORDER_NUM, COUNTER_ID, EAN, 
-		ROW_NUMBER() OVER (PARTITION BY CUSTOMER_CODE ORDER BY ORDER_DT DESC) AS rn 
-		FROM SPACE_Sales_Master sm 
+    SELECT CUSTOMER_CODE, ORDER_DT, ORDER_NUM, COUNTER_ID, EAN 
+    FROM ( 
+        SELECT CUSTOMER_CODE, ORDER_DT, ORDER_NUM, COUNTER_ID, EAN, 
+        ROW_NUMBER() OVER (PARTITION BY CUSTOMER_CODE ORDER BY ORDER_DT DESC) AS rn 
+        FROM SPACE_Sales_Master sm 
         WHERE sm.Price * sm.QUANTITY > 0 
-	    GROUP BY CUSTOMER_CODE, ORDER_DT, ORDER_NUM, COUNTER_ID, EAN 
-	) x 
-	WHERE x.rn = 1 
-	{{LP_WITH_EAN_COUNTER_ID_FILTER}}
-	{{LP_WITH_EAN_EAN_FILTER}}
-	`;
+        GROUP BY CUSTOMER_CODE, ORDER_DT, ORDER_NUM, COUNTER_ID, EAN 
+    ) x 
+    WHERE x.rn = 1 
+    {{LP_WITH_EAN_COUNTER_ID_FILTER}}
+    {{LP_WITH_EAN_EAN_FILTER}}
+    `;
 
                 let filterClause = '';
                 if (selectedType && selectedType.value === 'absolute') {
@@ -2808,15 +2595,15 @@ AND db.LAST_PURCHASE_STORE IN ('KX0','450KX0') /* for specific stores – remove
                 everpurchaseSnippet =
      `/* FOR Everpurchase */ 
 AND EXISTS( 
-	  SELECT DISTINCT customer_code /* Make sure DISTINCT is present */ 
+      SELECT DISTINCT customer_code /* Make sure DISTINCT is present */ 
  
-	  FROM SPACE_Sales_Master sm 
-		 
-	  WHERE db.customer_code = sm.customer_code 
-	  AND sm.Price * sm.QUANTITY > 0 
-	  ${dateFilter}
-	  ${counterIdFilter}
-	  ${eanFilter})`;
+      FROM SPACE_Sales_Master sm 
+         
+      WHERE db.customer_code = sm.customer_code 
+      AND sm.Price * sm.QUANTITY > 0 
+      ${dateFilter}
+      ${counterIdFilter}
+      ${eanFilter})`;
             }
 
             let loyaltySnippet = '';
@@ -2876,6 +2663,7 @@ AND EXISTS(
                 .replace(/\{\{LOCALE\}\}/g, localeData.label)
                 .replace(/\{\{COUNTRY_CODE\}\}/g, localeData.code)
                 .replace(/\{\{CUSTOMER_TYPE\}\}/g, customerType)
+                .replace(/\{\{CUSTOMER_TYPE_SNIPPET\}\}/g, customerTypeSnippet)
                 .replace(/\{\{RECORD_TYPE\}\}/g, recordType)
                 .replace(/\{\{PREVIOUS_ENTRY_JOIN\}\}/g, prevEntrySnippet)
                 .replace(/\{\{OPT_IN_CLAUSE\}\}/g, optInClause)
@@ -2883,7 +2671,7 @@ AND EXISTS(
                 .replace(/\{\{PROSPECT_LOYALTY_SNIPPET\}\}/g, prospectLoyaltySnippet)
                 .replace(/\{\{WHATSAPP\}\}/g, states.whatsapp ? snippets.whatsapp : '')
                 .replace(/\{\{ENGAGEMENTS\}\}/g, engagementsSnippet)
-                .replace(/\{\{AI_AUDIENCE\}\}/g, '') // Removed AI Audience snippet
+                .replace(/\{\{AI_AUDIENCE\}\}/g, '')
                 .replace(/\{\{VOUCHERS\}\}/g, voucherSnippet)
                 .replace(/\{\{SAMPLER_SNIPPET\}\}/g, samplerSnippet)
                 .replace(/\{\{LP_WITH_EAN_SNIPPET\}\}/g, lpWithEANSnippet)
@@ -2893,7 +2681,8 @@ AND EXISTS(
                 .replace(/\{\{SAMPLER_COUNTER_ID_FILTER\}\}/g, samplerCounterIdFilter)
                 .replace(/\{\{SAMPLER_EAN_FILTER\}\}/g, samplerEanFilter)
                 .replace(/\{\{LP_WITH_EAN_COUNTER_ID_FILTER\}\}/g, lpWithEanCounterIdFilter)
-                .replace(/\{\{LP_WITH_EAN_EAN_FILTER\}\}/g, lpWithEanEanFilter);
+                .replace(/\{\{LP_WITH_EAN_EAN_FILTER\}\}/g, lpWithEanEanFilter)
+                .replace(/\{\{AGE_FILTER\}\}/g, ageFilterSnippet);
 
             finalQuery = finalQuery
                 .replace(/\s+\n/g, '\n')
@@ -2922,24 +2711,26 @@ AND EXISTS(
 
             currentActiveType = type;
 
-            // Show/hide conditional controls
             if (type === 'prospect') {
                 prospectRow.classList.remove('hidden');
                 prospectLoyaltyRow.classList.remove('hidden');
                 samplerRow.classList.add('hidden');
                 customerSection.classList.add('hidden');
+                activeSleepingRow.classList.add('hidden');
                 toggleProspectType();
             } else if (type === 'sampler') {
                 prospectRow.classList.add('hidden');
                 prospectLoyaltyRow.classList.add('hidden');
                 samplerRow.classList.remove('hidden');
                 customerSection.classList.add('hidden');
+                activeSleepingRow.classList.add('hidden');
                 toggleSamplerType();
             } else if (type === 'customer') {
                 prospectRow.classList.add('hidden');
                 prospectLoyaltyRow.classList.add('hidden');
                 samplerRow.classList.add('hidden');
                 customerSection.classList.remove('hidden');
+                activeSleepingRow.classList.remove('hidden');
                 toggleLPWithEANType();
                 toggleLPWithoutEANType();
                 toggleEverpurchaseType();
@@ -2953,7 +2744,6 @@ AND EXISTS(
             }
 
             updateSettings();
-            updateSummary(type);
         }
 
         // ---------- Build AI query ----------
@@ -2976,6 +2766,7 @@ AND EXISTS(
             if (isNaN(engMonths) || engMonths < 1) engMonths = 6;
 
             const customerType = 'AI Audience';
+            const customerTypeSnippet = `'${customerType}' AS customer_type`;
 
             const optInClause = buildOptInClause(states);
             let prevEntrySnippet = states.previousEntry ? snippets.previousEntry : '';
@@ -2994,6 +2785,7 @@ AND EXISTS(
                 .replace(/\{\{LOCALE\}\}/g, localeData.label)
                 .replace(/\{\{COUNTRY_CODE\}\}/g, localeData.code)
                 .replace(/\{\{CUSTOMER_TYPE\}\}/g, customerType)
+                .replace(/\{\{CUSTOMER_TYPE_SNIPPET\}\}/g, customerTypeSnippet)
                 .replace(/\{\{RECORD_TYPE\}\}/g, recordType)
                 .replace(/\{\{PREVIOUS_ENTRY_JOIN\}\}/g, prevEntrySnippet)
                 .replace(/\{\{OPT_IN_CLAUSE\}\}/g, optInClause)
@@ -3003,6 +2795,7 @@ AND EXISTS(
                 .replace(/\{\{ENGAGEMENTS\}\}/g, engagementsSnippet)
                 .replace(/\{\{AI_AUDIENCE\}\}/g, snippets.aiAudience)
                 .replace(/\{\{VOUCHERS\}\}/g, voucherSnippet)
+                .replace(/\{\{AGE_FILTER\}\}/g, '')
                 .replace(/AND db\.FIRST_PURCHASE_DATE IS NULL\s*\n/g, '')
                 .replace(/\/\* Loyalty – adjust as BU's loyalty values \*\/\s*\nAND db\.LOYALTY_TIER_CURRENT NOT IN \('BLACK GOLD','GOLD','ROSE'\)\s*\n/g, '');
 
@@ -3031,7 +2824,6 @@ AND EXISTS(
             copyBtn.classList.remove('copied');
             currentActiveType = 'ai';
             updateSettings();
-            updateSummary('ai');
         }
 
         // ---------- Helper to disable/enable all controls ----------
@@ -3050,7 +2842,6 @@ AND EXISTS(
                 control.disabled = disabled;
             });
 
-            // Handle labels
             document.querySelectorAll('.checkbox-column label, .checkbox-column .filter-top-line, .optin-dropdown-wrapper').forEach(label => {
                 if (currentActiveType === 'ai') {
                     const parentRow = label.closest('.filter-row');
@@ -3078,7 +2869,6 @@ AND EXISTS(
                 }
             });
 
-            // Handle text inputs
             document.querySelectorAll('.checkbox-column input[type="text"], .checkbox-column input[type="number"], .checkbox-column input[type="date"]').forEach(input => {
                 if (currentActiveType === 'ai') {
                     const allowedIds = ['recordTypeInput', 'voucherInput', 'edmSuppressionTable', 'smsSuppressionTable', 'previousEntryTable', 'engagementsMonths'];
@@ -3107,7 +2897,6 @@ AND EXISTS(
             }
         });
 
-        // Email opt-in dropdown change - updates record type
         emailOptinDropdown.addEventListener('change', function() {
             const optInConfig = optInMap[this.value];
             if (optInConfig) {
@@ -3124,7 +2913,6 @@ AND EXISTS(
             showQuery(currentActiveType);
         });
 
-        // All checkboxes - modified to save settings
         document.querySelectorAll('input[type="checkbox"]').forEach(chk => {
             chk.addEventListener('change', function() {
                 if (currentActiveType === 'seed') return;
@@ -3149,7 +2937,6 @@ AND EXISTS(
             });
         });
 
-        // Text inputs
         document.querySelectorAll('.checkbox-column input[type="text"], .checkbox-column input[type="number"]').forEach(input => {
             input.addEventListener('input', function() {
                 if (currentActiveType === 'seed') return;
@@ -3166,7 +2953,6 @@ AND EXISTS(
             });
         });
 
-        // Date component changes
         document.querySelectorAll('.date-components select').forEach(select => {
             select.addEventListener('change', function() {
                 if (currentActiveType === 'seed' || currentActiveType === 'ai') return;
@@ -3175,7 +2961,6 @@ AND EXISTS(
             });
         });
 
-        // Prospect type radio buttons
         prospectTypeRadios.forEach(radio => {
             radio.addEventListener('change', function() {
                 if (currentActiveType === 'seed' || currentActiveType === 'ai') return;
@@ -3185,7 +2970,6 @@ AND EXISTS(
             });
         });
 
-        // Sampler type radio buttons
         samplerTypeRadios.forEach(radio => {
             radio.addEventListener('change', function() {
                 if (currentActiveType === 'seed' || currentActiveType === 'ai') return;
@@ -3195,7 +2979,6 @@ AND EXISTS(
             });
         });
 
-        // Customer type radio buttons
         lpWithEANTypeRadios.forEach(radio => {
             radio.addEventListener('change', function() {
                 if (currentActiveType === 'seed' || currentActiveType === 'ai') return;
@@ -3223,7 +3006,6 @@ AND EXISTS(
             });
         });
 
-        // Customer filter dropdown
         customerFilterSelect.addEventListener('change', function() {
             if (currentActiveType === 'seed' || currentActiveType === 'ai') return;
             saveCurrentSettings();
@@ -3231,7 +3013,43 @@ AND EXISTS(
             showQuery(currentActiveType);
         });
 
-        // ---------- Copy ----------
+        chkAgeFilter.addEventListener('change', function() {
+            if (currentActiveType === 'seed') return;
+            if (currentActiveType === 'ai') {
+                saveCurrentSettings();
+                buildAIQuery();
+                return;
+            }
+            saveCurrentSettings();
+            showQuery(currentActiveType);
+        });
+
+        ageFrom.addEventListener('input', function() {
+            if (currentActiveType === 'seed' || currentActiveType === 'ai') return;
+            saveCurrentSettings();
+            showQuery(currentActiveType);
+        });
+
+        ageTo.addEventListener('input', function() {
+            if (currentActiveType === 'seed' || currentActiveType === 'ai') return;
+            saveCurrentSettings();
+            showQuery(currentActiveType);
+        });
+
+        chkActiveSleeping.addEventListener('change', function() {
+            if (currentActiveType === 'seed' || currentActiveType === 'ai') return;
+            if (currentActiveType !== 'customer') return;
+            saveCurrentSettings();
+            showQuery(currentActiveType);
+        });
+
+        activeSleepingMonths.addEventListener('input', function() {
+            if (currentActiveType === 'seed' || currentActiveType === 'ai') return;
+            if (currentActiveType !== 'customer') return;
+            saveCurrentSettings();
+            showQuery(currentActiveType);
+        });
+
         copyBtn.addEventListener('click', function() {
             if (!currentDisplayedQuery || currentDisplayedQuery.trim() === '') {
                 alert('No query to copy.');
@@ -3268,7 +3086,6 @@ AND EXISTS(
         // ---------- Initialize ----------
         initializeDateComponents();
         
-        // Set default dates - From: 2025, To: 2026
         setDateComponents(prospectStartYear, prospectStartMonth, prospectStartDay, '2025-06-01');
         setDateComponents(prospectEndYear, prospectEndMonth, prospectEndDay, '2026-07-31');
         setDateComponents(samplerStartYear, samplerStartMonth, samplerStartDay, '2025-06-01');
@@ -3280,7 +3097,6 @@ AND EXISTS(
         setDateComponents(everpurchaseStartYear, everpurchaseStartMonth, everpurchaseStartDay, '2024-02-01');
         setDateComponents(everpurchaseEndYear, everpurchaseEndMonth, everpurchaseEndDay, '2025-07-31');
 
-        // ---------- Initial load ----------
         showQuery('prospect');
     </script>
 </body>
