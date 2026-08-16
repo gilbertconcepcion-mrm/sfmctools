@@ -1840,7 +1840,11 @@ AND EXISTS(
                 prospectMonths: 6,
                 prospectStartDate: '2025-06-01',
                 prospectEndDate: '2026-07-31',
-                prospectLoyaltyTiers: "'BLACK GOLD','GOLD','ROSE','BLACK','SILVER'"
+                prospectLoyaltyTiers: "'BLACK GOLD','GOLD','ROSE','BLACK','SILVER'",
+                previousEntry: false,
+                previousEntryTable: 'previous_entry_DE',
+                engagements: false,
+                engagementsMonths: 6
             },
             sampler: {
                 samplerType: 'relative',
@@ -1850,7 +1854,11 @@ AND EXISTS(
                 samplerCounterId: true,
                 samplerEan: true,
                 samplerCounterIdList: "'KX0','450KX0'",
-                samplerEanList: "'4936968883583', '3614274507713'"
+                samplerEanList: "'4936968883583', '3614274507713'",
+                previousEntry: false,
+                previousEntryTable: 'previous_entry_DE',
+                engagements: false,
+                engagementsMonths: 6
             },
             customer: {
                 customerFilter: 'lp_with_ean',
@@ -1870,7 +1878,11 @@ AND EXISTS(
                 customerCounterId: true,
                 customerEan: true,
                 customerCounterIdList: "'KX0','450KX0'",
-                customerEanList: "'4936968883583', '3614274507713'"
+                customerEanList: "'4936968883583', '3614274507713'",
+                previousEntry: false,
+                previousEntryTable: 'previous_entry_DE',
+                engagements: false,
+                engagementsMonths: 6
             },
             ai: {
                 previousEntry: false,
@@ -1888,15 +1900,11 @@ AND EXISTS(
         const commonSettings = {
             recordType: 'SMS1',
             optInType: 'email_optin',
-            previousEntry: false,
-            previousEntryTable: 'previous_entry_DE',
             edmSuppression: true,
             edmSuppressionTable: 'AutosuppresionDE',
             smsSuppression: true,
             smsSuppressionTable: 'SMS_optout_de',
             whatsapp: false,
-            engagements: false,
-            engagementsMonths: 6,
             vouchers: false,
             voucherId: 'O350',
             ageFilter: false,
@@ -1965,6 +1973,10 @@ AND EXISTS(
                 settingsStore.prospect.prospectStartDate = getDateFromComponents(prospectStartYear, prospectStartMonth, prospectStartDay) || '2025-06-01';
                 settingsStore.prospect.prospectEndDate = getDateFromComponents(prospectEndYear, prospectEndMonth, prospectEndDay) || '2026-07-31';
                 settingsStore.prospect.prospectLoyaltyTiers = prospectLoyaltyTiers.value;
+                settingsStore.prospect.previousEntry = chkPreviousEntry.checked;
+                settingsStore.prospect.previousEntryTable = previousEntryTable.value;
+                settingsStore.prospect.engagements = chkEngagements.checked;
+                settingsStore.prospect.engagementsMonths = engagementsMonths.value;
             } else if (type === 'sampler') {
                 const selected = document.querySelector('input[name="samplerType"]:checked');
                 settingsStore.sampler.samplerType = selected ? selected.value : 'relative';
@@ -1975,6 +1987,10 @@ AND EXISTS(
                 settingsStore.sampler.samplerEan = chkSamplerEan.checked;
                 settingsStore.sampler.samplerCounterIdList = samplerCounterIdList.value;
                 settingsStore.sampler.samplerEanList = samplerEanList.value;
+                settingsStore.sampler.previousEntry = chkPreviousEntry.checked;
+                settingsStore.sampler.previousEntryTable = previousEntryTable.value;
+                settingsStore.sampler.engagements = chkEngagements.checked;
+                settingsStore.sampler.engagementsMonths = engagementsMonths.value;
             } else if (type === 'customer') {
                 settingsStore.customer.customerFilter = customerFilterSelect.value;
                 
@@ -2001,6 +2017,10 @@ AND EXISTS(
                 settingsStore.customer.customerEan = chkCustomerEan.checked;
                 settingsStore.customer.customerCounterIdList = customerCounterIdList.value;
                 settingsStore.customer.customerEanList = customerEanList.value;
+                settingsStore.customer.previousEntry = chkPreviousEntry.checked;
+                settingsStore.customer.previousEntryTable = previousEntryTable.value;
+                settingsStore.customer.engagements = chkEngagements.checked;
+                settingsStore.customer.engagementsMonths = engagementsMonths.value;
             } else if (type === 'ai') {
                 settingsStore.ai.previousEntry = chkPreviousEntry.checked;
                 settingsStore.ai.previousEntryTable = previousEntryTable.value;
@@ -2012,15 +2032,11 @@ AND EXISTS(
                 settingsStore.ai.engagementsMonths = engagementsMonths.value;
             }
             
-            commonSettings.previousEntry = chkPreviousEntry.checked;
-            commonSettings.previousEntryTable = previousEntryTable.value;
             commonSettings.edmSuppression = chkEDMSuppression.checked;
             commonSettings.edmSuppressionTable = edmSuppressionTable.value;
             commonSettings.smsSuppression = chkSMSSuppression.checked;
             commonSettings.smsSuppressionTable = smsSuppressionTable.value;
             commonSettings.whatsapp = chkWhatsapp.checked;
-            commonSettings.engagements = chkEngagements.checked;
-            commonSettings.engagementsMonths = engagementsMonths.value;
             commonSettings.vouchers = chkVouchers.checked;
             commonSettings.voucherId = voucherInput.value.trim() || 'O350';
             commonSettings.recordType = recordTypeInput.value.trim() || 'SMS1';
@@ -2038,15 +2054,11 @@ AND EXISTS(
             recordTypeInput.value = commonSettings.recordType;
             emailOptinDropdown.value = commonSettings.optInType;
             voucherInput.value = commonSettings.voucherId;
-            chkPreviousEntry.checked = commonSettings.previousEntry;
-            previousEntryTable.value = commonSettings.previousEntryTable;
             chkEDMSuppression.checked = commonSettings.edmSuppression;
             edmSuppressionTable.value = commonSettings.edmSuppressionTable;
             chkSMSSuppression.checked = commonSettings.smsSuppression;
             smsSuppressionTable.value = commonSettings.smsSuppressionTable;
             chkWhatsapp.checked = commonSettings.whatsapp;
-            chkEngagements.checked = commonSettings.engagements;
-            engagementsMonths.value = commonSettings.engagementsMonths;
             chkVouchers.checked = commonSettings.vouchers;
             
             chkAgeFilter.checked = commonSettings.ageFilter || false;
@@ -2068,6 +2080,10 @@ AND EXISTS(
                 setDateComponents(prospectStartYear, prospectStartMonth, prospectStartDay, settings.prospectStartDate);
                 setDateComponents(prospectEndYear, prospectEndMonth, prospectEndDay, settings.prospectEndDate);
                 prospectLoyaltyTiers.value = settings.prospectLoyaltyTiers;
+                chkPreviousEntry.checked = settings.previousEntry;
+                previousEntryTable.value = settings.previousEntryTable;
+                chkEngagements.checked = settings.engagements;
+                engagementsMonths.value = settings.engagementsMonths;
                 toggleProspectType();
             } else if (type === 'sampler') {
                 const settings = settingsStore.sampler;
@@ -2079,6 +2095,10 @@ AND EXISTS(
                 chkSamplerEan.checked = settings.samplerEan;
                 samplerCounterIdList.value = settings.samplerCounterIdList;
                 samplerEanList.value = settings.samplerEanList;
+                chkPreviousEntry.checked = settings.previousEntry;
+                previousEntryTable.value = settings.previousEntryTable;
+                chkEngagements.checked = settings.engagements;
+                engagementsMonths.value = settings.engagementsMonths;
                 toggleSamplerType();
             } else if (type === 'customer') {
                 const settings = settingsStore.customer;
@@ -2104,6 +2124,10 @@ AND EXISTS(
                 chkCustomerEan.checked = settings.customerEan;
                 customerCounterIdList.value = settings.customerCounterIdList;
                 customerEanList.value = settings.customerEanList;
+                chkPreviousEntry.checked = settings.previousEntry;
+                previousEntryTable.value = settings.previousEntryTable;
+                chkEngagements.checked = settings.engagements;
+                engagementsMonths.value = settings.engagementsMonths;
                 
                 toggleLPWithEANType();
                 toggleLPWithoutEANType();
@@ -2928,6 +2952,17 @@ AND EXISTS(
         document.querySelectorAll('input[type="checkbox"]').forEach(chk => {
             chk.addEventListener('change', function() {
                 if (currentActiveType === 'seed') return;
+
+                // Show/hide the Previous Touchpoint DE table input — runs for every
+                // tab (including AI Audience) so the field always reflects the checkbox.
+                if (this === chkPreviousEntry) {
+                    if (this.checked) {
+                        previousEntryTable.classList.remove('hidden');
+                    } else {
+                        previousEntryTable.classList.add('hidden');
+                    }
+                }
+
                 if (currentActiveType === 'ai') {
                     const allowedIds = ['chkEDMSuppression', 'chkSMSSuppression', 
                                        'chkPreviousEntry', 'chkEngagements'];
@@ -2937,13 +2972,7 @@ AND EXISTS(
                     }
                     return;
                 }
-                if (this === chkPreviousEntry) {
-                    if (this.checked) {
-                        previousEntryTable.classList.remove('hidden');
-                    } else {
-                        previousEntryTable.classList.add('hidden');
-                    }
-                }
+
                 saveCurrentSettings();
                 showQuery(currentActiveType);
             });
