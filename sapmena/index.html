@@ -2304,6 +2304,8 @@ AND (DATEDIFF(YEAR, CAST(db.DOB AS DATE), GETDATE()) -
 , COALESCE(e.last_name, s.last_name) AS last_name
 , COALESCE(e.Email, s.Email) AS Email
 , COALESCE(e.Mobile, s.Mobile) AS Mobile
+/*, COALESCE(e.Mobile, s.Mobile_Number) AS Mobile*/
+/*, COALESCE(e.Mobile, s.Mobile_Formatted) AS Mobile*/
 , 'SEED' AS customer_type 
 , 'SEED' AS Record_Type 
 , '${localeLabel}' AS Locale
@@ -2311,8 +2313,18 @@ AND (DATEDIFF(YEAR, CAST(db.DOB AS DATE), GETDATE()) -
 FROM [${seedLabel}] s 
 LEFT JOIN [${localeLabel}_CAMPAIGN_NAME_03242026_ENTRY] e 
     ON e.EMAIL = s.EMAIL
+    /*ON e.Mobile = s.Mobile*/ 
+    /*ON e.Mobile = s.Mobile_Number*/ 
+    /*ON e.Mobile = s.Mobile_Formatted*/ 
 
     WHERE s.EMAIL != '' AND s.EMAIL IS NOT NULL
+   /*WHERE (s.MOBILE != '' AND s.MOBILE IS NOT NULL)*/ 
+   /*WHERE (s.MOBILE != '' AND s.MOBILE_NUMBER IS NOT NULL)*/  
+   /*WHERE (s.MOBILE != '' AND s.Mobile_Formatted IS NOT NULL)*/                  
+ 
+ 
+ /*if MY_GAB use s.Mobile_Formatted/*
+ /*in some BAU that s.Mobile will not work use s.Mobile_Number*/
 `;
 
                 currentDisplayedQuery = seedQuery;
