@@ -1324,27 +1324,32 @@
         // ---------- Opt-in mapping ----------
         const optInMap = {
             'email_optin': {
-                condition: `db.EMAIL_PERM_STATUS = 'Y'`,
+                condition: `db.EMAIL_PERM_STATUS = 'Y' 
+    AND db.EMAIL IS NOT NULL AND db.EMAIL != ''`,
                 recordType: `'EDM1' AS record_type`,
                 label: 'Email Opt-in'
             },
             'email_only': {
-                condition: `db.EMAIL_PERM_STATUS = 'Y' AND db.SMS_PERM_STATUS != 'Y'`,
+                condition: `db.EMAIL_PERM_STATUS = 'Y' AND db.SMS_PERM_STATUS != 'Y'
+    AND db.EMAIL IS NOT NULL AND db.EMAIL != ''`,
                 recordType: `'EDM1' AS record_type`,
                 label: 'Email Opt-in Only'
             },
             'sms_optin': {
-                condition: `db.SMS_PERM_STATUS = 'Y'`,
+                condition: `db.SMS_PERM_STATUS = 'Y'
+    AND db.MOBILE IS NOT NULL AND db.MOBILE != ''`,
                 recordType: `'SMS1' AS record_type`,
                 label: 'SMS Opt-in'
             },
             'sms_only': {
-                condition: `db.SMS_PERM_STATUS = 'Y' AND db.EMAIL_PERM_STATUS != 'Y'`,
+                condition: `db.SMS_PERM_STATUS = 'Y' AND db.EMAIL_PERM_STATUS != 'Y'
+    AND db.MOBILE IS NOT NULL AND db.MOBILE != ''`,
                 recordType: `'SMS1' AS record_type`,
                 label: 'SMS Opt-in Only'
             },
             'wha_optin': {
-                condition: `db.SMS_PERM_STATUS = 'Y' AND db.EMAIL_PERM_STATUS != 'Y'`,
+                condition: `db.SMS_PERM_STATUS = 'Y' AND db.EMAIL_PERM_STATUS != 'Y'
+    AND db.MOBILE IS NOT NULL AND db.MOBILE != ''`,
                 recordType: `'WHA1' AS record_type`,
                 label: 'WHA Opt-in'
             },
@@ -1840,7 +1845,7 @@ AND EXISTS(
                 prospectMonths: 6,
                 prospectStartDate: '2025-06-01',
                 prospectEndDate: '2026-07-31',
-                prospectLoyaltyTiers: "'BLACK GOLD','GOLD','ROSE','BLACK','SILVER'",
+                prospectLoyaltyTiers: "'BLACK GOLD','GOLD','ROSE','BLACK','SILVER','VIP','PLATINUM'",
                 previousEntry: false,
                 previousEntryTable: 'previous_entry_DE',
                 engagements: false,
