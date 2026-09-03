@@ -1397,15 +1397,14 @@ THEN CONCAT(sdb.CountryCode, SUBSTRING(sdb.Mobile_Formatted, PATINDEX('%[^0]%', 
 ELSE NULL 
 END AS Mobile 
  
-, '{{LOCALE}}' AS locale /* Update according to BU country */ 
+, '{{LOCALE}}' AS locale 
 , '{{CUSTOMER_TYPE}}' AS customer_type 
-, {{RECORD_TYPE}}  /* Usually the touchpoint, but depends on your preference */ 
+, {{RECORD_TYPE}}  
  
 FROM {{SPACE_DB}} db 
  
-/* REQUIRED for mobile formatting */ 
 INNER JOIN (  
-    SELECT a.CUSTOMER_CODE, '{{COUNTRY_CODE}}' AS CountryCode, /* Update country code accordingly */ 
+    SELECT a.CUSTOMER_CODE, '{{COUNTRY_CODE}}' AS CountryCode,
     REPLACE(REPLACE(REPLACE(LTRIM(RTRIM(a.MOBILE)), '+', ''), ' ', ''), '-', '') AS Mobile_Formatted 
  
     FROM {{SPACE_DB}} a 
@@ -1416,12 +1415,11 @@ ON sdb.CUSTOMER_CODE = db.CUSTOMER_CODE
 
 {{OPT_IN_CLAUSE}}
 
-AND db.active = 'True' /*  please include this condition to avoid duplicate records */ 
+AND db.active = 'True' 
 AND db.FIRST_PURCHASE_DATE IS NULL 
  
 {{PROSPECT_SNIPPET}}
  
-/* Loyalty – adjust as BU's loyalty values */ 
 {{PROSPECT_LOYALTY_SNIPPET}}
  
 {{WHATSAPP}}
@@ -1434,8 +1432,6 @@ AND db.FIRST_PURCHASE_DATE IS NULL
 
 {{AGE_FILTER}}
  
-/* Update country code accordingly */ 
-
 ) z WHERE z.Mobile LIKE '{{COUNTRY_CODE}}%'`,
 
             sampler: `SELECT 
@@ -1468,13 +1464,12 @@ THEN CONCAT(sdb.CountryCode, SUBSTRING(sdb.Mobile_Formatted, PATINDEX('%[^0]%', 
 ELSE NULL 
 END AS Mobile 
  
-, '{{LOCALE}}' AS locale /* Update according to BU country */ 
+, '{{LOCALE}}' AS locale 
 , '{{CUSTOMER_TYPE}}' AS customer_type 
-, {{RECORD_TYPE}}/* Usually the touchpoint, but depends on your preference */ 
+, {{RECORD_TYPE}}
  
 FROM {{SPACE_DB}} db 
  
-/* REQUIRED for mobile formatting */ 
 INNER JOIN (  
     SELECT a.CUSTOMER_CODE, '{{COUNTRY_CODE}}' AS CountryCode, /* Update country code accordingly */ 
     REPLACE(REPLACE(REPLACE(LTRIM(RTRIM(a.MOBILE)), '+', ''), ' ', ''), '-', '') AS Mobile_Formatted 
@@ -1485,7 +1480,6 @@ ON sdb.CUSTOMER_CODE = db.CUSTOMER_CODE
 
 {{PREVIOUS_ENTRY_JOIN}}
 
-/* for last sampled */ 
 INNER JOIN ( 
     SELECT CUSTOMER_CODE, ORDER_DT, ORDER_NUM, COUNTER_ID, EAN 
     FROM ( 
@@ -1518,10 +1512,7 @@ ON db.customer_code = sm.customer_code
 
 {{AGE_FILTER}}
 
-AND db.active = 'True' /*  please include this condition to avoid duplicate records */ 
-
- 
-/* Update country code accordingly */ 
+AND db.active = 'True' 
 
 ) z WHERE z.Mobile LIKE '{{COUNTRY_CODE}}%'`,
 
@@ -1555,13 +1546,12 @@ THEN CONCAT(sdb.CountryCode, SUBSTRING(sdb.Mobile_Formatted, PATINDEX('%[^0]%', 
 ELSE NULL 
 END AS Mobile 
  
-, '{{LOCALE}}' AS locale /* Update according to BU country */ 
-, {{CUSTOMER_TYPE_SNIPPET}} /* Customer Type - Active/Sleeping or static */
-, {{RECORD_TYPE}}/* Usually the touchpoint, but depends on your preference */ 
+, '{{LOCALE}}' AS locale 
+, {{CUSTOMER_TYPE_SNIPPET}}
+, {{RECORD_TYPE}}
  
 FROM {{SPACE_DB}} db 
  
-/* REQUIRED for mobile formatting */ 
 INNER JOIN (  
     SELECT a.CUSTOMER_CODE, '{{COUNTRY_CODE}}' AS CountryCode, /* Update country code accordingly */ 
     REPLACE(REPLACE(REPLACE(LTRIM(RTRIM(a.MOBILE)), '+', ''), ' ', ''), '-', '') AS Mobile_Formatted 
@@ -1576,7 +1566,7 @@ ON sdb.CUSTOMER_CODE = db.CUSTOMER_CODE
 
 {{OPT_IN_CLAUSE}}
 
-AND db.active = 'True' /* REQUIRED to remove duplicate records */ 
+AND db.active = 'True'
  
 {{LP_WITHOUT_EAN_SNIPPET}}
 
@@ -1593,8 +1583,6 @@ AND db.active = 'True' /* REQUIRED to remove duplicate records */
 {{AGE_FILTER}}
  
 {{EVERPURCHASE_SNIPPET}}
- 
-/* Update country code accordingly */ 
 
 ) z WHERE z.Mobile LIKE '{{COUNTRY_CODE}}%'`
         };
@@ -1602,7 +1590,6 @@ AND db.active = 'True' /* REQUIRED to remove duplicate records */
         // ---------- SQL snippets ----------
         const snippets = {
             previousEntry: `
-/* IF Audience is from previous touchpoint */ 
 INNER JOIN {{PREVIOUS_ENTRY_TABLE}} en  
 ON db.CUSTOMER_CODE = en. CUSTOMER_CODE 
 `,
@@ -1619,14 +1606,12 @@ ON db.CUSTOMER_CODE = en. CUSTOMER_CODE
     )
 `,
             whatsapp: `
-/* FOR WHATSAPP SENDS */ 
 AND NOT EXISTS( 
     SELECT 1 FROM WA_unsubscribe_DE wa  
     WHERE db.MOBILE = wa.MOBILE 
     ) 
 `,
-            engagements: `
-/* FOR Engagements / / EXAMPLE: P6M Open */  
+            engagements: ` 
 AND EXISTS(  
     SELECT 1 FROM _Open op  
     WHERE ( 
@@ -1635,7 +1620,6 @@ AND EXISTS(
     ) 
 `,
             aiAudience: `
-/* FOR AI Audience */  
 AND EXISTS(  
     SELECT 1 FROM [Tealium-CDP-Audience-DE] ai  
     WHERE db.CUSTOMER_CODE = ai.[LUCID]  
@@ -1643,7 +1627,6 @@ AND EXISTS(
     ) 
 `,
             vouchers: `
-/* FOR Vouchers */  
 AND EXISTS(  
     SELECT 1 FROM SPACE_Vouchers_Master vo  
     WHERE db.CUSTOMER_CODE = vo.CUSTOMER_CODE  
@@ -1845,7 +1828,7 @@ AND EXISTS(
                 prospectMonths: 6,
                 prospectStartDate: '2025-06-01',
                 prospectEndDate: '2026-07-31',
-                prospectLoyaltyTiers: "'BLACK GOLD','GOLD','ROSE','BLACK','SILVER','VIP','PLATINUM'",
+                prospectLoyaltyTiers: "'BLACK GOLD','GOLD','ROSE','BLACK','SILVER','VIP','PLATINUM','MEMBER','RED'",
                 previousEntry: false,
                 previousEntryTable: 'previous_entry_DE',
                 engagements: false,
@@ -2290,7 +2273,6 @@ WHERE (
             }
             
             return `
-/* Age filter */ 
 AND (DATEDIFF(YEAR, CAST(db.DOB AS DATE), GETDATE()) - 
     CASE 
         WHEN MONTH(GETDATE()) < MONTH(CAST(db.DOB AS DATE)) 
@@ -2504,7 +2486,7 @@ LEFT JOIN [${localeLabel}_CAMPAIGN_NAME_03242026_ENTRY] e
                     if (start && end) {
                         prospectSnippet =
                             `
-/* Prospect date range – adjust as per requirement */ 
+ 
 AND db.CREATION_DATE BETWEEN CAST('${start}' AS DATE) AND CAST('${end}' AS DATE)`;
                     }
                 } else {
@@ -2512,7 +2494,6 @@ AND db.CREATION_DATE BETWEEN CAST('${start}' AS DATE) AND CAST('${end}' AS DATE)
                     if (isNaN(prospectVal) || prospectVal < 1) prospectVal = 6;
                     prospectSnippet =
                         `
-/* P${prospectVal}M prospects – adjust as per requirement */ 
 AND db.CREATION_DATE >= DATEADD(month, -${prospectVal}, GETDATE())`;
                 }
             }
