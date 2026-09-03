@@ -1471,7 +1471,7 @@ END AS Mobile
 FROM {{SPACE_DB}} db 
  
 INNER JOIN (  
-    SELECT a.CUSTOMER_CODE, '{{COUNTRY_CODE}}' AS CountryCode, /* Update country code accordingly */ 
+    SELECT a.CUSTOMER_CODE, '{{COUNTRY_CODE}}' AS CountryCode,
     REPLACE(REPLACE(REPLACE(LTRIM(RTRIM(a.MOBILE)), '+', ''), ' ', ''), '-', '') AS Mobile_Formatted 
  
     FROM {{SPACE_DB}} a 
@@ -1553,7 +1553,7 @@ END AS Mobile
 FROM {{SPACE_DB}} db 
  
 INNER JOIN (  
-    SELECT a.CUSTOMER_CODE, '{{COUNTRY_CODE}}' AS CountryCode, /* Update country code accordingly */ 
+    SELECT a.CUSTOMER_CODE, '{{COUNTRY_CODE}}' AS CountryCode,
     REPLACE(REPLACE(REPLACE(LTRIM(RTRIM(a.MOBILE)), '+', ''), ' ', ''), '-', '') AS Mobile_Formatted 
  
     FROM {{SPACE_DB}} a 
@@ -1631,7 +1631,7 @@ AND EXISTS(
     SELECT 1 FROM SPACE_Vouchers_Master vo  
     WHERE db.CUSTOMER_CODE = vo.CUSTOMER_CODE  
     AND VOUCHER_STATUS = 'available'  
-    AND VOUCHER_ID = '{{VOUCHER_ID}}' /* change voucher_id according to brief */ 
+    AND VOUCHER_ID = '{{VOUCHER_ID}}'
      ) 
 `
         };
@@ -2527,7 +2527,7 @@ AND db.CREATION_DATE >= DATEADD(month, -${prospectVal}, GETDATE())`;
             let lpWithEANSnippet = '';
             if (type === 'customer' && customerFilterSelect.value === 'lp_with_ean') {
                 const selectedType = document.querySelector('input[name="lpWithEANType"]:checked');
-                const innerJoinBase = `/* for last purchase W/EAN – remove if everpurchase */ 
+                const innerJoinBase = ` 
     INNER JOIN ( 
     SELECT CUSTOMER_CODE, ORDER_DT, ORDER_NUM, COUNTER_ID, EAN 
     FROM ( 
@@ -2548,13 +2548,13 @@ AND db.CREATION_DATE >= DATEADD(month, -${prospectVal}, GETDATE())`;
                     const end = getDateFromComponents(lpWithEANEndYear, lpWithEANEndMonth, lpWithEANEndDay);
                     if (start && end) {
                         filterClause =
-                            `AND ORDER_DT BETWEEN CAST('${start}' AS DATE) AND CAST('${end}' AS DATE) /* adjust as needed*/`;
+                            `AND ORDER_DT BETWEEN CAST('${start}' AS DATE) AND CAST('${end}' AS DATE)`;
                     }
                 } else {
                     let val = parseInt(lpWithEANMonths.value, 10);
                     if (isNaN(val) || val < 1) val = 36;
                     filterClause =
-                        `AND ORDER_DT >= DATEADD(month, -${val}, GETDATE()) /* adjust as per brief */`;
+                        `AND ORDER_DT >= DATEADD(month, -${val}, GETDATE())`;
                 }
 
                 lpWithEANSnippet = innerJoinBase + filterClause + `
@@ -2571,20 +2571,19 @@ ON db.customer_code = sm.customer_code`;
                     const end = getDateFromComponents(lpWithoutEANEndYear, lpWithoutEANEndMonth, lpWithoutEANEndDay);
                     if (start && end) {
                         dateFilter =
-                            `AND db.LAST_PURCHASE_DATE BETWEEN CAST('${start}' AS DATE) AND CAST('${end}' AS DATE) /* adjust as needed */`;
+                            `AND db.LAST_PURCHASE_DATE BETWEEN CAST('${start}' AS DATE) AND CAST('${end}' AS DATE)`;
                     }
                 } else {
                     let val = parseInt(lpWithoutEANMonths.value, 10);
                     if (isNaN(val) || val < 1) val = 36;
                     dateFilter =
-                        `AND db.LAST_PURCHASE_DATE >= DATEADD(month, -${val}, GETDATE()) /* adjust as needed */`;
+                        `AND db.LAST_PURCHASE_DATE >= DATEADD(month, -${val}, GETDATE())`;
                 }
                 lpWithoutEANSnippet =
                     `
-/* for last purchase w/o EAN – remove if everpurchase */ 
 ${dateFilter}
 AND db.TOTAL_SPENT > 0 
-AND db.LAST_PURCHASE_STORE IN ('KX0','450KX0') /* for specific stores – remove if not needed */`;
+AND db.LAST_PURCHASE_STORE IN ('KX0','450KX0')`;
             }
 
             let everpurchaseSnippet = '';
@@ -2596,28 +2595,28 @@ AND db.LAST_PURCHASE_STORE IN ('KX0','450KX0') /* for specific stores – remove
                     const end = getDateFromComponents(everpurchaseEndYear, everpurchaseEndMonth, everpurchaseEndDay);
                     if (start && end) {
                         dateFilter =
-                            `AND sm.ORDER_DT BETWEEN CAST('${start}' AS DATE) AND CAST('${end}' AS DATE) /* adjust as needed*/`;
+                            `AND sm.ORDER_DT BETWEEN CAST('${start}' AS DATE) AND CAST('${end}' AS DATE)`;
                     }
                 } else {
                     let everVal = parseInt(everpurchaseMonths.value, 10);
                     if (isNaN(everVal) || everVal < 1) everVal = 6;
                     dateFilter =
-                        `AND sm.ORDER_DT >= DATEADD(month, -${everVal}, GETDATE()) /* adjust as needed*/`;
+                        `AND sm.ORDER_DT >= DATEADD(month, -${everVal}, GETDATE())`;
                 }
 
                 let counterIdList = customerCounterIdList.value.trim();
                 let eanList = customerEanList.value.trim();
                 let counterIdFilter = states.customerCounterId && counterIdList ?
-                    `AND sm.counter_id IN (${counterIdList}) /* adjust as needed */` :
+                    `AND sm.counter_id IN (${counterIdList})` :
                     '';
                 let eanFilter = states.customerEan && eanList ?
-                    `AND sm.EAN IN (${eanList}) /* adjust as needed*/` :
+                    `AND sm.EAN IN (${eanList})` :
                     '';
 
                 everpurchaseSnippet =
-     `/* FOR Everpurchase */ 
+     `
 AND EXISTS( 
-      SELECT DISTINCT customer_code /* Make sure DISTINCT is present */ 
+      SELECT DISTINCT customer_code 
  
       FROM SPACE_Sales_Master sm 
          
@@ -2633,7 +2632,7 @@ AND EXISTS(
                 let tiers = loyaltyTiersInput.value.trim();
                 if (!tiers) tiers = "'RUBY','GOLD','SAPPHIRE','BLACK DIAMOND'";
                 loyaltySnippet =
-                    `/* If loyalty is needed - adjust as per BU's loyalty values*/ 
+                    ` 
                     AND db.Loyalty_Tier_Current IN (${tiers})`;
             }
 
