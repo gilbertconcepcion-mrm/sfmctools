@@ -1457,18 +1457,26 @@ db.brand_code, db.first_name, db.last_name, db.Email_Perm_Status, db.SMS_Perm_St
 , db.customer_code 
 , db.customer_code AS Subscriber_Key 
  
-, CASE 
-WHEN sdb.Mobile_Formatted IS NULL OR sdb.Mobile_Formatted = ''  
-THEN NULL 
- 
-WHEN sdb.Mobile_Formatted LIKE sdb.CountryCode + '%'  
-THEN sdb.Mobile_Formatted 
- 
-WHEN PATINDEX('%[^0]%', sdb.Mobile_Formatted) > 0  
-THEN CONCAT(sdb.CountryCode, SUBSTRING(sdb.Mobile_Formatted, PATINDEX('%[^0]%', sdb.Mobile_Formatted), LEN(sdb.Mobile_Formatted))) 
- 
-ELSE NULL 
-END AS Mobile 
+,CASE
+    WHEN sdb.Mobile_Formatted IS NULL
+            OR sdb.Mobile_Formatted = ''
+        THEN NULL
+
+    WHEN sdb.Mobile_Formatted LIKE sdb.CountryCode + '%'
+        THEN sdb.Mobile_Formatted
+
+    WHEN PATINDEX('%[^0]%', sdb.Mobile_Formatted) > 0
+        THEN CONCAT(
+            sdb.CountryCode,
+            SUBSTRING(
+                sdb.Mobile_Formatted,
+                PATINDEX('%[^0]%', sdb.Mobile_Formatted),
+                LEN(sdb.Mobile_Formatted)
+            )
+        )
+
+    ELSE NULL
+END AS Mobile
  
 , '{{LOCALE}}' AS locale 
 , '{{CUSTOMER_TYPE}}' AS customer_type 
@@ -1539,18 +1547,26 @@ db.brand_code, db.first_name, db.last_name, db.Email_Perm_Status, db.SMS_Perm_St
 , db.customer_code 
 , db.customer_code AS Subscriber_Key 
  
-, CASE 
-WHEN sdb.Mobile_Formatted IS NULL OR sdb.Mobile_Formatted = ''  
-THEN NULL 
- 
-WHEN sdb.Mobile_Formatted LIKE sdb.CountryCode + '%'  
-THEN sdb.Mobile_Formatted 
- 
-WHEN PATINDEX('%[^0]%', sdb.Mobile_Formatted) > 0  
-THEN CONCAT(sdb.CountryCode, SUBSTRING(sdb.Mobile_Formatted, PATINDEX('%[^0]%', sdb.Mobile_Formatted), LEN(sdb.Mobile_Formatted))) 
- 
-ELSE NULL 
-END AS Mobile 
+,CASE
+    WHEN sdb.Mobile_Formatted IS NULL
+            OR sdb.Mobile_Formatted = ''
+        THEN NULL
+
+    WHEN sdb.Mobile_Formatted LIKE sdb.CountryCode + '%'
+        THEN sdb.Mobile_Formatted
+
+    WHEN PATINDEX('%[^0]%', sdb.Mobile_Formatted) > 0
+        THEN CONCAT(
+            sdb.CountryCode,
+            SUBSTRING(
+                sdb.Mobile_Formatted,
+                PATINDEX('%[^0]%', sdb.Mobile_Formatted),
+                LEN(sdb.Mobile_Formatted)
+            )
+        )
+
+    ELSE NULL
+END AS Mobile
  
 , '{{LOCALE}}' AS locale 
 , {{CUSTOMER_TYPE_SNIPPET}}
