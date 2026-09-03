@@ -2648,14 +2648,14 @@ AND EXISTS(
                 let val = samplerCounterIdList.value.trim();
                 if (val) {
                     samplerCounterIdFilter =
-                    `AND COUNTER_ID IN (${val}) /* for specific stores – remove if not needed */`;
+                    `AND COUNTER_ID IN (${val})`;
                 }
             }
             let samplerEanFilter = '';
             if (type === 'sampler' && states.samplerEan) {
                 let val = samplerEanList.value.trim();
                 if (val) {
-                    samplerEanFilter = `AND EAN IN (${val}) /* adjust as needed*/`;
+                    samplerEanFilter = `AND EAN IN (${val})`;
                 }
             }
 
@@ -2664,14 +2664,14 @@ AND EXISTS(
                 let val = customerCounterIdList.value.trim();
                 if (val) {
                     lpWithEanCounterIdFilter =
-                    `AND COUNTER_ID IN (${val}) /* for specific stores – remove if not needed */`;
+                    `AND COUNTER_ID IN (${val})`;
                 }
             }
             let lpWithEanEanFilter = '';
             if (type === 'customer' && states.customerEan) {
                 let val = customerEanList.value.trim();
                 if (val) {
-                    lpWithEanEanFilter = `AND EAN IN (${val}) /* adjust as needed*/`;
+                    lpWithEanEanFilter = `AND EAN IN (${val})`;
                 }
             }
 
