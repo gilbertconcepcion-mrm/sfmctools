@@ -65,7 +65,7 @@ input int DaysToPlot = 5;
 input color DailyHighColor = clrRed;
 input color DailyLowColor  = clrDodgerBlue;
 input int RayWidth = 1;
-input ENUM_LINE_STYLE RayStyle = STYLE_SOLID;
+input ENUM_LINE_STYLE RayStyle = STYLE_DOT;
 input bool DrawInBackground = true;
 
 input string ___grp3 = "=== Level labels ===";
