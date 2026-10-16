@@ -1,0 +1,899 @@
+//+------------------------------------------------------------------+
+//|                     CombinedLevelsSessionPanel.mq5 / .mq4        |
+//|  Previous Day Pivots + PDH/PDL + Previous N Days High/Low Rays   |
+//|  + Session countdown panel (Asian / London / NY)                 |
+//|                                                                  |
+//|  Single source file: compiles in both MetaEditor 4 and 5.        |
+//|  Save as .mq5 for MT5, or copy/rename to .mq4 for MT4.           |
+//|                                                                  |
+//|  MT5: pivot levels are drawn with indicator buffers.             |
+//|  MT4: only 8 buffers can be plotted, so the 13 pivot levels      |
+//|       are drawn as right-extending trend line objects instead.   |
+//+------------------------------------------------------------------+
+#property strict
+#property version   "1.00"
+#property description "Previous day levels with session countdown panel"
+#property indicator_chart_window
+
+#ifdef __MQL5__
+   #property indicator_buffers 13
+   #property indicator_plots   13
+
+   #property indicator_label1  "PP"
+   #property indicator_type1   DRAW_LINE
+   #property indicator_label2  "R1"
+   #property indicator_type2   DRAW_LINE
+   #property indicator_label3  "R2"
+   #property indicator_type3   DRAW_LINE
+   #property indicator_label4  "R3"
+   #property indicator_type4   DRAW_LINE
+   #property indicator_label5  "R4"
+   #property indicator_type5   DRAW_LINE
+   #property indicator_label6  "R5"
+   #property indicator_type6   DRAW_LINE
+   #property indicator_label7  "S1"
+   #property indicator_type7   DRAW_LINE
+   #property indicator_label8  "S2"
+   #property indicator_type8   DRAW_LINE
+   #property indicator_label9  "S3"
+   #property indicator_type9   DRAW_LINE
+   #property indicator_label10 "S4"
+   #property indicator_type10  DRAW_LINE
+   #property indicator_label11 "S5"
+   #property indicator_type11  DRAW_LINE
+   #property indicator_label12 "PDH"
+   #property indicator_type12  DRAW_LINE
+   #property indicator_label13 "PDL"
+   #property indicator_type13  DRAW_LINE
+#endif
+
+//+------------------------------------------------------------------+
+//| Inputs: previous day levels                                      |
+//| ("input group" is MQL5-only, so plain string separators are used)|
+//+------------------------------------------------------------------+
+input string ___grp1 = "=== Pivot levels ===";
+input color PPColor         = clrBlue;
+input color ResistanceColor = clrMediumBlue;
+input color SupportColor    = clrMediumBlue;
+input color HighLowColor    = clrRed;
+input int LineWidth = 1;
+input ENUM_LINE_STYLE LineStyle = STYLE_DOT;
+
+input string ___grp2 = "=== Previous days high/low rays ===";
+input bool ShowPreviousDayRays = true;
+input int DaysToPlot = 5;
+input color DailyHighColor = clrRed;
+input color DailyLowColor  = clrDodgerBlue;
+input int RayWidth = 1;
+input ENUM_LINE_STYLE RayStyle = STYLE_SOLID;
+input bool DrawInBackground = true;
+
+input string ___grp3 = "=== Level labels ===";
+input bool ShowLabels = true;
+input bool ShowPrice = true;
+input int FontSize = 10;
+
+//+------------------------------------------------------------------+
+//| Inputs: session countdown panel                                  |
+//+------------------------------------------------------------------+
+input string ___grp4 = "=== Session panel ===";
+input bool ShowSessionPanel = true;                 // Show session panel
+input color PanelBGColor = clrBlack;                // Background color
+input int PanelFontSize = 10;                       // Font size
+input string PanelFontName = "Arial";               // Font name
+input ENUM_BASE_CORNER PanelCorner = CORNER_RIGHT_UPPER; // Display corner
+input int PanelX = 25;                              // X position
+input int PanelY = 25;                              // Y position
+input bool ShowSeconds = true;                      // Show seconds in countdown
+input bool ShowBackground = true;                   // Show background panel
+input bool ShowSessionTimes = true;                 // Show session time ranges
+
+input string ___grp5 = "=== Session times (GMT) ===";
+input int AsianStartHour    = 0;
+input int AsianStartMinute  = 0;
+input int AsianEndHour      = 9;
+input int AsianEndMinute    = 0;
+
+input int LondonStartHour   = 8;
+input int LondonStartMinute = 0;
+input int LondonEndHour     = 17;
+input int LondonEndMinute   = 0;
+
+input int NYStartHour       = 13;
+input int NYStartMinute     = 0;
+input int NYEndHour         = 22;
+input int NYEndMinute       = 0;
+
+//--- Indicator buffers (MT5 only)
+#ifdef __MQL5__
+double PPBuffer[];
+double R1Buffer[];
+double R2Buffer[];
+double R3Buffer[];
+double R4Buffer[];
+double R5Buffer[];
+double S1Buffer[];
+double S2Buffer[];
+double S3Buffer[];
+double S4Buffer[];
+double S5Buffer[];
+double PDHBuffer[];
+double PDLBuffer[];
+#endif
+
+//--- Cached pivot values
+double g_PP = 0;
+double g_R1 = 0, g_R2 = 0, g_R3 = 0, g_R4 = 0, g_R5 = 0;
+double g_S1 = 0, g_S2 = 0, g_S3 = 0, g_S4 = 0, g_S5 = 0;
+double g_PDH = 0, g_PDL = 0;
+
+datetime g_lastDayStart = 0;   // start of the D1 bar the levels were computed for
+datetime g_prevDayStart = 0;   // start of the previous completed D1 bar
+
+const string LabelPrefix = "LBL_PD_";
+const string RayPrefix   = "Prev5D_";
+const string LevelPrefix = "PVL_";      // MT4 pivot line objects
+
+//--- Session panel state
+const string PanelPrefix = "SessionInd_";
+const int    PanelWidth  = 240;
+const int    PanelHeight = 195;
+string       g_sessKey[3] = {"Asian", "London", "NY"};
+int          g_sessStart[3];            // minutes since midnight (GMT)
+int          g_sessEnd[3];
+bool         g_panelDirty = false;
+
+//+------------------------------------------------------------------+
+//| Cross-platform helper: hide object from the object list          |
+//+------------------------------------------------------------------+
+void HideObject(const string name)
+{
+#ifdef __MQL5__
+   ObjectSetInteger(0, name, OBJPROP_HIDDEN, true);
+#endif
+}
+
+//+------------------------------------------------------------------+
+//| Initialization                                                   |
+//+------------------------------------------------------------------+
+int OnInit()
+{
+   if(LineWidth < 1 || LineWidth > 5 ||
+      RayWidth < 1 || RayWidth > 5 ||
+      FontSize < 1 || DaysToPlot < 1)
+      return(INIT_PARAMETERS_INCORRECT);
+
+#ifdef __MQL5__
+   SetIndexBuffer(0,  PPBuffer,  INDICATOR_DATA);
+   SetIndexBuffer(1,  R1Buffer,  INDICATOR_DATA);
+   SetIndexBuffer(2,  R2Buffer,  INDICATOR_DATA);
+   SetIndexBuffer(3,  R3Buffer,  INDICATOR_DATA);
+   SetIndexBuffer(4,  R4Buffer,  INDICATOR_DATA);
+   SetIndexBuffer(5,  R5Buffer,  INDICATOR_DATA);
+   SetIndexBuffer(6,  S1Buffer,  INDICATOR_DATA);
+   SetIndexBuffer(7,  S2Buffer,  INDICATOR_DATA);
+   SetIndexBuffer(8,  S3Buffer,  INDICATOR_DATA);
+   SetIndexBuffer(9,  S4Buffer,  INDICATOR_DATA);
+   SetIndexBuffer(10, S5Buffer,  INDICATOR_DATA);
+   SetIndexBuffer(11, PDHBuffer, INDICATOR_DATA);
+   SetIndexBuffer(12, PDLBuffer, INDICATOR_DATA);
+
+   ArraySetAsSeries(PPBuffer,  true);
+   ArraySetAsSeries(R1Buffer,  true);
+   ArraySetAsSeries(R2Buffer,  true);
+   ArraySetAsSeries(R3Buffer,  true);
+   ArraySetAsSeries(R4Buffer,  true);
+   ArraySetAsSeries(R5Buffer,  true);
+   ArraySetAsSeries(S1Buffer,  true);
+   ArraySetAsSeries(S2Buffer,  true);
+   ArraySetAsSeries(S3Buffer,  true);
+   ArraySetAsSeries(S4Buffer,  true);
+   ArraySetAsSeries(S5Buffer,  true);
+   ArraySetAsSeries(PDHBuffer, true);
+   ArraySetAsSeries(PDLBuffer, true);
+
+   for(int p = 0; p < 13; p++)
+   {
+      PlotIndexSetInteger(p, PLOT_DRAW_TYPE, DRAW_LINE);
+      PlotIndexSetInteger(p, PLOT_LINE_STYLE, LineStyle);
+      PlotIndexSetInteger(p, PLOT_LINE_WIDTH, LineWidth);
+      PlotIndexSetDouble(p, PLOT_EMPTY_VALUE, EMPTY_VALUE);
+   }
+
+   PlotIndexSetInteger(0, PLOT_LINE_COLOR, PPColor);
+   for(int p = 1; p <= 5; p++)
+      PlotIndexSetInteger(p, PLOT_LINE_COLOR, ResistanceColor);
+   for(int p = 6; p <= 10; p++)
+      PlotIndexSetInteger(p, PLOT_LINE_COLOR, SupportColor);
+   PlotIndexSetInteger(11, PLOT_LINE_COLOR, HighLowColor);
+   PlotIndexSetInteger(12, PLOT_LINE_COLOR, HighLowColor);
+
+   IndicatorSetString(INDICATOR_SHORTNAME, "Combined Levels + Sessions");
+   IndicatorSetInteger(INDICATOR_DIGITS, _Digits);
+#else
+   IndicatorShortName("Combined Levels + Sessions");
+   IndicatorDigits(_Digits);
+#endif
+
+   g_lastDayStart = 0;
+   g_prevDayStart = 0;
+
+   DeleteAllLabels();
+   DeleteDailyRays();
+   DeletePivotLines();
+
+   //--- Session panel
+   if(ShowSessionPanel)
+   {
+      g_sessStart[0] = AsianStartHour  * 60 + AsianStartMinute;
+      g_sessEnd[0]   = AsianEndHour    * 60 + AsianEndMinute;
+      g_sessStart[1] = LondonStartHour * 60 + LondonStartMinute;
+      g_sessEnd[1]   = LondonEndHour   * 60 + LondonEndMinute;
+      g_sessStart[2] = NYStartHour     * 60 + NYStartMinute;
+      g_sessEnd[2]   = NYEndHour       * 60 + NYEndMinute;
+
+      ObjectsDeleteAll(0, PanelPrefix);
+      CreatePanelObjects();
+      UpdatePanel();
+      EventSetMillisecondTimer(500);
+   }
+
+   return(INIT_SUCCEEDED);
+}
+
+//+------------------------------------------------------------------+
+//| Deinitialization                                                 |
+//+------------------------------------------------------------------+
+void OnDeinit(const int reason)
+{
+   EventKillTimer();
+   DeleteAllLabels();
+   DeleteDailyRays();
+   DeletePivotLines();
+   ObjectsDeleteAll(0, PanelPrefix);
+   ChartRedraw(0);
+}
+
+//+------------------------------------------------------------------+
+//| Timer: refresh the session panel                                 |
+//+------------------------------------------------------------------+
+void OnTimer()
+{
+   if(ShowSessionPanel)
+      UpdatePanel();
+}
+
+//+------------------------------------------------------------------+
+//| Buffer helpers (MT5)                                             |
+//+------------------------------------------------------------------+
+#ifdef __MQL5__
+void SetBar(const int i)
+{
+   PPBuffer[i]  = g_PP;
+   R1Buffer[i]  = g_R1;  R2Buffer[i] = g_R2;  R3Buffer[i] = g_R3;
+   R4Buffer[i]  = g_R4;  R5Buffer[i] = g_R5;
+   S1Buffer[i]  = g_S1;  S2Buffer[i] = g_S2;  S3Buffer[i] = g_S3;
+   S4Buffer[i]  = g_S4;  S5Buffer[i] = g_S5;
+   PDHBuffer[i] = g_PDH;
+   PDLBuffer[i] = g_PDL;
+}
+
+void ClearBar(const int i)
+{
+   PPBuffer[i]  = EMPTY_VALUE;
+   R1Buffer[i]  = EMPTY_VALUE;  R2Buffer[i] = EMPTY_VALUE;  R3Buffer[i] = EMPTY_VALUE;
+   R4Buffer[i]  = EMPTY_VALUE;  R5Buffer[i] = EMPTY_VALUE;
+   S1Buffer[i]  = EMPTY_VALUE;  S2Buffer[i] = EMPTY_VALUE;  S3Buffer[i] = EMPTY_VALUE;
+   S4Buffer[i]  = EMPTY_VALUE;  S5Buffer[i] = EMPTY_VALUE;
+   PDHBuffer[i] = EMPTY_VALUE;
+   PDLBuffer[i] = EMPTY_VALUE;
+}
+
+void InitAllBuffers()
+{
+   ArrayInitialize(PPBuffer,  EMPTY_VALUE);
+   ArrayInitialize(R1Buffer,  EMPTY_VALUE);
+   ArrayInitialize(R2Buffer,  EMPTY_VALUE);
+   ArrayInitialize(R3Buffer,  EMPTY_VALUE);
+   ArrayInitialize(R4Buffer,  EMPTY_VALUE);
+   ArrayInitialize(R5Buffer,  EMPTY_VALUE);
+   ArrayInitialize(S1Buffer,  EMPTY_VALUE);
+   ArrayInitialize(S2Buffer,  EMPTY_VALUE);
+   ArrayInitialize(S3Buffer,  EMPTY_VALUE);
+   ArrayInitialize(S4Buffer,  EMPTY_VALUE);
+   ArrayInitialize(S5Buffer,  EMPTY_VALUE);
+   ArrayInitialize(PDHBuffer, EMPTY_VALUE);
+   ArrayInitialize(PDLBuffer, EMPTY_VALUE);
+}
+#endif
+
+//+------------------------------------------------------------------+
+//| Main calculation                                                 |
+//+------------------------------------------------------------------+
+int OnCalculate(
+   const int rates_total,
+   const int prev_calculated,
+   const datetime &time[],
+   const double &open[],
+   const double &high[],
+   const double &low[],
+   const double &close[],
+   const long &tick_volume[],
+   const long &volume[],
+   const int &spread[]
+)
+{
+   if(rates_total < 1)
+      return(0);
+
+   const bool firstRun = (prev_calculated == 0);
+
+   //--- Cheap check: single D1 time lookup per tick
+   const datetime currentDayStart = iTime(_Symbol, PERIOD_D1, 0);
+   if(currentDayStart <= 0)
+      return(prev_calculated);
+
+   if(firstRun || currentDayStart != g_lastDayStart)
+   {
+      //--- Fetch the last DaysToPlot+1 daily bars in ONE call
+      const int need = MathMax(DaysToPlot + 1, 2);
+      MqlRates d1[];
+      ArraySetAsSeries(d1, true);
+      const int got = CopyRates(_Symbol, PERIOD_D1, 0, need, d1);
+      if(got < 2)
+         return(0);
+
+      if(!CalculatePivotLevels(d1[1].high, d1[1].low, d1[1].close))
+         return(prev_calculated);
+
+#ifdef __MQL5__
+      const datetime oldPrevDayStart = g_prevDayStart;
+#endif
+      g_prevDayStart = d1[1].time;
+      g_lastDayStart = currentDayStart;
+
+#ifdef __MQL5__
+      //--- Decide how far back buffers need touching
+      datetime boundary;
+      if(firstRun || oldPrevDayStart == 0)
+      {
+         InitAllBuffers();
+         boundary = g_prevDayStart;
+      }
+      else
+         boundary = MathMin(oldPrevDayStart, g_prevDayStart);
+
+      //--- Walk newest -> oldest, stop as soon as we pass the boundary
+      for(int i = 0; i < rates_total; i++)
+      {
+         const datetime barTime = iTime(_Symbol, _Period, i);
+         if(barTime < boundary)
+            break;
+         if(barTime >= g_prevDayStart)
+            SetBar(i);
+         else
+            ClearBar(i);
+      }
+#else
+      //--- MT4: pivot levels as trend line objects
+      DrawPivotLines(g_prevDayStart);
+#endif
+
+      //--- Objects only change on a new day
+      if(ShowLabels)
+         UpdateAllLabels(g_prevDayStart);   // line start
+      else
+         DeleteAllLabels();
+
+      if(ShowPreviousDayRays)
+         DrawDailyRays(d1, got);
+      else
+         DeleteDailyRays();
+
+      ChartRedraw(0);
+      return(rates_total);
+   }
+
+#ifdef __MQL5__
+   //--- Normal tick/new bar: only fill bars not yet calculated
+   int limit = rates_total - prev_calculated;
+   if(limit > 0)
+   {
+      if(limit > rates_total)
+         limit = rates_total;
+      for(int i = 0; i < limit; i++)
+         SetBar(i);
+   }
+#endif
+
+   return(rates_total);
+}
+
+//+------------------------------------------------------------------+
+//| Calculate pivot levels from previous completed daily candle      |
+//+------------------------------------------------------------------+
+bool CalculatePivotLevels(const double highPrev, const double lowPrev, const double closePrev)
+{
+   if(highPrev <= 0 || lowPrev <= 0 || closePrev <= 0 || highPrev < lowPrev)
+      return(false);
+
+   const double range = highPrev - lowPrev;
+
+   g_PP = (highPrev + lowPrev + closePrev) / 3.0;
+
+   g_R1 = (2.0 * g_PP) - lowPrev;
+   g_R2 = g_PP + range;
+   g_R3 = highPrev + 2.0 * (g_PP - lowPrev);
+   g_R4 = g_R3 + range;
+   g_R5 = g_R4 + range;
+
+   g_S1 = (2.0 * g_PP) - highPrev;
+   g_S2 = g_PP - range;
+   g_S3 = lowPrev - 2.0 * (highPrev - g_PP);
+   g_S4 = g_S3 - range;
+   g_S5 = g_S4 - range;
+
+   g_PDH = highPrev;
+   g_PDL = lowPrev;
+   return(true);
+}
+
+//+------------------------------------------------------------------+
+//| MT4: draw pivot levels as right-extending trend lines            |
+//+------------------------------------------------------------------+
+void CreatePivotLine(const string name, const double price, const color clr, const datetime startTime)
+{
+   const string objectName = LevelPrefix + name;
+   const datetime endTime  = startTime + PeriodSeconds(PERIOD_D1);
+
+   if(!ObjectCreate(0, objectName, OBJ_TREND, 0, startTime, price, endTime, price))
+      return;
+
+   ObjectSetInteger(0, objectName, OBJPROP_COLOR, clr);
+   ObjectSetInteger(0, objectName, OBJPROP_WIDTH, LineWidth);
+   ObjectSetInteger(0, objectName, OBJPROP_STYLE, LineStyle);
+   ObjectSetInteger(0, objectName, OBJPROP_RAY_RIGHT, true);
+   ObjectSetInteger(0, objectName, OBJPROP_BACK, true);
+   ObjectSetInteger(0, objectName, OBJPROP_SELECTABLE, false);
+   ObjectSetInteger(0, objectName, OBJPROP_SELECTED, false);
+   HideObject(objectName);
+}
+
+void DrawPivotLines(const datetime startTime)
+{
+   DeletePivotLines();
+
+   CreatePivotLine("PP",  g_PP,  PPColor,         startTime);
+   CreatePivotLine("R1",  g_R1,  ResistanceColor, startTime);
+   CreatePivotLine("R2",  g_R2,  ResistanceColor, startTime);
+   CreatePivotLine("R3",  g_R3,  ResistanceColor, startTime);
+   CreatePivotLine("R4",  g_R4,  ResistanceColor, startTime);
+   CreatePivotLine("R5",  g_R5,  ResistanceColor, startTime);
+   CreatePivotLine("S1",  g_S1,  SupportColor,    startTime);
+   CreatePivotLine("S2",  g_S2,  SupportColor,    startTime);
+   CreatePivotLine("S3",  g_S3,  SupportColor,    startTime);
+   CreatePivotLine("S4",  g_S4,  SupportColor,    startTime);
+   CreatePivotLine("S5",  g_S5,  SupportColor,    startTime);
+   CreatePivotLine("PDH", g_PDH, HighLowColor,    startTime);
+   CreatePivotLine("PDL", g_PDL, HighLowColor,    startTime);
+}
+
+//+------------------------------------------------------------------+
+//| Update all price labels                                          |
+//+------------------------------------------------------------------+
+void UpdateAllLabels(const datetime labelTime)
+{
+   CreateLabel("PP",  g_PP,  PPColor,         labelTime, false);
+   CreateLabel("R1",  g_R1,  ResistanceColor, labelTime, true);
+   CreateLabel("R2",  g_R2,  ResistanceColor, labelTime, true);
+   CreateLabel("R3",  g_R3,  ResistanceColor, labelTime, true);
+   CreateLabel("R4",  g_R4,  ResistanceColor, labelTime, true);
+   CreateLabel("R5",  g_R5,  ResistanceColor, labelTime, true);
+
+   CreateLabel("S1",  g_S1,  SupportColor,    labelTime, false);
+   CreateLabel("S2",  g_S2,  SupportColor,    labelTime, false);
+   CreateLabel("S3",  g_S3,  SupportColor,    labelTime, false);
+   CreateLabel("S4",  g_S4,  SupportColor,    labelTime, false);
+   CreateLabel("S5",  g_S5,  SupportColor,    labelTime, false);
+
+   CreateLabel("PDH", g_PDH, HighLowColor,    labelTime, true);
+   CreateLabel("PDL", g_PDL, HighLowColor,    labelTime, false);
+}
+
+//+------------------------------------------------------------------+
+//| Create (once) or move a single level label                       |
+//+------------------------------------------------------------------+
+void CreateLabel(const string name, const double price, const color clr,
+                 const datetime labelTime, const bool isResistance)
+{
+   const string objectName = LabelPrefix + name;
+   const string labelText  = ShowPrice ? name + ": " + DoubleToString(price, _Digits) : name;
+
+   if(ObjectFind(0, objectName) < 0)
+   {
+      if(!ObjectCreate(0, objectName, OBJ_TEXT, 0, labelTime, price))
+         return;
+
+      //--- Static properties set only once, at creation
+      ObjectSetString(0, objectName, OBJPROP_FONT, "Arial");
+      ObjectSetInteger(0, objectName, OBJPROP_COLOR, clr);
+      ObjectSetInteger(0, objectName, OBJPROP_FONTSIZE, FontSize);
+      ObjectSetInteger(0, objectName, OBJPROP_BACK, true);
+      ObjectSetInteger(0, objectName, OBJPROP_SELECTABLE, false);
+      ObjectSetInteger(0, objectName, OBJPROP_SELECTED, false);
+      HideObject(objectName);
+      //--- Resistance text hangs below its level, support text sits above it
+      ObjectSetInteger(0, objectName, OBJPROP_ANCHOR,
+                       isResistance ? ANCHOR_LEFT_UPPER : ANCHOR_LEFT_LOWER);
+   }
+   else
+      ObjectMove(0, objectName, 0, labelTime, price);
+
+   ObjectSetString(0, objectName, OBJPROP_TEXT, labelText);
+}
+
+//+------------------------------------------------------------------+
+//| Draw previous completed daily high/low rays                      |
+//+------------------------------------------------------------------+
+void DrawDailyRays(const MqlRates &d1[], const int count)
+{
+   DeleteDailyRays();
+
+   const int days = MathMin(DaysToPlot, count - 1);
+   const int daySeconds = PeriodSeconds(PERIOD_D1);
+
+   for(int i = 1; i <= days; i++)
+   {
+      const datetime dayStart = d1[i].time;
+      const double dayHigh = d1[i].high;
+      const double dayLow  = d1[i].low;
+
+      if(dayStart <= 0 || dayHigh <= 0 || dayLow <= 0)
+         continue;
+
+      const datetime dayEnd = dayStart + daySeconds;
+
+      const string highName = RayPrefix + "PDH_" + IntegerToString(i);
+      if(ObjectCreate(0, highName, OBJ_TREND, 0, dayStart, dayHigh, dayEnd, dayHigh))
+         SetRayProperties(highName, DailyHighColor);
+
+      const string lowName = RayPrefix + "PDL_" + IntegerToString(i);
+      if(ObjectCreate(0, lowName, OBJ_TREND, 0, dayStart, dayLow, dayEnd, dayLow))
+         SetRayProperties(lowName, DailyLowColor);
+   }
+}
+
+//+------------------------------------------------------------------+
+//| Set ray properties                                               |
+//+------------------------------------------------------------------+
+void SetRayProperties(const string name, const color clr)
+{
+   ObjectSetInteger(0, name, OBJPROP_COLOR, clr);
+   ObjectSetInteger(0, name, OBJPROP_WIDTH, RayWidth);
+   ObjectSetInteger(0, name, OBJPROP_STYLE, RayStyle);
+   ObjectSetInteger(0, name, OBJPROP_RAY_RIGHT, true);
+   ObjectSetInteger(0, name, OBJPROP_BACK, DrawInBackground);
+   ObjectSetInteger(0, name, OBJPROP_SELECTABLE, false);
+   ObjectSetInteger(0, name, OBJPROP_SELECTED, false);
+   HideObject(name);
+}
+
+//+------------------------------------------------------------------+
+//| Delete helpers (native bulk delete by prefix)                    |
+//+------------------------------------------------------------------+
+void DeleteAllLabels()
+{
+   ObjectsDeleteAll(0, LabelPrefix, -1, -1);
+}
+
+void DeleteDailyRays()
+{
+   ObjectsDeleteAll(0, RayPrefix, -1, -1);
+}
+
+void DeletePivotLines()
+{
+   ObjectsDeleteAll(0, LevelPrefix, -1, -1);
+}
+
+//+==================================================================+
+//|                    SESSION COUNTDOWN PANEL                       |
+//+==================================================================+
+
+//+------------------------------------------------------------------+
+//| Format a duration in seconds (always with seconds)               |
+//+------------------------------------------------------------------+
+string FormatTime(int seconds)
+{
+   if(seconds < 0) seconds = 0;
+   const int h = seconds / 3600;
+   const int m = (seconds % 3600) / 60;
+   const int s = seconds % 60;
+
+   if(h > 0)
+      return(StringFormat("%dh %02dm %02ds", h, m, s));
+   if(m > 0)
+      return(StringFormat("%02dm %02ds", m, s));
+   return(StringFormat("%02ds", s));
+}
+
+//+------------------------------------------------------------------+
+//| Format a session countdown (honors ShowSeconds)                  |
+//+------------------------------------------------------------------+
+string FormatCountdown(int totalSeconds)
+{
+   if(totalSeconds < 0) totalSeconds = 0;
+
+   if(ShowSeconds)
+   {
+      const int h = totalSeconds / 3600;
+      const int m = (totalSeconds % 3600) / 60;
+      const int s = totalSeconds % 60;
+      if(h > 0)
+         return(StringFormat("%dh %02dm %02ds", h, m, s));
+      return(StringFormat("%02dm %02ds", m, s));
+   }
+
+   //--- Without seconds: round up to the next whole minute
+   const int totalMin = (totalSeconds + 59) / 60;
+   const int h = totalMin / 60;
+   const int m = totalMin % 60;
+   if(h > 0)
+      return(StringFormat("%dh %02dm", h, m));
+   return(StringFormat("%02dm", m));
+}
+
+//+------------------------------------------------------------------+
+//| Countdown text for one session. nowSec = seconds since 00:00 GMT |
+//| Shows time to end if open, time to start if closed.              |
+//| Sessions crossing midnight (end <= start) are supported.         |
+//+------------------------------------------------------------------+
+string SessionCountdown(const int startMin, const int endMin, const int nowSec, bool &isOpen)
+{
+   const int s = startMin * 60;
+   const int e = endMin   * 60;
+
+   if(s < e)
+      isOpen = (nowSec >= s && nowSec < e);
+   else
+      isOpen = (nowSec >= s || nowSec < e);
+
+   int diff = (isOpen ? e : s) - nowSec;
+   if(diff <= 0)
+      diff += 86400;
+
+   return(FormatCountdown(diff));
+}
+
+//+------------------------------------------------------------------+
+//| Create a panel label                                             |
+//+------------------------------------------------------------------+
+void CreatePanelLabel(const string key, const string text, const int x, const int y,
+                      const color clr, const int size = 0)
+{
+   const string name = PanelPrefix + key;
+   ObjectCreate(0, name, OBJ_LABEL, 0, 0, 0);
+   ObjectSetString(0, name, OBJPROP_TEXT, text);
+   ObjectSetInteger(0, name, OBJPROP_CORNER, PanelCorner);
+
+   int adjustedX;
+   if(PanelCorner == CORNER_RIGHT_UPPER || PanelCorner == CORNER_RIGHT_LOWER)
+      adjustedX = PanelX + PanelWidth - x;
+   else
+      adjustedX = PanelX + x;
+
+   ObjectSetInteger(0, name, OBJPROP_XDISTANCE, adjustedX);
+   ObjectSetInteger(0, name, OBJPROP_YDISTANCE, PanelY + y);
+   ObjectSetInteger(0, name, OBJPROP_COLOR, clr);
+   ObjectSetInteger(0, name, OBJPROP_FONTSIZE, (size > 0) ? size : PanelFontSize);
+   ObjectSetString(0, name, OBJPROP_FONT, PanelFontName);
+   ObjectSetInteger(0, name, OBJPROP_SELECTABLE, false);
+   HideObject(name);
+}
+
+//+------------------------------------------------------------------+
+//| Update a panel label only if text/color actually changed         |
+//+------------------------------------------------------------------+
+void SetPanelLabel(const string key, const string text, const color clr = clrNONE)
+{
+   const string name = PanelPrefix + key;
+
+   if(ObjectFind(0, name) < 0)
+      return;
+
+   const string current = ObjectGetString(0, name, OBJPROP_TEXT);
+   if(current != text)
+   {
+      ObjectSetString(0, name, OBJPROP_TEXT, text);
+      g_panelDirty = true;
+   }
+
+   if(clr != clrNONE && (color)ObjectGetInteger(0, name, OBJPROP_COLOR) != clr)
+   {
+      ObjectSetInteger(0, name, OBJPROP_COLOR, clr);
+      g_panelDirty = true;
+   }
+}
+
+//+------------------------------------------------------------------+
+//| Create all panel objects                                         |
+//+------------------------------------------------------------------+
+void CreatePanelObjects()
+{
+   int bgX = PanelX;
+   if(PanelCorner == CORNER_RIGHT_UPPER || PanelCorner == CORNER_RIGHT_LOWER)
+      bgX = PanelX + PanelWidth;
+
+   if(ShowBackground)
+   {
+      const string bg = PanelPrefix + "BG";
+      ObjectCreate(0, bg, OBJ_RECTANGLE_LABEL, 0, 0, 0);
+      ObjectSetInteger(0, bg, OBJPROP_CORNER, PanelCorner);
+      ObjectSetInteger(0, bg, OBJPROP_XDISTANCE, bgX);
+      ObjectSetInteger(0, bg, OBJPROP_YDISTANCE, PanelY);
+      ObjectSetInteger(0, bg, OBJPROP_XSIZE, PanelWidth);
+      ObjectSetInteger(0, bg, OBJPROP_YSIZE, PanelHeight);
+      ObjectSetInteger(0, bg, OBJPROP_BGCOLOR, PanelBGColor);
+      ObjectSetInteger(0, bg, OBJPROP_BORDER_TYPE, BORDER_FLAT);
+      ObjectSetInteger(0, bg, OBJPROP_COLOR, clrGray);
+      ObjectSetInteger(0, bg, OBJPROP_BACK, false);
+      ObjectSetInteger(0, bg, OBJPROP_SELECTABLE, false);
+      HideObject(bg);
+   }
+
+   //--- Title (symbol + floating profit)
+   CreatePanelLabel("Title", _Symbol + ": 0.00", 10, 5, clrGold, 12);
+
+   //--- Sessions
+   string names[3] = {"Asian", "London", "NY"};
+   int    rowY[3]  = {30, 50, 70};
+
+   for(int i = 0; i < 3; i++)
+   {
+      string caption = names[i] + ":";
+      if(ShowSessionTimes)
+         caption = StringFormat("%s (%02d:%02d-%02d:%02d):", names[i],
+                                g_sessStart[i] / 60, g_sessStart[i] % 60,
+                                g_sessEnd[i]   / 60, g_sessEnd[i]   % 60);
+
+      CreatePanelLabel(g_sessKey[i] + "Label", caption, 10, rowY[i], clrLightSkyBlue);
+      CreatePanelLabel(g_sessKey[i] + "Value", "Calculating...", 140, rowY[i], clrLime);
+   }
+
+   //--- Separator
+   CreatePanelLabel("Separator", "----------------------------------------", 5, 85, clrGray);
+
+   //--- Next candle / times / status
+   CreatePanelLabel("CandleLabel", "Next Candle:", 10, 115, clrLightSkyBlue);
+   CreatePanelLabel("CandleValue", "...",          95, 115, clrYellow);
+
+   CreatePanelLabel("TimeLabel",   "Current:",     10, 130, clrLightSkyBlue);
+   CreatePanelLabel("TimeValue",   "--:--:--",     70, 130, clrWhite);
+
+   CreatePanelLabel("ServerLabel", "Server:",      10, 145, clrLightSkyBlue);
+   CreatePanelLabel("ServerValue", "--:--:--",     70, 145, clrSilver);
+
+   CreatePanelLabel("StatusLabel", "Status:",      10, 160, clrLightSkyBlue);
+   CreatePanelLabel("StatusValue", "LIVE",         75, 160, clrLimeGreen);
+}
+
+//+------------------------------------------------------------------+
+//| Refresh every dynamic value in the panel                         |
+//+------------------------------------------------------------------+
+void UpdatePanel()
+{
+   //--- GMT time read once, shared by all three sessions
+   MqlDateTime gmt;
+   TimeToStruct(TimeGMT(), gmt);
+   const int nowSec = gmt.hour * 3600 + gmt.min * 60 + gmt.sec;
+
+   for(int i = 0; i < 3; i++)
+   {
+      bool isOpen = false;
+      const string txt = SessionCountdown(g_sessStart[i], g_sessEnd[i], nowSec, isOpen);
+      SetPanelLabel(g_sessKey[i] + "Value", txt, isOpen ? clrLime : clrOrange);
+   }
+
+   //--- Clocks
+   SetPanelLabel("TimeValue", StringFormat("%02d:%02d:%02d", gmt.hour, gmt.min, gmt.sec));
+
+   MqlDateTime srv;
+   TimeToStruct(TimeCurrent(), srv);
+   SetPanelLabel("ServerValue", StringFormat("%02d:%02d:%02d", srv.hour, srv.min, srv.sec));
+
+   UpdateSymbolProfit();
+   UpdateNextCandle();
+   UpdateStatusIndicator();
+
+   //--- Redraw only when something visibly changed
+   if(g_panelDirty)
+   {
+      ChartRedraw(0);
+      g_panelDirty = false;
+   }
+}
+
+//+------------------------------------------------------------------+
+//| Floating profit of open positions on this symbol                 |
+//+------------------------------------------------------------------+
+void UpdateSymbolProfit()
+{
+   double totalProfit = 0.0;
+
+#ifdef __MQL5__
+   const int total = PositionsTotal();
+   for(int i = 0; i < total; i++)
+   {
+      if(PositionGetSymbol(i) != _Symbol)   // also selects the position
+         continue;
+      totalProfit += PositionGetDouble(POSITION_PROFIT) + PositionGetDouble(POSITION_SWAP);
+   }
+#else
+   const int total = OrdersTotal();
+   for(int i = 0; i < total; i++)
+   {
+      if(!OrderSelect(i, SELECT_BY_POS, MODE_TRADES))
+         continue;
+      if(OrderSymbol() != _Symbol)
+         continue;
+      if(OrderType() > OP_SELL)             // skip pending orders
+         continue;
+      totalProfit += OrderProfit() + OrderSwap();
+   }
+#endif
+
+   string txt;
+   color  clr;
+
+   if(totalProfit > 0)
+   {
+      txt = StringFormat("%s: +%.2f", _Symbol, totalProfit);
+      clr = clrLime;
+   }
+   else if(totalProfit < 0)
+   {
+      txt = StringFormat("%s: %.2f", _Symbol, totalProfit);
+      clr = clrAqua;
+   }
+   else
+   {
+      txt = StringFormat("%s: %.2f", _Symbol, totalProfit);
+      clr = clrGold;
+   }
+
+   SetPanelLabel("Title", txt, clr);
+}
+
+//+------------------------------------------------------------------+
+//| Time until the current candle closes                             |
+//+------------------------------------------------------------------+
+void UpdateNextCandle()
+{
+   int secs = (int)(iTime(_Symbol, _Period, 0) + PeriodSeconds() - TimeCurrent());
+   if(secs < 0)
+      secs = 0;
+
+   color clr;
+   if(secs < 30)       clr = clrRed;
+   else if(secs < 60)  clr = clrOrange;
+   else                clr = clrYellow;
+
+   SetPanelLabel("CandleValue", FormatTime(secs), clr);
+}
+
+//+------------------------------------------------------------------+
+//| Blinking LIVE indicator                                          |
+//+------------------------------------------------------------------+
+void UpdateStatusIndicator()
+{
+   static int  counter = 0;
+   static bool blink   = false;
+   counter++;
+
+   if(counter % 2 == 0)
+   {
+      blink = !blink;
+      SetPanelLabel("StatusValue", "LIVE", blink ? clrLimeGreen : clrForestGreen);
+   }
+}
+//+------------------------------------------------------------------+
