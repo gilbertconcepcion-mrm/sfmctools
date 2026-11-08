@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mini Paint</title>
+<style>
+:root{--bg:#d9d4c7;--panel:#eceae3;--ink:#23211c;--line:#9a948382;--accent:#1f5fbf;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1d1c1a;--panel:#2b2925;--ink:#ece8dd;--line:#6f6a5f82;--accent:#6aa3ff}}
+:root[data-theme="dark"]{--bg:#1d1c1a;--panel:#2b2925;--ink:#ece8dd;--line:#6f6a5f82;--accent:#6aa3ff}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.4 "Trebuchet MS","Segoe UI",system-ui,sans-serif;display:flex;flex-direction:column}
+.bar{background:var(--panel);border-bottom:1px solid var(--line);padding:10px 12px;display:flex;flex-wrap:wrap;gap:14px 20px;align-items:center}
+.group{display:flex;align-items:center;gap:8px}
+.palette{display:grid;grid-template-columns:repeat(8,26px);gap:4px}
+.sw{width:26px;height:26px;border:2px solid var(--line);border-radius:4px;cursor:pointer;padding:0}
+.sw.on{outline:3px solid var(--accent);outline-offset:1px}
+button.tool{background:var(--bg);color:var(--ink);border:2px solid var(--line);border-radius:6px;padding:7px 14px;font:inherit;cursor:pointer}
+button.tool.on{border-color:var(--accent);background:var(--accent);color:#fff}
+button.tool:focus-visible,.sw:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+button.danger:hover{border-color:#c0392b;color:#c0392b}
+input[type=color]{width:34px;height:30px;border:2px solid var(--line);border-radius:4px;padding:0;background:none;cursor:pointer}
+input[type=range]{width:120px;accent-color:var(--accent)}
+.dot{display:inline-block;width:34px;height:34px;position:relative}
+.dot i{position:absolute;left:50%;top:50%;border-radius:50%;background:var(--ink);transform:translate(-50%,-50%)}
+.stage{flex:1;min-height:0;padding:14px;overflow:auto}
+canvas{background:#fff;display:block;box-shadow:0 2px 0 var(--line),0 0 0 1px var(--line);touch-action:none;cursor:crosshair;max-width:none}
+</style>
+</head>
+<body>
+<div class="bar">
+  <div class="group">
+    <button class="tool on" id="brush">Brush</button>
+    <button class="tool" id="eraser">Eraser</button>
+  </div>
+  <div class="group" role="group" aria-label="Colors">
+    <div class="palette" id="palette"></div>
+    <input type="color" id="custom" value="#e63946" aria-label="Custom color">
+  </div>
+  <div class="group">
+    <label for="size">Size</label>
+    <input type="range" id="size" min="1" max="60" value="6">
+    <span class="dot"><i id="preview"></i></span>
+    <span id="sizeLabel">6</span>
+  </div>
+  <button class="tool danger" id="clear">Delete all</button>
+</div>
+<div class="stage" id="stage"><canvas id="c" width="1000" height="600"></canvas></div>
+<script>
+const colors=["#000000","#7f7f7f","#880015","#ed1c24","#ff7f27","#fff200","#22b14c","#00a2e8","#3f48cc","#a349a4","#ffffff","#c3c3c3","#b97a57","#ffaec9","#ffc90e","#efe4b0","#b5e61d","#99d9ea","#7092be","#c8bfe7"];
+const cv=document.getElementById("c"),ctx=cv.getContext("2d");
+const pal=document.getElementById("palette"),sizeEl=document.getElementById("size");
+let color="#000000",tool="brush",size=6,drawing=false,last=null;
+
+// size canvas to fill the stage (once), keep white background
+function fit(){
+  const s=document.getElementById("stage");
+  cv.width=Math.max(300,s.clientWidth-28);
+  cv.height=Math.max(300,s.clientHeight-28);
+  ctx.fillStyle="#fff";ctx.fillRect(0,0,cv.width,cv.height);
+}
+fit();
+
+colors.forEach(c=>{
+  const b=document.createElement("button");
+  b.className="sw";b.style.background=c;b.title=c;b.setAttribute("aria-label",c);
+  b.onclick=()=>setColor(c);pal.appendChild(b);
+});
+function setColor(c){
+  color=c;
+  [...pal.children].forEach(b=>b.classList.toggle("on",b.title===c));
+  setTool("brush");updatePreview();
+}
+function setTool(t){
+  tool=t;
+  document.getElementById("brush").classList.toggle("on",t==="brush");
+  document.getElementById("eraser").classList.toggle("on",t==="eraser");
+  updatePreview();
+}
+function updatePreview(){
+  const p=document.getElementById("preview");
+  p.style.width=p.style.height=Math.min(size,34)+"px";
+  p.style.background=tool==="eraser"?"#fff":color;
+  p.style.boxShadow=tool==="eraser"?"0 0 0 1px var(--ink)":"none";
+  document.getElementById("sizeLabel").textContent=size;
+}
+document.getElementById("brush").onclick=()=>setTool("brush");
+document.getElementById("eraser").onclick=()=>setTool("eraser");
+document.getElementById("custom").oninput=e=>setColor(e.target.value);
+sizeEl.oninput=()=>{size=+sizeEl.value;updatePreview()};
+document.getElementById("clear").onclick=()=>{
+  ctx.fillStyle="#fff";ctx.fillRect(0,0,cv.width,cv.height);
+};
+
+function pos(e){const r=cv.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top}}
+function stroke(a,b){
+  ctx.strokeStyle=ctx.fillStyle=tool==="eraser"?"#fff":color;
+  ctx.lineWidth=size;ctx.lineCap=ctx.lineJoin="round";
+  ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();
+}
+cv.addEventListener("pointerdown",e=>{
+  drawing=true;cv.setPointerCapture(e.pointerId);last=pos(e);
+  ctx.fillStyle=tool==="eraser"?"#fff":color;
+  ctx.beginPath();ctx.arc(last.x,last.y,size/2,0,Math.PI*2);ctx.fill();
+});
+cv.addEventListener("pointermove",e=>{
+  if(!drawing)return;const p=pos(e);stroke(last,p);last=p;
+});
+["pointerup","pointercancel"].forEach(t=>cv.addEventListener(t,()=>{drawing=false}));
+
+setColor("#000000");
+</script>
+</body>
+</html>
