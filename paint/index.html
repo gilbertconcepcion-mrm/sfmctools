@@ -5,29 +5,74 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Mini Paint</title>
 <style>
-:root{--bg:#d9d4c7;--panel:#eceae3;--ink:#23211c;--line:#9a948382;--accent:#1f5fbf;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1d1c1a;--panel:#2b2925;--ink:#ece8dd;--line:#6f6a5f82;--accent:#6aa3ff}}
-:root[data-theme="dark"]{--bg:#1d1c1a;--panel:#2b2925;--ink:#ece8dd;--line:#6f6a5f82;--accent:#6aa3ff}
+:root{
+  --bg:#d9d4c7;--panel:#eceae3;--ink:#23211c;--line:#9a948382;--accent:#1f5fbf;
+  --danger:#c0392b;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1d1c1a;--panel:#2b2925;--ink:#ece8dd;--line:#6f6a5f82;--accent:#6aa3ff;--danger:#ff6b5c}}
+:root[data-theme="dark"]{--bg:#1d1c1a;--panel:#2b2925;--ink:#ece8dd;--line:#6f6a5f82;--accent:#6aa3ff;--danger:#ff6b5c}
 *{box-sizing:border-box}
 html,body{height:100%;margin:0}
-body{background:var(--bg);color:var(--ink);font:15px/1.4 "Trebuchet MS","Segoe UI",system-ui,sans-serif;display:flex;flex-direction:row}
-.bar{background:var(--panel);border-right:1px solid var(--line);padding:12px;display:flex;flex-direction:column;gap:18px;align-items:stretch;width:220px;flex-shrink:0;overflow-y:auto}
+body{
+  background:var(--bg);color:var(--ink);
+  font:15px/1.4 "Trebuchet MS","Segoe UI",system-ui,sans-serif;
+  display:flex;flex-direction:row;overflow:hidden;
+}
+.bar{
+  background:var(--panel);border-right:1px solid var(--line);
+  padding:12px;display:flex;flex-direction:column;gap:14px;
+  align-items:stretch;width:220px;flex-shrink:0;overflow-y:auto;
+}
 .group{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
 .group button.tool{flex:1;display:flex;align-items:center;justify-content:center}
-@media (max-width:600px){.bar{width:180px}}
+@media (max-width:600px){.bar{width:160px;padding:10px}.palette{grid-template-columns:repeat(4,22px)}.sw{width:22px;height:22px}}
 .palette{display:grid;grid-template-columns:repeat(5,26px);gap:4px}
-.sw{width:26px;height:26px;border:2px solid var(--line);border-radius:4px;cursor:pointer;padding:0}
+.sw{width:26px;height:26px;border:2px solid var(--line);border-radius:4px;cursor:pointer;padding:0;transition:transform .08s}
+.sw:hover{transform:scale(1.1)}
 .sw.on{outline:3px solid var(--accent);outline-offset:1px}
-button.tool{background:var(--bg);color:var(--ink);border:2px solid var(--line);border-radius:6px;padding:7px 14px;font:inherit;cursor:pointer}
+button.tool{
+  background:var(--bg);color:var(--ink);border:2px solid var(--line);
+  border-radius:6px;padding:7px 12px;font:inherit;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  transition:background .1s,border-color .1s,transform .05s,opacity .1s;
+}
+button.tool:active{transform:scale(.97)}
 button.tool.on{border-color:var(--accent);background:var(--accent);color:#fff}
-button.tool:focus-visible,.sw:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
-button.danger:hover{border-color:#c0392b;color:#c0392b}
-input[type=color]{width:34px;height:30px;border:2px solid var(--line);border-radius:4px;padding:0;background:none;cursor:pointer}
-input[type=range]{width:100%;accent-color:var(--accent)}
-.dot{display:inline-block;width:34px;height:34px;position:relative}
-.dot i{position:absolute;left:50%;top:50%;border-radius:50%;background:var(--ink);transform:translate(-50%,-50%)}
-.stage{flex:1;min-height:0;padding:14px;overflow:auto}
-canvas{background:#fff;display:block;box-shadow:0 2px 0 var(--line),0 0 0 1px var(--line);touch-action:none;cursor:crosshair;max-width:none}
+button.tool:focus-visible,.sw:focus-visible,input:focus-visible{
+  outline:3px solid var(--accent);outline-offset:2px;
+}
+button.tool.danger{border-color:var(--line);color:var(--ink)}
+button.tool.danger:hover{border-color:var(--danger);color:var(--danger)}
+button.tool:disabled{
+  opacity:.4;cursor:not-allowed;transform:none;
+}
+button.tool:disabled:active{transform:none}
+input[type=color]{
+  width:38px;height:30px;border:2px solid var(--line);border-radius:4px;
+  padding:0;background:none;cursor:pointer;
+}
+input[type=color]::-webkit-color-swatch-wrapper{padding:0}
+input[type=color]::-webkit-color-swatch{border:none;border-radius:2px}
+input[type=range]{width:100%;accent-color:var(--accent);cursor:pointer}
+.dot{
+  display:inline-flex;width:38px;height:38px;align-items:center;justify-content:center;
+  border:1px dashed var(--line);border-radius:50%;flex-shrink:0;
+}
+.dot i{display:block;border-radius:50%;background:var(--ink);transition:width .08s,height .08s}
+.stage{flex:1;min-height:0;padding:14px;overflow:auto;display:flex;align-items:flex-start;justify-content:center}
+canvas{
+  background:#fff;display:block;
+  box-shadow:0 2px 0 var(--line),0 0 0 1px var(--line);
+  touch-action:none;cursor:crosshair;max-width:none;border-radius:2px;
+}
+canvas.bucket{cursor:cell}
+canvas.pencil{cursor:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round'><path d='M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z'/></svg>") 2 22, crosshair}
+canvas.line{cursor:crosshair}
+kbd{
+  font:inherit;font-size:11px;background:var(--bg);border:1px solid var(--line);
+  border-radius:3px;padding:1px 5px;opacity:.75;
+}
+.hint{font-size:12px;opacity:.65;line-height:1.3;margin-top:4px}
 </style>
 </head>
 <body>
@@ -36,82 +81,340 @@ canvas{background:#fff;display:block;box-shadow:0 2px 0 var(--line),0 0 0 1px va
     <div class="palette" id="palette"></div>
     <input type="color" id="custom" value="#e63946" aria-label="Custom color">
   </div>
+
   <div class="group">
     <label for="size">Size</label>
-    <input type="range" id="size" min="1" max="60" value="6">
+    <input type="range" id="size" min="1" max="60" value="6" aria-describedby="sizeLabel">
     <span class="dot"><i id="preview"></i></span>
     <span id="sizeLabel">6</span>
   </div>
-  <div class="group" style="margin-top:auto">
-    <button class="tool on" id="brush" title="Brush" aria-label="Brush"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9.06 11.9 8.07-8.06a2.85 2.85 0 1 1 4.03 4.03l-8.06 8.08"/><path d="M7.07 14.94c-1.66 0-3 1.35-3 3.02 0 1.33-2.5 1.52-2 2.02 1.08 1.1 2.49 2.02 4 2.02 2.2 0 4-1.8 4-4.04a3.01 3.01 0 0 0-3-3.02z"/></svg></button>
-    <button class="tool" id="eraser" title="Eraser" aria-label="Eraser"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21"/><path d="M22 21H7"/><path d="m5 11 9 9"/></svg></button>
+
+  <div class="group" role="group" aria-label="Tools">
+    <button class="tool on" id="brush" title="Brush (B)" aria-label="Brush">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9.06 11.9 8.07-8.06a2.85 2.85 0 1 1 4.03 4.03l-8.06 8.08"/><path d="M7.07 14.94c-1.66 0-3 1.35-3 3.02 0 1.33-2.5 1.52-2 2.02 1.08 1.1 2.49 2.02 4 2.02 2.2 0 4-1.8 4-4.04a3.01 3.01 0 0 0-3-3.02z"/></svg>
+    </button>
+    <button class="tool" id="pencil" title="Pencil (P)" aria-label="Pencil">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+    </button>
+    <button class="tool" id="line" title="Line (L) — straight line" aria-label="Line">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="19" x2="19" y2="5"/></svg>
+    </button>
+    <button class="tool" id="eraser" title="Eraser (E)" aria-label="Eraser">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21"/><path d="M22 21H7"/><path d="m5 11 9 9"/></svg>
+    </button>
+    <button class="tool" id="bucket" title="Paint bucket (G)" aria-label="Paint bucket">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m19 11-8-8-8.6 8.6a2 2 0 0 0 0 2.8l5.2 5.2c.8.8 2 .8 2.8 0L19 11Z"/><path d="m5 2 5 5"/><path d="M2 13h15"/><path d="M22 20a2 2 0 1 1-4 0c0-1.6 1.7-2.4 2-4 .3 1.6 2 2.4 2 4Z"/></svg>
+    </button>
   </div>
-  <button class="tool danger" id="clear">Delete all</button>
+
+  <div class="group">
+    <button class="tool" id="undo" title="Undo (Ctrl+Z)" aria-label="Undo" disabled>
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7v6h6"/><path d="M3 13a9 9 0 1 0 3-7.7L3 8"/></svg>
+      <span>Undo</span>
+    </button>
+  </div>
+
+  <button class="tool danger" id="clear" title="Delete all">Delete all</button>
+  <div class="hint">Shortcuts: <kbd>B</kbd> brush · <kbd>P</kbd> pencil · <kbd>L</kbd> line · <kbd>E</kbd> eraser · <kbd>G</kbd> bucket · <kbd>Ctrl</kbd>+<kbd>Z</kbd> undo</div>
 </div>
+
 <div class="stage" id="stage"><canvas id="c" width="1000" height="600"></canvas></div>
+
 <script>
-const colors=["#000000","#7f7f7f","#880015","#ed1c24","#ff7f27","#fff200","#22b14c","#00a2e8","#3f48cc","#a349a4","#ffffff","#c3c3c3","#b97a57","#ffaec9","#ffc90e","#efe4b0","#b5e61d","#99d9ea","#7092be","#c8bfe7"];
-const cv=document.getElementById("c"),ctx=cv.getContext("2d");
-const pal=document.getElementById("palette"),sizeEl=document.getElementById("size");
-let color="#000000",tool="brush",size=6,drawing=false,last=null;
+(() => {
+  const colors = ["#000000","#7f7f7f","#880015","#ed1c24","#ff7f27","#fff200","#22b14c","#00a2e8","#3f48cc","#a349a4","#ffffff","#c3c3c3","#b97a57","#ffaec9","#ffc90e","#efe4b0","#b5e61d","#99d9ea","#7092be","#c8bfe7"];
 
-// size canvas to fill the stage (once), keep white background
-function fit(){
-  const s=document.getElementById("stage");
-  cv.width=Math.max(300,s.clientWidth-28);
-  cv.height=Math.max(300,s.clientHeight-28);
-  ctx.fillStyle="#fff";ctx.fillRect(0,0,cv.width,cv.height);
-}
-fit();
+  const cv = document.getElementById("c");
+  const ctx = cv.getContext("2d", { willReadFrequently: true });
+  const pal = document.getElementById("palette");
+  const sizeEl = document.getElementById("size");
+  const stage = document.getElementById("stage");
+  const undoBtn = document.getElementById("undo");
 
-colors.forEach(c=>{
-  const b=document.createElement("button");
-  b.className="sw";b.style.background=c;b.title=c;b.setAttribute("aria-label",c);
-  b.onclick=()=>setColor(c);pal.appendChild(b);
-});
-function setColor(c){
-  color=c;
-  [...pal.children].forEach(b=>b.classList.toggle("on",b.title===c));
-  setTool("brush");updatePreview();
-}
-function setTool(t){
-  tool=t;
-  document.getElementById("brush").classList.toggle("on",t==="brush");
-  document.getElementById("eraser").classList.toggle("on",t==="eraser");
-  updatePreview();
-}
-function updatePreview(){
-  const p=document.getElementById("preview");
-  p.style.width=p.style.height=Math.min(size,34)+"px";
-  p.style.background=tool==="eraser"?"#fff":color;
-  p.style.boxShadow=tool==="eraser"?"0 0 0 1px var(--ink)":"none";
-  document.getElementById("sizeLabel").textContent=size;
-}
-document.getElementById("brush").onclick=()=>setTool("brush");
-document.getElementById("eraser").onclick=()=>setTool("eraser");
-document.getElementById("custom").oninput=e=>setColor(e.target.value);
-sizeEl.oninput=()=>{size=+sizeEl.value;updatePreview()};
-document.getElementById("clear").onclick=()=>{
-  ctx.fillStyle="#fff";ctx.fillRect(0,0,cv.width,cv.height);
-};
+  let color = "#000000";
+  let tool = "brush";
+  let size = 6;
+  // separate remembered sizes per tool so switching tools feels natural
+  const toolSizes = { brush: 6, pencil: 1, line: 6, eraser: 6, bucket: 6 };
+  let drawing = false;
+  let last = null;
+  let lineStart = null;
+  let linePreviewSnapshot = null;
+  let customSwatch = null;
 
-function pos(e){const r=cv.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top}}
-function stroke(a,b){
-  ctx.strokeStyle=ctx.fillStyle=tool==="eraser"?"#fff":color;
-  ctx.lineWidth=size;ctx.lineCap=ctx.lineJoin="round";
-  ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();
-}
-cv.addEventListener("pointerdown",e=>{
-  drawing=true;cv.setPointerCapture(e.pointerId);last=pos(e);
-  ctx.fillStyle=tool==="eraser"?"#fff":color;
-  ctx.beginPath();ctx.arc(last.x,last.y,size/2,0,Math.PI*2);ctx.fill();
-});
-cv.addEventListener("pointermove",e=>{
-  if(!drawing)return;const p=pos(e);stroke(last,p);last=p;
-});
-["pointerup","pointercancel"].forEach(t=>cv.addEventListener(t,()=>{drawing=false}));
+  // ---------- Canvas sizing (debounced) ----------
+  let fitTimer = null;
+  function fit() {
+    const w = Math.max(300, stage.clientWidth - 28);
+    const h = Math.max(300, stage.clientHeight - 28);
+    if (w === cv.width && h === cv.height) return;
+    const snapshot = document.createElement("canvas");
+    snapshot.width = cv.width;
+    snapshot.height = cv.height;
+    snapshot.getContext("2d").drawImage(cv, 0, 0);
+    cv.width = w;
+    cv.height = h;
+    ctx.fillStyle = "#fff";
+    ctx.fillRect(0, 0, w, h);
+    ctx.drawImage(snapshot, 0, 0);
+  }
+  function scheduleFit() { clearTimeout(fitTimer); fitTimer = setTimeout(fit, 150); }
+  fit();
+  window.addEventListener("resize", scheduleFit);
 
-setColor("#000000");
+  // ---------- Palette ----------
+  colors.forEach(c => {
+    const b = document.createElement("button");
+    b.className = "sw";
+    b.style.background = c;
+    b.title = c;
+    b.setAttribute("aria-label", "color " + c);
+    b.dataset.color = c;
+    b.onclick = () => setColor(c);
+    pal.appendChild(b);
+  });
+
+  function setColor(c) {
+    color = c;
+    [...pal.children].forEach(b => b.classList.toggle("on", b.dataset.color === c));
+    document.getElementById("custom").value = c;
+    if (customSwatch) customSwatch.remove(), customSwatch = null;
+    if (tool === "eraser") setTool("brush");
+    updatePreview();
+  }
+
+  function setTool(t) {
+    // remember current size for the outgoing tool
+    if (tool) toolSizes[tool] = size;
+    tool = t;
+    // restore the size remembered for the new tool
+    size = toolSizes[t] ?? 6;
+    sizeEl.value = size;
+
+    document.getElementById("brush").classList.toggle("on", t === "brush");
+    document.getElementById("pencil").classList.toggle("on", t === "pencil");
+    document.getElementById("line").classList.toggle("on", t === "line");
+    document.getElementById("eraser").classList.toggle("on", t === "eraser");
+    document.getElementById("bucket").classList.toggle("on", t === "bucket");
+    cv.classList.toggle("bucket", t === "bucket");
+    cv.classList.toggle("pencil", t === "pencil");
+    cv.classList.toggle("line", t === "line");
+    updatePreview();
+  }
+
+  function updatePreview() {
+    const p = document.getElementById("preview");
+    const d = Math.min(size, 34);
+    p.style.width = p.style.height = Math.max(d, 3) + "px";
+    p.style.background = tool === "eraser" ? "#fff" : color;
+    p.style.boxShadow = tool === "eraser" ? "inset 0 0 0 1px var(--ink)" : "none";
+    document.getElementById("sizeLabel").textContent = size;
+  }
+
+  // ---------- Controls ----------
+  document.getElementById("brush").onclick  = () => setTool("brush");
+  document.getElementById("pencil").onclick = () => setTool("pencil");
+  document.getElementById("line").onclick   = () => setTool("line");
+  document.getElementById("eraser").onclick = () => setTool("eraser");
+  document.getElementById("bucket").onclick = () => setTool("bucket");
+  undoBtn.onclick = () => undo();
+
+  document.getElementById("custom").oninput = e => setColor(e.target.value);
+
+  sizeEl.oninput = () => {
+    size = +sizeEl.value;
+    toolSizes[tool] = size;
+    updatePreview();
+  };
+
+  document.getElementById("clear").onclick = () => {
+    pushUndo();
+    ctx.fillStyle = "#fff";
+    ctx.fillRect(0, 0, cv.width, cv.height);
+  };
+
+  window.addEventListener("keydown", e => {
+    if (e.target.matches("input, textarea")) return;
+    const k = e.key.toLowerCase();
+    if (k === "b") setTool("brush");
+    else if (k === "p") setTool("pencil");
+    else if (k === "l") setTool("line");
+    else if (k === "e") setTool("eraser");
+    else if (k === "g") setTool("bucket");
+    else if ((e.ctrlKey || e.metaKey) && k === "z") { e.preventDefault(); undo(); }
+  });
+
+  // ---------- Undo ----------
+  const undoStack = [];
+  const MAX_UNDO = 20;
+
+  function updateUndoButton() {
+    undoBtn.disabled = undoStack.length === 0;
+  }
+
+  function pushUndo() {
+    try {
+      undoStack.push(ctx.getImageData(0, 0, cv.width, cv.height));
+      if (undoStack.length > MAX_UNDO) undoStack.shift();
+      updateUndoButton();
+    } catch (_) { /* ignore quota errors */ }
+  }
+  function undo() {
+    const snap = undoStack.pop();
+    if (!snap) return;
+    ctx.putImageData(snap, 0, 0);
+    updateUndoButton();
+  }
+
+  // ---------- Drawing helpers ----------
+  function getPos(e) {
+    const r = cv.getBoundingClientRect();
+    return {
+      x: (e.clientX - r.left) * (cv.width / r.width),
+      y: (e.clientY - r.top) * (cv.height / r.height)
+    };
+  }
+
+  function strokeColor() {
+    return tool === "eraser" ? "#fff" : color;
+  }
+
+  function currentWidth() {
+    return size;
+  }
+
+  function drawSegment(a, b) {
+    ctx.strokeStyle = strokeColor();
+    ctx.lineWidth = currentWidth();
+    ctx.lineCap = ctx.lineJoin = "round";
+    ctx.beginPath();
+    ctx.moveTo(a.x, a.y);
+    ctx.lineTo(b.x, b.y);
+    ctx.stroke();
+  }
+
+  function drawDot(p) {
+    const w = currentWidth();
+    ctx.fillStyle = strokeColor();
+    if (tool === "pencil" && w === 1) {
+      // 1px: a single crisp pixel is sharper than an anti-aliased arc
+      ctx.fillRect(Math.floor(p.x), Math.floor(p.y), 1, 1);
+    } else {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, w / 2, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  // ---------- Flood fill ----------
+  function hexToRgb(hex) {
+    hex = hex.replace("#", "");
+    if (hex.length === 3) hex = hex.split("").map(c => c + c).join("");
+    return { r: parseInt(hex.slice(0,2),16), g: parseInt(hex.slice(2,4),16), b: parseInt(hex.slice(4,6),16) };
+  }
+
+  function floodFill(startX, startY, fillHex) {
+    const w = cv.width, h = cv.height;
+    if (startX < 0 || startY < 0 || startX >= w || startY >= h) return;
+
+    pushUndo();
+    const img = ctx.getImageData(0, 0, w, h);
+    const data = img.data;
+    const fill = hexToRgb(fillHex);
+    const si = (startY * w + startX) * 4;
+    const startR = data[si], startG = data[si+1], startB = data[si+2], startA = data[si+3];
+
+    if (startA === 255 && startR === fill.r && startG === fill.g && startB === fill.b) return;
+
+    const tolerance = 24;
+    const isMatch = (r,g,b,a) =>
+      a === startA &&
+      Math.abs(r - startR) <= tolerance &&
+      Math.abs(g - startG) <= tolerance &&
+      Math.abs(b - startB) <= tolerance;
+
+    const stack = [startX + startY * w];
+    const seen = new Uint8Array(w * h);
+    while (stack.length) {
+      const idx = stack.pop();
+      if (seen[idx]) continue;
+      seen[idx] = 1;
+      const pi = idx * 4;
+      if (!isMatch(data[pi], data[pi+1], data[pi+2], data[pi+3])) continue;
+      data[pi] = fill.r; data[pi+1] = fill.g; data[pi+2] = fill.b; data[pi+3] = 255;
+      const x = idx % w, y = (idx / w) | 0;
+      if (x > 0)     stack.push(idx - 1);
+      if (x < w - 1) stack.push(idx + 1);
+      if (y > 0)     stack.push(idx - w);
+      if (y < h - 1) stack.push(idx + w);
+    }
+    ctx.putImageData(img, 0, 0);
+  }
+
+  // ---------- Pointer events ----------
+  cv.addEventListener("pointerdown", e => {
+    e.preventDefault();
+
+    if (tool === "bucket") {
+      const p = getPos(e);
+      floodFill(Math.floor(p.x), Math.floor(p.y), color);
+      return;
+    }
+
+    if (tool === "line") {
+      pushUndo();
+      drawing = true;
+      cv.setPointerCapture(e.pointerId);
+      lineStart = getPos(e);
+      linePreviewSnapshot = ctx.getImageData(0, 0, cv.width, cv.height);
+      return;
+    }
+
+    pushUndo();
+    drawing = true;
+    cv.setPointerCapture(e.pointerId);
+    last = getPos(e);
+    drawDot(last);
+  });
+
+  cv.addEventListener("pointermove", e => {
+    if (!drawing) return;
+
+    if (tool === "line") {
+      if (!lineStart || !linePreviewSnapshot) return;
+      ctx.putImageData(linePreviewSnapshot, 0, 0);
+      const p = getPos(e);
+      ctx.strokeStyle = strokeColor();
+      ctx.lineWidth = currentWidth();
+      ctx.lineCap = ctx.lineJoin = "round";
+      ctx.beginPath();
+      ctx.moveTo(lineStart.x, lineStart.y);
+      ctx.lineTo(p.x, p.y);
+      ctx.stroke();
+      return;
+    }
+
+    const p = getPos(e);
+    drawSegment(last, p);
+    last = p;
+  });
+
+  function endStroke() {
+    if (tool === "line" && linePreviewSnapshot) {
+      linePreviewSnapshot = null;
+    }
+    drawing = false;
+    last = null;
+    lineStart = null;
+  }
+
+  ["pointerup", "pointercancel"].forEach(t => cv.addEventListener(t, endStroke));
+
+  // ---------- Init ----------
+  setColor("#000000");
+  setTool("brush");
+  updateUndoButton();
+})();
 </script>
 </body>
 </html>
